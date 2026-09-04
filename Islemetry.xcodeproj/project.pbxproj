@@ -1,0 +1,240 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000000000000000000001 /* IslemetryApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000001 /* IslemetryApp.swift */; };
+		A10000000000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000002 /* ContentView.swift */; };
+		A10000000000000000000003 /* DeviceMetric.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000003 /* DeviceMetric.swift */; };
+		A10000000000000000000004 /* DeviceTelemetryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000004 /* DeviceTelemetryStore.swift */; };
+		A10000000000000000000005 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000005 /* LiveActivityManager.swift */; };
+		A10000000000000000000006 /* DeviceActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000006 /* DeviceActivityAttributes.swift */; };
+		A10000000000000000000007 /* IslemetryWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000007 /* IslemetryWidgetsBundle.swift */; };
+		A10000000000000000000008 /* IslemetryLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000008 /* IslemetryLiveActivity.swift */; };
+		A10000000000000000000009 /* DeviceActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000006 /* DeviceActivityAttributes.swift */; };
+		A1000000000000000000000A /* IslemetryWidgets.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = F1000000000000000000000A /* IslemetryWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C10000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = P10000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = T10000000000000000000002;
+			remoteInfo = IslemetryWidgets;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D10000000000000000000001 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A1000000000000000000000A /* IslemetryWidgets.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		F10000000000000000000001 /* IslemetryApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslemetryApp.swift; sourceTree = "<group>"; };
+		F10000000000000000000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		F10000000000000000000003 /* DeviceMetric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceMetric.swift; sourceTree = "<group>"; };
+		F10000000000000000000004 /* DeviceTelemetryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceTelemetryStore.swift; sourceTree = "<group>"; };
+		F10000000000000000000005 /* LiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityManager.swift; sourceTree = "<group>"; };
+		F10000000000000000000006 /* DeviceActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceActivityAttributes.swift; sourceTree = "<group>"; };
+		F10000000000000000000007 /* IslemetryWidgetsBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslemetryWidgetsBundle.swift; sourceTree = "<group>"; };
+		F10000000000000000000008 /* IslemetryLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslemetryLiveActivity.swift; sourceTree = "<group>"; };
+		F10000000000000000000009 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F1000000000000000000000B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F1000000000000000000000C /* Islemetry.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Islemetry.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F1000000000000000000000A /* IslemetryWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = IslemetryWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E10000000000000000000001 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		E10000000000000000000002 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		G10000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				G10000000000000000000002 /* Islemetry */,
+				G10000000000000000000006 /* Shared */,
+				G10000000000000000000007 /* IslemetryWidgets */,
+				G10000000000000000000008 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		G10000000000000000000002 /* Islemetry */ = {
+			isa = PBXGroup;
+			children = (
+				G10000000000000000000003 /* App */,
+				G10000000000000000000004 /* Models */,
+				G10000000000000000000005 /* Services */,
+				F10000000000000000000009 /* Info.plist */,
+			);
+			path = Islemetry;
+			sourceTree = "<group>";
+		};
+		G10000000000000000000003 /* App */ = {
+			isa = PBXGroup;
+			children = (F10000000000000000000001, F10000000000000000000002, );
+			path = App;
+			sourceTree = "<group>";
+		};
+		G10000000000000000000004 /* Models */ = {
+			isa = PBXGroup;
+			children = (F10000000000000000000003, );
+			path = Models;
+			sourceTree = "<group>";
+		};
+		G10000000000000000000005 /* Services */ = {
+			isa = PBXGroup;
+			children = (F10000000000000000000004, F10000000000000000000005, );
+			path = Services;
+			sourceTree = "<group>";
+		};
+		G10000000000000000000006 /* Shared */ = {
+			isa = PBXGroup;
+			children = (F10000000000000000000006, );
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		G10000000000000000000007 /* IslemetryWidgets */ = {
+			isa = PBXGroup;
+			children = (F10000000000000000000007, F10000000000000000000008, F1000000000000000000000B, );
+			path = IslemetryWidgets;
+			sourceTree = "<group>";
+		};
+		G10000000000000000000008 /* Products */ = {
+			isa = PBXGroup;
+			children = (F1000000000000000000000C /* Islemetry.app */, F1000000000000000000000A /* IslemetryWidgets.appex */, );
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		T10000000000000000000001 /* Islemetry */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = L10000000000000000000002 /* Build configuration list for PBXNativeTarget "Islemetry" */;
+			buildPhases = (
+				S10000000000000000000001 /* Sources */,
+				E10000000000000000000001 /* Frameworks */,
+				R10000000000000000000001 /* Resources */,
+				D10000000000000000000001 /* Embed App Extensions */,
+			);
+			buildRules = ();
+			dependencies = (Y10000000000000000000001 /* PBXTargetDependency */, );
+			name = Islemetry;
+			productName = Islemetry;
+			productReference = F1000000000000000000000C /* Islemetry.app */;
+			productType = "com.apple.product-type.application";
+		};
+		T10000000000000000000002 /* IslemetryWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = L10000000000000000000003 /* Build configuration list for PBXNativeTarget "IslemetryWidgets" */;
+			buildPhases = (
+				S10000000000000000000002 /* Sources */,
+				E10000000000000000000002 /* Frameworks */,
+				R10000000000000000000002 /* Resources */,
+			);
+			buildRules = ();
+			dependencies = ();
+			name = IslemetryWidgets;
+			productName = IslemetryWidgets;
+			productReference = F1000000000000000000000A /* IslemetryWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		P10000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2600;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					T10000000000000000000001 = {CreatedOnToolsVersion = 26.0; };
+					T10000000000000000000002 = {CreatedOnToolsVersion = 26.0; };
+				};
+			};
+			buildConfigurationList = L10000000000000000000001 /* Build configuration list for PBXProject "Islemetry" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (en, Base, );
+			mainGroup = G10000000000000000000001;
+			productRefGroup = G10000000000000000000008 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (T10000000000000000000001 /* Islemetry */, T10000000000000000000002 /* IslemetryWidgets */, );
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		R10000000000000000000001 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		R10000000000000000000002 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		S10000000000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000001,
+				A10000000000000000000002,
+				A10000000000000000000003,
+				A10000000000000000000004,
+				A10000000000000000000005,
+				A10000000000000000000006,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		S10000000000000000000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000007,
+				A10000000000000000000008,
+				A10000000000000000000009,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		Y10000000000000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = T10000000000000000000002 /* IslemetryWidgets */;
+			targetProxy = C10000000000000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		B10000000000000000000001 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {CLANG_ENABLE_MODULES = YES; DEBUG_INFORMATION_FORMAT = dwarf; ENABLE_TESTABILITY = YES; GCC_C_LANGUAGE_STANDARD = gnu17; IPHONEOS_DEPLOYMENT_TARGET = 17.0; ONLY_ACTIVE_ARCH = YES; SDKROOT = iphoneos; SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)"; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; }; name = Debug; };
+		B10000000000000000000002 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {CLANG_ENABLE_MODULES = YES; DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym"; GCC_C_LANGUAGE_STANDARD = gnu17; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SDKROOT = iphoneos; SWIFT_COMPILATION_MODE = wholemodule; SWIFT_OPTIMIZATION_LEVEL = "-O"; }; name = Release; };
+		B10000000000000000000003 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; DEVELOPMENT_ASSET_PATHS = ""; INFOPLIST_FILE = Islemetry/Info.plist; IPHONEOS_DEPLOYMENT_TARGET = 17.0; LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks"; MARKETING_VERSION = 0.1; PRODUCT_BUNDLE_IDENTIFIER = com.tiburonns.islemetry; PRODUCT_NAME = "$(TARGET_NAME)"; SWIFT_EMIT_LOC_STRINGS = YES; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = 1; }; name = Debug; };
+		B10000000000000000000004 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; INFOPLIST_FILE = Islemetry/Info.plist; IPHONEOS_DEPLOYMENT_TARGET = 17.0; LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks"; MARKETING_VERSION = 0.1; PRODUCT_BUNDLE_IDENTIFIER = com.tiburonns.islemetry; PRODUCT_NAME = "$(TARGET_NAME)"; SWIFT_EMIT_LOC_STRINGS = YES; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = 1; }; name = Release; };
+		B10000000000000000000005 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {APPLICATION_EXTENSION_API_ONLY = YES; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; INFOPLIST_FILE = IslemetryWidgets/Info.plist; IPHONEOS_DEPLOYMENT_TARGET = 17.0; LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../../Frameworks @executable_path/Frameworks"; MARKETING_VERSION = 0.1; PRODUCT_BUNDLE_IDENTIFIER = com.tiburonns.islemetry.widgets; PRODUCT_NAME = "$(TARGET_NAME)"; SKIP_INSTALL = YES; SWIFT_EMIT_LOC_STRINGS = YES; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = 1; }; name = Debug; };
+		B10000000000000000000006 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {APPLICATION_EXTENSION_API_ONLY = YES; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; INFOPLIST_FILE = IslemetryWidgets/Info.plist; IPHONEOS_DEPLOYMENT_TARGET = 17.0; LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../../Frameworks @executable_path/Frameworks"; MARKETING_VERSION = 0.1; PRODUCT_BUNDLE_IDENTIFIER = com.tiburonns.islemetry.widgets; PRODUCT_NAME = "$(TARGET_NAME)"; SKIP_INSTALL = YES; SWIFT_EMIT_LOC_STRINGS = YES; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = 1; }; name = Release; };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		L10000000000000000000001 /* Build configuration list for PBXProject "Islemetry" */ = {isa = XCConfigurationList; buildConfigurations = (B10000000000000000000001, B10000000000000000000002, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		L10000000000000000000002 /* Build configuration list for PBXNativeTarget "Islemetry" */ = {isa = XCConfigurationList; buildConfigurations = (B10000000000000000000003, B10000000000000000000004, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		L10000000000000000000003 /* Build configuration list for PBXNativeTarget "IslemetryWidgets" */ = {isa = XCConfigurationList; buildConfigurations = (B10000000000000000000005, B10000000000000000000006, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+	};
+	rootObject = P10000000000000000000001 /* Project object */;
+}
