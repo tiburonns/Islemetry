@@ -220,20 +220,24 @@ private struct IslandConfigurationView: View {
 
     var body: some View {
         Form {
-            Section("Compact Dynamic Island") {
+            Section {
                 metricPicker("Leading", selection: $leadingMetricRaw)
                 metricPicker("Trailing", selection: $trailingMetricRaw)
+            } header: {
+                Text("Compact Dynamic Island")
             } footer: {
                 Text("These are the two values visible while the Dynamic Island is compact.")
             }
 
-            Section("Expanded Dynamic Island") {
+            Section {
                 expandedPicker("Slot 1", selection: $expanded1)
                 expandedPicker("Slot 2", selection: $expanded2)
                 expandedPicker("Slot 3", selection: $expanded3)
                 expandedPicker("Slot 4", selection: $expanded4)
                 expandedPicker("Slot 5", selection: $expanded5)
                 expandedPicker("Slot 6", selection: $expanded6)
+            } header: {
+                Text("Expanded Dynamic Island")
             } footer: {
                 Text("Choose None for any expanded slot you do not want to display.")
             }
