@@ -8,6 +8,12 @@ final class DeviceTelemetryStore: ObservableObject {
     @Published private(set) var lastUpdated: Date = .distantPast
     @Published private(set) var networkDescription = "Checking…"
 
+    private var networkConstrained = false
+    private var networkExpensive = false
+    private var networkSupportsIPv4 = false
+    private var networkSupportsIPv6 = false
+    private var networkSupportsDNS = false
+
     private let pathMonitor = NWPathMonitor()
     private let monitorQueue = DispatchQueue(label: "com.tiburonns.islemetry.network")
 
@@ -25,23 +31,45 @@ final class DeviceTelemetryStore: ObservableObject {
         let now = Date()
         let processInfo = ProcessInfo.processInfo
         let device = UIDevice.current
+        let screen = UIScreen.main
+
         let batteryLevel = device.batteryLevel >= 0 ? Int((device.batteryLevel * 100).rounded()) : nil
         let memory = ByteCountFormatter.string(fromByteCount: Int64(processInfo.physicalMemory), countStyle: .memory)
-        let storage = storageDescription()
-        let refreshRate = UIScreen.main.maximumFramesPerSecond
+        let storage = storageValues()
+        let refreshRate = screen.maximumFramesPerSecond
+        let brightness = Int((screen.brightness * 100).rounded())
+        let resolution = "\(Int(screen.nativeBounds.width))×\(Int(screen.nativeBounds.height)) px"
+        let displayScale = String(format: "%.2f×", screen.nativeScale)
 
         metrics = [
             DeviceMetric(kind: .battery, title: "Battery", value: batteryLevel.map { "\($0)%" } ?? "Unknown", symbol: batterySymbol(level: batteryLevel), updatedAt: now),
             DeviceMetric(kind: .charging, title: "Power", value: chargingDescription(device.batteryState), symbol: "bolt.fill", updatedAt: now),
             DeviceMetric(kind: .lowPower, title: "Low Power", value: processInfo.isLowPowerModeEnabled ? "On" : "Off", symbol: "leaf.fill", updatedAt: now),
             DeviceMetric(kind: .thermal, title: "Thermal", value: thermalDescription(processInfo.thermalState), symbol: "thermometer.medium", updatedAt: now),
-            DeviceMetric(kind: .memory, title: "Memory", value: memory, symbol: "memorychip", updatedAt: now),
-            DeviceMetric(kind: .storage, title: "Storage", value: storage, symbol: "internaldrive", updatedAt: now),
+            DeviceMetric(kind: .memory, title: "Memory Total", value: memory, symbol: "memorychip", updatedAt: now),
+            DeviceMetric(kind: .storage, title: "Storage", value: storage.summary, symbol: "internaldrive", updatedAt: now),
+            DeviceMetric(kind: .storageFree, title: "Storage Free", value: storage.free, symbol: "internaldrive.fill", updatedAt: now),
+            DeviceMetric(kind: .storageUsed, title: "Storage Used", value: storage.used, symbol: "externaldrive.fill.badge.checkmark", updatedAt: now),
+            DeviceMetric(kind: .storageTotal, title: "Storage Total", value: storage.total, symbol: "externaldrive.fill", updatedAt: now),
             DeviceMetric(kind: .cpuCores, title: "CPU Cores", value: "\(processInfo.processorCount)", symbol: "cpu", updatedAt: now),
-            DeviceMetric(kind: .refreshRate, title: "Display", value: "\(refreshRate) Hz max", symbol: "rectangle.inset.filled", updatedAt: now),
+            DeviceMetric(kind: .activeCpuCores, title: "Active Cores", value: "\(processInfo.activeProcessorCount)", symbol: "cpu.fill", updatedAt: now),
+            DeviceMetric(kind: .systemUptime, title: "Uptime", value: uptimeDescription(processInfo.systemUptime), symbol: "clock.arrow.circlepath", updatedAt: now),
+            DeviceMetric(kind: .refreshRate, title: "Refresh Rate", value: "\(refreshRate) Hz max", symbol: "rectangle.inset.filled", updatedAt: now),
+            DeviceMetric(kind: .promotion, title: "ProMotion", value: refreshRate > 60 ? "Up to \(refreshRate) Hz" : "Not active", symbol: "gauge.with.dots.needle.67percent", updatedAt: now),
+            DeviceMetric(kind: .displayResolution, title: "Resolution", value: resolution, symbol: "rectangle.expand.vertical", updatedAt: now),
+            DeviceMetric(kind: .displayScale, title: "Display Scale", value: displayScale, symbol: "arrow.up.left.and.arrow.down.right", updatedAt: now),
+            DeviceMetric(kind: .brightness, title: "Brightness", value: "\(brightness)%", symbol: "sun.max.fill", updatedAt: now),
             DeviceMetric(kind: .network, title: "Network", value: networkDescription, symbol: networkSymbol(), updatedAt: now),
-            DeviceMetric(kind: .device, title: "Device", value: Self.hardwareIdentifier, symbol: "iphone", updatedAt: now),
-            DeviceMetric(kind: .system, title: "iOS", value: device.systemVersion, symbol: "gear", updatedAt: now)
+            DeviceMetric(kind: .lowDataMode, title: "Low Data", value: networkConstrained ? "On" : "Off", symbol: "tortoise.fill", updatedAt: now),
+            DeviceMetric(kind: .networkExpensive, title: "Network Cost", value: networkExpensive ? "Expensive" : "Normal", symbol: "network.badge.shield.half.filled", updatedAt: now),
+            DeviceMetric(kind: .ipv4, title: "IPv4", value: supportDescription(networkSupportsIPv4), symbol: "4.circle.fill", updatedAt: now),
+            DeviceMetric(kind: .ipv6, title: "IPv6", value: supportDescription(networkSupportsIPv6), symbol: "6.circle.fill", updatedAt: now),
+            DeviceMetric(kind: .dns, title: "DNS", value: supportDescription(networkSupportsDNS), symbol: "network", updatedAt: now),
+            DeviceMetric(kind: .device, title: "Hardware", value: Self.hardwareIdentifier, symbol: "iphone", updatedAt: now),
+            DeviceMetric(kind: .deviceModel, title: "Device Model", value: device.localizedModel, symbol: "iphone.gen3", updatedAt: now),
+            DeviceMetric(kind: .system, title: "System", value: "\(device.systemName) \(device.systemVersion)", symbol: "gear", updatedAt: now),
+            DeviceMetric(kind: .locale, title: "Locale", value: Locale.current.identifier, symbol: "globe", updatedAt: now),
+            DeviceMetric(kind: .timeZone, title: "Time Zone", value: TimeZone.current.identifier, symbol: "clock", updatedAt: now)
         ]
 
         lastUpdated = now
@@ -65,25 +93,60 @@ final class DeviceTelemetryStore: ObservableObject {
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 self.networkDescription = description
+                self.networkConstrained = path.isConstrained
+                self.networkExpensive = path.isExpensive
+                self.networkSupportsIPv4 = path.supportsIPv4
+                self.networkSupportsIPv6 = path.supportsIPv6
+                self.networkSupportsDNS = path.supportsDNS
                 self.refresh()
             }
         }
         pathMonitor.start(queue: monitorQueue)
     }
 
-    private func storageDescription() -> String {
+    private func storageValues() -> (summary: String, free: String, used: String, total: String) {
         do {
-            let values = try URL(fileURLWithPath: NSHomeDirectory()).resourceValues(forKeys: [.volumeTotalCapacityKey, .volumeAvailableCapacityKey])
+            let values = try URL(fileURLWithPath: NSHomeDirectory()).resourceValues(
+                forKeys: [.volumeTotalCapacityKey, .volumeAvailableCapacityKey]
+            )
+
             guard let total = values.volumeTotalCapacity,
                   let available = values.volumeAvailableCapacity else {
-                return "Unknown"
+                return ("Unknown", "Unknown", "Unknown", "Unknown")
             }
+
+            let used = max(total - available, 0)
             let formatter = ByteCountFormatter()
             formatter.countStyle = .file
-            return "\(formatter.string(fromByteCount: Int64(available))) free / \(formatter.string(fromByteCount: Int64(total)))"
+
+            let freeString = formatter.string(fromByteCount: Int64(available))
+            let usedString = formatter.string(fromByteCount: Int64(used))
+            let totalString = formatter.string(fromByteCount: Int64(total))
+
+            return (
+                "\(freeString) free / \(totalString)",
+                freeString,
+                usedString,
+                totalString
+            )
         } catch {
-            return "Unavailable"
+            return ("Unavailable", "Unavailable", "Unavailable", "Unavailable")
         }
+    }
+
+    private func uptimeDescription(_ uptime: TimeInterval) -> String {
+        let totalMinutes = max(Int(uptime) / 60, 0)
+        let days = totalMinutes / (24 * 60)
+        let hours = (totalMinutes % (24 * 60)) / 60
+        let minutes = totalMinutes % 60
+
+        if days > 0 {
+            return "\(days)d \(hours)h \(minutes)m"
+        }
+        if hours > 0 {
+            return "\(hours)h \(minutes)m"
+        }
+        return "\(minutes)m"
     }
 
     private func batterySymbol(level: Int?) -> String {
@@ -115,6 +178,10 @@ final class DeviceTelemetryStore: ObservableObject {
         case .critical: return "Critical"
         @unknown default: return "Unknown"
         }
+    }
+
+    private func supportDescription(_ supported: Bool) -> String {
+        supported ? "Supported" : "Unavailable"
     }
 
     private func networkSymbol() -> String {
