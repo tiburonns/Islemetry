@@ -48,25 +48,24 @@ final class DeviceTelemetryStore: ObservableObject {
             DeviceMetric(kind: .thermal, title: "Thermal", value: thermalDescription(processInfo.thermalState), symbol: "thermometer.medium", updatedAt: now),
             DeviceMetric(kind: .memory, title: "Memory Total", value: memory, symbol: "memorychip", updatedAt: now),
             DeviceMetric(kind: .storage, title: "Storage", value: storage.summary, symbol: "internaldrive", updatedAt: now),
-            DeviceMetric(kind: .storageFree, title: "Storage Free", value: storage.free, symbol: "internaldrive.fill", updatedAt: now),
-            DeviceMetric(kind: .storageUsed, title: "Storage Used", value: storage.used, symbol: "externaldrive.fill.badge.checkmark", updatedAt: now),
-            DeviceMetric(kind: .storageTotal, title: "Storage Total", value: storage.total, symbol: "externaldrive.fill", updatedAt: now),
+            DeviceMetric(kind: .storageFree, title: "Storage Free", value: storage.free, symbol: "internaldrive", updatedAt: now),
+            DeviceMetric(kind: .storageUsed, title: "Storage Used", value: storage.used, symbol: "internaldrive", updatedAt: now),
+            DeviceMetric(kind: .storageTotal, title: "Storage Total", value: storage.total, symbol: "internaldrive", updatedAt: now),
             DeviceMetric(kind: .cpuCores, title: "CPU Cores", value: "\(processInfo.processorCount)", symbol: "cpu", updatedAt: now),
-            DeviceMetric(kind: .activeCpuCores, title: "Active Cores", value: "\(processInfo.activeProcessorCount)", symbol: "cpu.fill", updatedAt: now),
-            DeviceMetric(kind: .systemUptime, title: "Uptime", value: uptimeDescription(processInfo.systemUptime), symbol: "clock.arrow.circlepath", updatedAt: now),
+            DeviceMetric(kind: .activeCpuCores, title: "Active Cores", value: "\(processInfo.activeProcessorCount)", symbol: "cpu", updatedAt: now),
             DeviceMetric(kind: .refreshRate, title: "Refresh Rate", value: "\(refreshRate) Hz max", symbol: "rectangle.inset.filled", updatedAt: now),
-            DeviceMetric(kind: .promotion, title: "ProMotion", value: refreshRate > 60 ? "Up to \(refreshRate) Hz" : "Not active", symbol: "gauge.with.dots.needle.67percent", updatedAt: now),
-            DeviceMetric(kind: .displayResolution, title: "Resolution", value: resolution, symbol: "rectangle.expand.vertical", updatedAt: now),
+            DeviceMetric(kind: .promotion, title: "ProMotion", value: refreshRate > 60 ? "Up to \(refreshRate) Hz" : "Not active", symbol: "speedometer", updatedAt: now),
+            DeviceMetric(kind: .displayResolution, title: "Resolution", value: resolution, symbol: "rectangle", updatedAt: now),
             DeviceMetric(kind: .displayScale, title: "Display Scale", value: displayScale, symbol: "arrow.up.left.and.arrow.down.right", updatedAt: now),
             DeviceMetric(kind: .brightness, title: "Brightness", value: "\(brightness)%", symbol: "sun.max.fill", updatedAt: now),
             DeviceMetric(kind: .network, title: "Network", value: networkDescription, symbol: networkSymbol(), updatedAt: now),
             DeviceMetric(kind: .lowDataMode, title: "Low Data", value: networkConstrained ? "On" : "Off", symbol: "tortoise.fill", updatedAt: now),
-            DeviceMetric(kind: .networkExpensive, title: "Network Cost", value: networkExpensive ? "Expensive" : "Normal", symbol: "network.badge.shield.half.filled", updatedAt: now),
+            DeviceMetric(kind: .networkExpensive, title: "Network Cost", value: networkExpensive ? "Expensive" : "Normal", symbol: "antenna.radiowaves.left.and.right", updatedAt: now),
             DeviceMetric(kind: .ipv4, title: "IPv4", value: supportDescription(networkSupportsIPv4), symbol: "4.circle.fill", updatedAt: now),
             DeviceMetric(kind: .ipv6, title: "IPv6", value: supportDescription(networkSupportsIPv6), symbol: "6.circle.fill", updatedAt: now),
             DeviceMetric(kind: .dns, title: "DNS", value: supportDescription(networkSupportsDNS), symbol: "network", updatedAt: now),
             DeviceMetric(kind: .device, title: "Hardware", value: Self.hardwareIdentifier, symbol: "iphone", updatedAt: now),
-            DeviceMetric(kind: .deviceModel, title: "Device Model", value: device.localizedModel, symbol: "iphone.gen3", updatedAt: now),
+            DeviceMetric(kind: .deviceModel, title: "Device Model", value: device.localizedModel, symbol: "iphone", updatedAt: now),
             DeviceMetric(kind: .system, title: "System", value: "\(device.systemName) \(device.systemVersion)", symbol: "gear", updatedAt: now),
             DeviceMetric(kind: .locale, title: "Locale", value: Locale.current.identifier, symbol: "globe", updatedAt: now),
             DeviceMetric(kind: .timeZone, title: "Time Zone", value: TimeZone.current.identifier, symbol: "clock", updatedAt: now)
@@ -132,21 +131,6 @@ final class DeviceTelemetryStore: ObservableObject {
         } catch {
             return ("Unavailable", "Unavailable", "Unavailable", "Unavailable")
         }
-    }
-
-    private func uptimeDescription(_ uptime: TimeInterval) -> String {
-        let totalMinutes = max(Int(uptime) / 60, 0)
-        let days = totalMinutes / (24 * 60)
-        let hours = (totalMinutes % (24 * 60)) / 60
-        let minutes = totalMinutes % 60
-
-        if days > 0 {
-            return "\(days)d \(hours)h \(minutes)m"
-        }
-        if hours > 0 {
-            return "\(hours)h \(minutes)m"
-        }
-        return "\(minutes)m"
     }
 
     private func batterySymbol(level: Int?) -> String {
