@@ -18,6 +18,18 @@ Islemetry lets you decide which device metrics are shown in the Dynamic Island a
 
 If a Live Activity is already running, **Apply to Live Activity** refreshes it with the new layout and color. If no activity is running, the choices are saved and used the next time you press **Start**.
 
+## Compact vs expanded layout
+
+The compact and expanded layouts are intentionally independent:
+
+- **Compact Leading / Trailing** are only used while the Dynamic Island is collapsed.
+- The expanded presentation uses the six **Expanded Dynamic Island** slots directly.
+- Expanded slots 1 and 2 are rendered in the upper leading/trailing regions.
+- Expanded slots 3–6 are rendered in a compact 2×2 grid below them.
+- The compact Leading/Trailing values are not repeated in the expanded view.
+
+This keeps the expanded view to a maximum of six telemetry metrics and prevents the bottom rows from being clipped by the Dynamic Island's available height.
+
 ## Dynamic Island text color
 
 The **Appearance** section contains a full iOS Color Picker rather than a fixed palette.
