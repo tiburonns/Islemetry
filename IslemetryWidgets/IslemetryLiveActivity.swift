@@ -5,19 +5,25 @@ import WidgetKit
 struct IslemetryLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: DeviceActivityAttributes.self) { context in
+            let textColor = Color(islemetryHex: context.state.textColorHex)
+
             lockScreenView(
                 context.state,
-                profileName: context.state.languageCode == "es" ? "Personalizado" : "Custom"
+                profileName: context.state.languageCode == "es" ? "Personalizado" : "Custom",
+                textColor: textColor
             )
-                .activityBackgroundTint(.black.opacity(0.88))
-                .activitySystemActionForegroundColor(.white)
+            .activityBackgroundTint(.black.opacity(0.88))
+            .activitySystemActionForegroundColor(textColor)
         } dynamicIsland: { context in
+            let textColor = Color(islemetryHex: context.state.textColorHex)
+
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
                     expandedMetric(
                         title: context.state.leadingTitle,
                         value: context.state.leadingValue,
-                        symbol: context.state.leadingSymbol
+                        symbol: context.state.leadingSymbol,
+                        textColor: textColor
                     )
                 }
 
@@ -25,14 +31,15 @@ struct IslemetryLiveActivity: Widget {
                     expandedMetric(
                         title: context.state.trailingTitle,
                         value: context.state.trailingValue,
-                        symbol: context.state.trailingSymbol
+                        symbol: context.state.trailingSymbol,
+                        textColor: textColor
                     )
                 }
 
                 DynamicIslandExpandedRegion(.center) {
                     Text(context.state.languageCode == "es" ? "Personalizado" : "Custom")
                         .font(.caption2.weight(.semibold))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(textColor.opacity(0.68))
                 }
 
                 DynamicIslandExpandedRegion(.bottom) {
@@ -43,15 +50,20 @@ struct IslemetryLiveActivity: Widget {
                                     HStack(spacing: 6) {
                                         Image(systemName: metric.symbol)
                                             .font(.caption)
+                                            .foregroundStyle(textColor)
+
                                         VStack(alignment: .leading, spacing: 1) {
                                             Text(metric.title)
                                                 .font(.caption2)
-                                                .foregroundStyle(.secondary)
+                                                .foregroundStyle(textColor.opacity(0.68))
+
                                             Text(metric.value)
                                                 .font(.caption.weight(.semibold))
+                                                .foregroundStyle(textColor)
                                                 .lineLimit(1)
                                                 .minimumScaleFactor(0.75)
                                         }
+
                                         Spacer(minLength: 0)
                                     }
                                 }
@@ -64,7 +76,7 @@ struct IslemetryLiveActivity: Widget {
                             Text(context.state.updatedAt, style: .relative)
                         }
                         .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(textColor.opacity(0.68))
                     }
                 }
             } compactLeading: {
@@ -74,6 +86,7 @@ struct IslemetryLiveActivity: Widget {
                         .font(.caption2.weight(.semibold))
                         .lineLimit(1)
                 }
+                .foregroundStyle(textColor)
             } compactTrailing: {
                 HStack(spacing: 4) {
                     Image(systemName: context.state.trailingSymbol)
@@ -81,8 +94,10 @@ struct IslemetryLiveActivity: Widget {
                         .font(.caption2.weight(.semibold))
                         .lineLimit(1)
                 }
+                .foregroundStyle(textColor)
             } minimal: {
                 Image(systemName: context.state.leadingSymbol)
+                    .foregroundStyle(textColor)
             }
             .widgetURL(URL(string: "islemetry://live"))
         }
@@ -90,22 +105,38 @@ struct IslemetryLiveActivity: Widget {
 
     private func lockScreenView(
         _ state: DeviceActivityAttributes.ContentState,
-        profileName: String
+        profileName: String,
+        textColor: Color
     ) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Label("Islemetry", systemImage: "waveform.path.ecg")
                     .font(.headline)
+                    .foregroundStyle(textColor)
+
                 Spacer()
+
                 Text(profileName)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(textColor.opacity(0.68))
             }
 
             HStack(spacing: 16) {
-                expandedMetric(title: state.leadingTitle, value: state.leadingValue, symbol: state.leadingSymbol)
+                expandedMetric(
+                    title: state.leadingTitle,
+                    value: state.leadingValue,
+                    symbol: state.leadingSymbol,
+                    textColor: textColor
+                )
+
                 Spacer()
-                expandedMetric(title: state.trailingTitle, value: state.trailingValue, symbol: state.trailingSymbol)
+
+                expandedMetric(
+                    title: state.trailingTitle,
+                    value: state.trailingValue,
+                    symbol: state.trailingSymbol,
+                    textColor: textColor
+                )
             }
 
             if !state.secondary.isEmpty {
@@ -114,9 +145,11 @@ struct IslemetryLiveActivity: Widget {
                         VStack(alignment: .leading, spacing: 2) {
                             Label(metric.title, systemImage: metric.symbol)
                                 .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(textColor.opacity(0.68))
+
                             Text(metric.value)
                                 .font(.caption.weight(.semibold))
+                                .foregroundStyle(textColor)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.7)
                         }
@@ -130,20 +163,60 @@ struct IslemetryLiveActivity: Widget {
                 Text(state.updatedAt, style: .relative)
             }
             .font(.caption2)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(textColor.opacity(0.68))
         }
         .padding(.horizontal, 4)
     }
 
-    private func expandedMetric(title: String, value: String, symbol: String) -> some View {
+    private func expandedMetric(
+        title: String,
+        value: String,
+        symbol: String,
+        textColor: Color
+    ) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Label(title, systemImage: symbol)
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(textColor.opacity(0.68))
+
             Text(value)
                 .font(.headline)
+                .foregroundStyle(textColor)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
+        }
+    }
+}
+
+private extension Color {
+    init(islemetryHex hex: String?) {
+        let fallback = "#FFFFFF"
+        let source = (hex?.isEmpty == false ? hex! : fallback)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: "#", with: "")
+
+        var value: UInt64 = 0
+        guard Scanner(string: source).scanHexInt64(&value) else {
+            self = .white
+            return
+        }
+
+        switch source.count {
+        case 6:
+            let red = Double((value >> 16) & 0xFF) / 255
+            let green = Double((value >> 8) & 0xFF) / 255
+            let blue = Double(value & 0xFF) / 255
+            self = Color(red: red, green: green, blue: blue)
+
+        case 8:
+            let red = Double((value >> 24) & 0xFF) / 255
+            let green = Double((value >> 16) & 0xFF) / 255
+            let blue = Double((value >> 8) & 0xFF) / 255
+            let alpha = Double(value & 0xFF) / 255
+            self = Color(red: red, green: green, blue: blue, opacity: alpha)
+
+        default:
+            self = .white
         }
     }
 }
