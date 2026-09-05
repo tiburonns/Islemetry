@@ -77,7 +77,7 @@ When behavior, architecture, testing procedures, privacy requirements, or roadma
 
 ## On-device testing
 
-The hardware validation procedure is documented in [docs/TESTING.md](docs/TESTING.md).
+The current V0.2 hardware validation procedure is documented in [docs/TESTING.md](docs/TESTING.md).
 
 V0.1 has been successfully built, installed, and validated on a real iPhone. The current branch extends that working baseline with configurable Dynamic Island content, expanded telemetry, a main-screen Island preview, and in-app English/Spanish switching.
 
