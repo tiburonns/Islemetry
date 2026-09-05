@@ -13,7 +13,6 @@ struct DeviceMetric: Identifiable, Hashable, Codable {
         case storageTotal
         case cpuCores
         case activeCpuCores
-        case systemUptime
         case refreshRate
         case promotion
         case displayResolution
@@ -46,7 +45,6 @@ struct DeviceMetric: Identifiable, Hashable, Codable {
             case .storageTotal: return "Storage Total"
             case .cpuCores: return "CPU Cores"
             case .activeCpuCores: return "Active CPU Cores"
-            case .systemUptime: return "System Uptime"
             case .refreshRate: return "Max Refresh Rate"
             case .promotion: return "ProMotion"
             case .displayResolution: return "Display Resolution"
