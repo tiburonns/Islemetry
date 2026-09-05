@@ -11,6 +11,7 @@ struct DeviceActivityAttributes: ActivityAttributes {
         var trailingSymbol: String
         var secondary: [LiveMetric]
         var updatedAt: Date
+        var languageCode: String
     }
 
     struct LiveMetric: Codable, Hashable, Identifiable {
