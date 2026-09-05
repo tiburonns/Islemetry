@@ -4,10 +4,21 @@
 
 Islemetry lets you decide which device metrics are shown in the Dynamic Island. The configuration is stored locally on the iPhone and reused the next time a Live Activity starts.
 
+## Home-screen Dynamic Island preview
+
+The main Islemetry screen now includes a **Dynamic Island Preview** section. It uses the same saved configuration that is sent to ActivityKit, so it shows:
+
+- the current **Leading** compact metric;
+- the current **Trailing** compact metric;
+- the selected expanded metrics;
+- each metric's latest value from the current telemetry snapshot.
+
+This is a visual preview inside Islemetry. The real Dynamic Island remains controlled by iOS and ActivityKit.
+
 ## Change what the Dynamic Island shows
 
 1. Open **Islemetry**.
-2. Tap the **Dynamic Island** configuration card.
+2. Tap **Configure Dynamic Island**.
 3. Under **Compact Dynamic Island**, choose:
    - **Leading** — the metric shown on the left side.
    - **Trailing** — the metric shown on the right side.
@@ -16,6 +27,20 @@ Islemetry lets you decide which device metrics are shown in the Dynamic Island. 
 6. Tap **Apply to Live Activity**.
 
 If a Live Activity is already running, **Apply to Live Activity** refreshes it with the new layout. If no activity is running, the choices are saved and used the next time you press **Start**.
+
+## Language
+
+The Home screen contains a segmented **English / Español** language selector.
+
+Changing the language:
+
+- updates Islemetry's visible interface;
+- updates metric names and localized status values;
+- updates the configuration screen;
+- refreshes the current telemetry snapshot;
+- automatically sends an updated state to a running Live Activity.
+
+The language choice is stored locally in Islemetry using UserDefaults. It is independent of the iPhone system-language setting.
 
 ## Default layout
 
@@ -93,10 +118,10 @@ Storage is calculated from the volume capacity values exposed by Foundation.
 
 The Live Activity displays the latest telemetry snapshot sent by Islemetry. iOS does not allow Islemetry to run continuously in the background like a desktop system monitor, so many metrics are refreshed when the app is active and Islemetry sends a new ActivityKit state.
 
-The **Refresh** button captures a new snapshot and updates the active Live Activity.
+The **Refresh** button captures a new snapshot and updates the active Live Activity. Changing the app language also performs a refresh and updates a running Live Activity.
 
 ## Privacy and App Store compatibility
 
-Islemetry intentionally uses public Apple frameworks. Disk-space information is a Required Reason API use case; Apple's approved reason `85F4.1` permits displaying disk-space information to the user. UserDefaults is used only to save Islemetry's own configuration, corresponding to approved reason `CA92.1`.
+Islemetry intentionally uses public Apple frameworks. Disk-space information is a Required Reason API use case; Apple's approved reason `85F4.1` permits displaying disk-space information to the user. UserDefaults is used only to save Islemetry's own configuration and language preference, corresponding to approved reason `CA92.1`.
 
 System uptime is intentionally not exposed as a metric in this App Store-oriented build because Apple's approved reasons for the system-boot-time API do not include simply displaying device uptime as a system-monitor statistic.
