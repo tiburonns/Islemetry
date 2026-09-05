@@ -2,20 +2,37 @@
 
 **Español** · [English](CONFIGURATION.md)
 
-Islemetry te permite decidir qué métricas del dispositivo aparecen en la Isla Dinámica. La configuración se guarda localmente en el iPhone y se reutiliza la próxima vez que inicies una Live Activity.
+Islemetry te permite decidir qué métricas del dispositivo aparecen en la Isla Dinámica y personalizar el color usado para el texto y los símbolos de telemetría. La configuración se guarda localmente en el iPhone y se reutiliza la próxima vez que inicies una Live Activity.
 
 ## Cambiar lo que muestra la Isla Dinámica
 
 1. Abre **Islemetry**.
-2. Toca la tarjeta **Dynamic Island**.
-3. En **Compact Dynamic Island**, elige:
-   - **Leading** — la métrica del lado izquierdo.
-   - **Trailing** — la métrica del lado derecho.
-4. En **Expanded Dynamic Island**, elige hasta seis métricas adicionales.
-5. Selecciona **None** en las posiciones expandidas que no quieras utilizar.
-6. Toca **Apply to Live Activity**.
+2. Toca la tarjeta **Configurar Isla Dinámica**.
+3. En **Isla Dinámica compacta**, elige:
+   - **Izquierda** — la métrica del lado izquierdo.
+   - **Derecha** — la métrica del lado derecho.
+4. En **Isla Dinámica expandida**, elige hasta seis métricas adicionales.
+5. Selecciona **Ninguna** en las posiciones expandidas que no quieras utilizar.
+6. En **Apariencia**, elige el color del texto con el Color Picker de iOS.
+7. Toca **Aplicar a Live Activity**.
 
-Si ya hay una Live Activity activa, **Apply to Live Activity** la actualiza con la nueva distribución. Si no hay ninguna actividad activa, la selección queda guardada y se utilizará la próxima vez que pulses **Start**.
+Si ya hay una Live Activity activa, **Aplicar a Live Activity** la actualiza con la nueva distribución y el nuevo color. Si no hay ninguna actividad activa, la selección queda guardada y se utilizará la próxima vez que pulses **Iniciar**.
+
+## Color del texto de la Isla Dinámica
+
+La sección **Apariencia** utiliza el Color Picker completo de iOS, no una paleta fija.
+
+- Color predeterminado: blanco (`#FFFFFF`).
+- La opacidad está desactivada intencionalmente para mantener una legibilidad predecible sobre el fondo negro de la Isla Dinámica.
+- El color elegido se guarda localmente como un valor RGB HEX.
+- La pantalla de configuración muestra el valor HEX actual.
+- **Restablecer a blanco** recupera el valor predeterminado.
+- La vista previa de la Isla Dinámica en Inicio utiliza el mismo color seleccionado.
+- Al aplicarlo, el color se incluye en el estado de ActivityKit para que una Live Activity activa pueda cambiar de color sin reiniciarse.
+
+El color se utiliza para los valores de telemetría y los símbolos de las métricas en las presentaciones compacta, expandida, mínima y de pantalla bloqueada. Las etiquetas secundarias utilizan el mismo color con menor opacidad para conservar la jerarquía visual.
+
+Los colores muy oscuros pueden tener poco contraste sobre el fondo negro de la Isla Dinámica, por lo que se recomiendan colores claros o brillantes.
 
 ## Idioma
 
@@ -33,6 +50,7 @@ Cuando seleccionas **System / Sistema**, los idiomas de iOS en español (`es-*`)
 
 - Izquierda: Batería
 - Derecha: Estado térmico
+- Color del texto: Blanco (`#FFFFFF`)
 
 ### Expandida
 
@@ -103,10 +121,10 @@ El almacenamiento se calcula con los valores de capacidad del volumen expuestos 
 
 La Live Activity muestra el último snapshot de telemetría enviado por Islemetry. iOS no permite que Islemetry se ejecute continuamente en segundo plano como un monitor de sistema de escritorio, por lo que muchas métricas se actualizan cuando la app está activa y envía un nuevo estado a ActivityKit.
 
-El botón **Refresh** toma un nuevo snapshot y actualiza la Live Activity activa.
+El botón **Actualizar** toma un nuevo snapshot y actualiza la Live Activity activa. Los cambios de distribución y color también se pueden enviar con **Aplicar a Live Activity**.
 
 ## Privacidad y compatibilidad con App Store
 
-Islemetry utiliza intencionalmente frameworks públicos de Apple. La información de espacio en disco pertenece a las Required Reason APIs; el motivo aprobado por Apple `85F4.1` permite mostrar información de almacenamiento al usuario. UserDefaults se utiliza únicamente para guardar la configuración propia de Islemetry, correspondiente al motivo aprobado `CA92.1`.
+Islemetry utiliza intencionalmente frameworks públicos de Apple. La información de espacio en disco pertenece a las Required Reason APIs; el motivo aprobado por Apple `85F4.1` permite mostrar información de almacenamiento al usuario. UserDefaults se utiliza únicamente para guardar la configuración propia de Islemetry, incluida la selección de métricas, idioma y color del texto, correspondiente al motivo aprobado `CA92.1`.
 
 El uptime del sistema se excluye intencionalmente de esta compilación orientada a App Store porque los motivos aprobados por Apple para la API de tiempo de arranque del sistema no incluyen simplemente mostrar el uptime del dispositivo como estadística de monitorización.
