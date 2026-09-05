@@ -4,21 +4,28 @@
 
 **Live device telemetry for iPhone, surfaced through Live Activities and the Dynamic Island.**
 
-Islemetry is a native SwiftUI iOS app focused on glanceable device information. It collects user-visible device metrics and presents a compact selection through ActivityKit on the Lock Screen and Dynamic Island.
+Islemetry is a native SwiftUI iOS app focused on glanceable device information. It collects user-visible device metrics and presents a configurable selection through ActivityKit on the Lock Screen and Dynamic Island.
 
-## V0.1 scope
+## Current features
 
-- Battery level and charging state
-- Low Power Mode
-- Thermal state
-- Physical memory capacity
-- Storage capacity and available space
-- CPU core count
-- Maximum display refresh rate
-- Network path (Wi-Fi / cellular / wired / offline)
-- iPhone model identifier and iOS version
 - Start, refresh, and stop a Live Activity
 - Compact, minimal, expanded, and Lock Screen Live Activity layouts
+- User-selectable compact **Leading** and **Trailing** metrics
+- Up to six user-selectable expanded metrics
+- Persistent Dynamic Island configuration stored locally on-device
+- 27 available device/system metrics
+- No third-party runtime dependencies
+
+### Metric categories
+
+- **Power:** battery, charging state, Low Power Mode, thermal state, brightness
+- **CPU / memory:** CPU cores, active CPU cores, physical memory total
+- **Storage:** summary, free, used, total
+- **Display:** maximum refresh rate, ProMotion indication, native resolution, native scale
+- **Network:** interface, Low Data Mode, expensive-path state, IPv4, IPv6, DNS
+- **Device / system:** hardware identifier, device model, iOS version, locale, time zone
+
+See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for the complete Dynamic Island configuration guide and metric notes.
 
 ## Architecture
 
@@ -26,7 +33,9 @@ Islemetry is a native SwiftUI iOS app focused on glanceable device information. 
 Islemetry/
 ├── App/
 ├── Models/
-└── Services/
+├── Services/
+├── Info.plist
+└── PrivacyInfo.xcprivacy
 Shared/
 └── DeviceActivityAttributes.swift
 IslemetryWidgets/
@@ -46,7 +55,9 @@ IslemetryWidgets/
 
 ## Privacy
 
-The V0.1 architecture keeps telemetry on-device. Before App Store distribution, every Required Reason API used by the final build will be declared in `PrivacyInfo.xcprivacy` with the matching Apple-approved reason.
+Islemetry is designed to keep device telemetry on-device. Disk-space information is used to display storage information to the user, matching Apple's Required Reason API reason `85F4.1`. UserDefaults stores Islemetry's own display preferences, matching reason `CA92.1`.
+
+System uptime is intentionally excluded from the App Store-oriented metric catalog because Apple's approved reasons for the system-boot-time API do not include displaying uptime as a general device-monitor statistic.
 
 ## Documentation policy
 
@@ -56,22 +67,25 @@ Examples:
 
 - `README.md` / `README.es.md`
 - `docs/TESTING.md` / `docs/TESTING.es.md`
+- `docs/CONFIGURATION.md` / `docs/CONFIGURATION.es.md`
 
 When behavior, architecture, testing procedures, privacy requirements, or roadmap decisions change, both language versions should be updated together.
 
 ## On-device testing
 
-The first hardware validation procedure is documented in [docs/TESTING.md](docs/TESTING.md).
+The hardware validation procedure is documented in [docs/TESTING.md](docs/TESTING.md).
+
+V0.1 has been successfully built, installed, and validated on a real iPhone. The current branch extends that working baseline with configurable Dynamic Island content and additional telemetry.
 
 ## Roadmap
 
-1. **V0.1** — Core device snapshot + Dynamic Island Live Activity
-2. **V0.2** — Configurable metrics and profiles
-3. **V0.3** — Shortcuts / App Intents
+1. **V0.1** — Core device snapshot + Dynamic Island Live Activity ✅ hardware validated
+2. **V0.2** — Configurable Dynamic Island metrics + expanded telemetry 🚧 current
+3. **V0.3** — Profiles + Shortcuts / App Intents
 4. **V0.4** — Network diagnostics and richer telemetry
 5. **V0.5** — Optional WeatherKit / HealthKit modules
 6. **V1.0** — Polished App Store-ready release
 
 ## Project status
 
-Early development. The first milestone intentionally uses public Apple frameworks and no third-party dependencies.
+Active development. Islemetry intentionally uses public Apple frameworks and no third-party runtime dependencies.
