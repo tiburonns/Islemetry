@@ -16,52 +16,71 @@ struct IslemetryLiveActivity: Widget {
             .activitySystemActionForegroundColor(textColor)
         } dynamicIsland: { context in
             let textColor = Color(islemetryHex: context.state.textColorHex)
+            let expandedMetrics = context.state.secondary
+            let remainingExpandedMetrics = Array(expandedMetrics.dropFirst(2))
 
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    expandedMetric(
-                        title: context.state.leadingTitle,
-                        value: context.state.leadingValue,
-                        symbol: context.state.leadingSymbol,
-                        textColor: textColor
-                    )
+                    if let metric = expandedMetrics.first {
+                        expandedMetric(
+                            title: metric.title,
+                            value: metric.value,
+                            symbol: metric.symbol,
+                            textColor: textColor
+                        )
+                    } else {
+                        expandedMetric(
+                            title: context.state.leadingTitle,
+                            value: context.state.leadingValue,
+                            symbol: context.state.leadingSymbol,
+                            textColor: textColor
+                        )
+                    }
                 }
 
                 DynamicIslandExpandedRegion(.trailing) {
-                    expandedMetric(
-                        title: context.state.trailingTitle,
-                        value: context.state.trailingValue,
-                        symbol: context.state.trailingSymbol,
-                        textColor: textColor
-                    )
-                }
-
-                DynamicIslandExpandedRegion(.center) {
-                    Text(context.state.languageCode == "es" ? "Personalizado" : "Custom")
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(textColor.opacity(0.68))
+                    if expandedMetrics.count > 1 {
+                        let metric = expandedMetrics[1]
+                        expandedMetric(
+                            title: metric.title,
+                            value: metric.value,
+                            symbol: metric.symbol,
+                            textColor: textColor
+                        )
+                    } else {
+                        expandedMetric(
+                            title: context.state.trailingTitle,
+                            value: context.state.trailingValue,
+                            symbol: context.state.trailingSymbol,
+                            textColor: textColor
+                        )
+                    }
                 }
 
                 DynamicIslandExpandedRegion(.bottom) {
-                    VStack(spacing: 10) {
-                        if !context.state.secondary.isEmpty {
-                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
-                                ForEach(context.state.secondary) { metric in
-                                    HStack(spacing: 6) {
+                    VStack(spacing: 6) {
+                        if !remainingExpandedMetrics.isEmpty {
+                            LazyVGrid(
+                                columns: [GridItem(.flexible()), GridItem(.flexible())],
+                                spacing: 6
+                            ) {
+                                ForEach(remainingExpandedMetrics) { metric in
+                                    HStack(spacing: 5) {
                                         Image(systemName: metric.symbol)
-                                            .font(.caption)
+                                            .font(.caption2)
                                             .foregroundStyle(textColor)
 
-                                        VStack(alignment: .leading, spacing: 1) {
+                                        VStack(alignment: .leading, spacing: 0) {
                                             Text(metric.title)
                                                 .font(.caption2)
                                                 .foregroundStyle(textColor.opacity(0.68))
+                                                .lineLimit(1)
 
                                             Text(metric.value)
                                                 .font(.caption.weight(.semibold))
                                                 .foregroundStyle(textColor)
                                                 .lineLimit(1)
-                                                .minimumScaleFactor(0.75)
+                                                .minimumScaleFactor(0.7)
                                         }
 
                                         Spacer(minLength: 0)
@@ -178,6 +197,7 @@ struct IslemetryLiveActivity: Widget {
             Label(title, systemImage: symbol)
                 .font(.caption2)
                 .foregroundStyle(textColor.opacity(0.68))
+                .lineLimit(1)
 
             Text(value)
                 .font(.headline)
