@@ -77,7 +77,7 @@ Cuando cambien el comportamiento, la arquitectura, los procedimientos de prueba,
 
 ## Pruebas en dispositivo real
 
-El procedimiento de validación en hardware está documentado en [docs/TESTING.es.md](docs/TESTING.es.md).
+El procedimiento actual de validación de hardware de V0.2 está documentado en [docs/TESTING.es.md](docs/TESTING.es.md).
 
 V0.1 ya fue compilada, instalada y validada correctamente en un iPhone real. La rama actual amplía esa base funcional con contenido configurable en la Isla Dinámica, telemetría adicional, una vista previa en Inicio y cambio de idioma English/Español dentro de la app.
 
