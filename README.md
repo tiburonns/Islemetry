@@ -17,9 +17,10 @@ You can choose:
 - **Compact Leading** metric
 - **Compact Trailing** metric
 - Up to **six expanded metrics**
+- A custom **Dynamic Island text color**
 - **System / English / Español** language behavior
 
-The same Live Activity also appears on the Lock Screen, and the app includes a Home-screen preview that mirrors the saved Dynamic Island configuration.
+The same Live Activity also appears on the Lock Screen, and the app includes a Home-screen preview that mirrors the saved Dynamic Island configuration and selected text color.
 
 ## Current features
 
@@ -27,11 +28,13 @@ The same Live Activity also appears on the Lock Screen, and the app includes a H
 - Compact, minimal, expanded, and Lock Screen presentations
 - User-selectable compact Leading and Trailing metrics
 - Up to six configurable expanded metrics
+- Full iOS Color Picker for Dynamic Island telemetry text and symbols
+- Persistent HEX color storage with white (`#FFFFFF`) as the default
 - Persistent on-device Dynamic Island configuration
-- Home-screen preview of the exact saved Island layout
+- Home-screen preview of the exact saved Island layout and color
 - **System / English / Español** language selector
 - Metric names, states, configuration UI, and Live Activity auxiliary text follow the effective language
-- Language/layout changes can update an already-running Live Activity
+- Language/layout/color changes can update an already-running Live Activity
 - 27 current device/system metrics
 - No third-party runtime dependencies
 
@@ -135,7 +138,7 @@ Islemetry is designed to keep device telemetry on-device whenever possible and u
 Current Required Reason API decisions include:
 
 - Disk-space information is displayed to the user under Apple's approved reason `85F4.1`.
-- UserDefaults stores Islemetry's own display/language preferences under approved reason `CA92.1`.
+- UserDefaults stores Islemetry's own metric-layout, language, and Dynamic Island color preferences under approved reason `CA92.1`.
 - General device uptime is intentionally excluded because the approved reasons for the relevant system-boot-time API do not include using it as a generic system-monitor statistic.
 
 No signing credentials or private Apple account material should ever be committed to this repository.
@@ -155,7 +158,7 @@ When functionality, architecture, installation, privacy, or release behavior cha
 ## Roadmap
 
 1. **V0.1** — Core device snapshot + Dynamic Island Live Activity ✅ hardware validated
-2. **V0.2** — Configurable Dynamic Island + expanded telemetry + preview + language controls 🚧 current
+2. **V0.2** — Configurable Dynamic Island + expanded telemetry + preview + language and appearance controls 🚧 current
 3. **V0.3** — Profiles + Shortcuts / App Intents
 4. **V0.4** — Network diagnostics and richer telemetry
 5. **V0.5** — Optional WeatherKit / HealthKit modules
