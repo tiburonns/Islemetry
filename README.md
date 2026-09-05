@@ -17,10 +17,10 @@ You can choose:
 - **Compact Leading** metric
 - **Compact Trailing** metric
 - Up to **six expanded metrics**
-- A custom **Dynamic Island text color**
+- A custom **Dynamic Island telemetry color**
 - **System / English / Español** language behavior
 
-The same Live Activity also appears on the Lock Screen, and the app includes a Home-screen preview that mirrors the saved Dynamic Island configuration and selected text color.
+The same Live Activity also appears on the Lock Screen, and the app includes a Home-screen preview that mirrors the saved Dynamic Island configuration and selected telemetry color.
 
 ## Current features
 
@@ -28,8 +28,8 @@ The same Live Activity also appears on the Lock Screen, and the app includes a H
 - Compact, minimal, expanded, and Lock Screen presentations
 - User-selectable compact Leading and Trailing metrics
 - Up to six configurable expanded metrics
-- Full iOS Color Picker for Dynamic Island telemetry text and symbols
-- Persistent HEX color storage with white (`#FFFFFF`) as the default
+- Full iOS Color Picker for Dynamic Island telemetry text and metric symbols
+- Persistent RGB HEX color storage with white (`#FFFFFF`) as the default
 - Persistent on-device Dynamic Island configuration
 - Home-screen preview of the exact saved Island layout and color
 - **System / English / Español** language selector
