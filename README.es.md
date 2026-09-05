@@ -17,10 +17,10 @@ Puedes elegir:
 - Métrica **Izquierda** de la Isla compacta
 - Métrica **Derecha** de la Isla compacta
 - Hasta **seis métricas expandidas**
-- Un **color personalizado para el texto de la Isla Dinámica**
+- Un **color personalizado para la telemetría de la Isla Dinámica**
 - Comportamiento de idioma **Sistema / English / Español**
 
-La misma Live Activity también aparece en la pantalla bloqueada y la app incluye una vista previa en Inicio que refleja la configuración guardada de la Isla Dinámica y el color de texto elegido.
+La misma Live Activity también aparece en la pantalla bloqueada y la app incluye una vista previa en Inicio que refleja la configuración guardada de la Isla Dinámica y el color de telemetría elegido.
 
 ## Funciones actuales
 
@@ -28,8 +28,8 @@ La misma Live Activity también aparece en la pantalla bloqueada y la app incluy
 - Presentaciones compacta, mínima, expandida y de pantalla bloqueada
 - Métricas Izquierda/Derecha configurables
 - Hasta seis métricas configurables en la vista expandida
-- Color Picker completo de iOS para texto y símbolos de telemetría de la Isla Dinámica
-- Color persistente guardado como HEX, con blanco (`#FFFFFF`) como valor predeterminado
+- Color Picker completo de iOS para texto y símbolos de métricas de la Isla Dinámica
+- Color RGB HEX persistente, con blanco (`#FFFFFF`) como valor predeterminado
 - Configuración persistente guardada en el dispositivo
 - Vista previa en Inicio con exactamente la distribución y el color guardados
 - Selector de idioma **Sistema / English / Español**
