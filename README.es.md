@@ -17,9 +17,10 @@ Puedes elegir:
 - Métrica **Izquierda** de la Isla compacta
 - Métrica **Derecha** de la Isla compacta
 - Hasta **seis métricas expandidas**
+- Un **color personalizado para el texto de la Isla Dinámica**
 - Comportamiento de idioma **Sistema / English / Español**
 
-La misma Live Activity también aparece en la pantalla bloqueada y la app incluye una vista previa en Inicio que refleja la configuración guardada de la Isla Dinámica.
+La misma Live Activity también aparece en la pantalla bloqueada y la app incluye una vista previa en Inicio que refleja la configuración guardada de la Isla Dinámica y el color de texto elegido.
 
 ## Funciones actuales
 
@@ -27,11 +28,13 @@ La misma Live Activity también aparece en la pantalla bloqueada y la app incluy
 - Presentaciones compacta, mínima, expandida y de pantalla bloqueada
 - Métricas Izquierda/Derecha configurables
 - Hasta seis métricas configurables en la vista expandida
+- Color Picker completo de iOS para texto y símbolos de telemetría de la Isla Dinámica
+- Color persistente guardado como HEX, con blanco (`#FFFFFF`) como valor predeterminado
 - Configuración persistente guardada en el dispositivo
-- Vista previa en Inicio con exactamente la distribución guardada
+- Vista previa en Inicio con exactamente la distribución y el color guardados
 - Selector de idioma **Sistema / English / Español**
 - Nombres de métricas, estados, configuración y textos auxiliares de Live Activity según el idioma efectivo
-- Cambios de idioma/distribución pueden actualizar una Live Activity ya activa
+- Cambios de idioma/distribución/color pueden actualizar una Live Activity ya activa
 - 27 métricas actuales del dispositivo/sistema
 - Sin dependencias externas en tiempo de ejecución
 
@@ -135,7 +138,7 @@ Islemetry está diseñada para mantener la telemetría local siempre que sea pos
 Decisiones actuales relacionadas con Required Reason APIs:
 
 - El espacio en disco se muestra al usuario bajo el motivo aprobado `85F4.1`.
-- UserDefaults almacena preferencias propias de distribución/idioma bajo el motivo aprobado `CA92.1`.
+- UserDefaults almacena preferencias propias de distribución, idioma y color de la Isla Dinámica bajo el motivo aprobado `CA92.1`.
 - El uptime general del dispositivo se excluye intencionalmente porque los motivos aprobados para la API correspondiente no incluyen usarlo como una estadística genérica de monitor de sistema.
 
 Nunca deben almacenarse credenciales de firma ni material privado de cuentas Apple en este repositorio.
@@ -155,7 +158,7 @@ Cuando cambien funcionalidad, arquitectura, instalación, privacidad o distribuc
 ## Roadmap
 
 1. **V0.1** — Snapshot principal + Live Activity en Isla Dinámica ✅ validado en hardware
-2. **V0.2** — Isla configurable + telemetría ampliada + preview + controles de idioma 🚧 actual
+2. **V0.2** — Isla configurable + telemetría ampliada + preview + controles de idioma y apariencia 🚧 actual
 3. **V0.3** — Perfiles + Shortcuts / App Intents
 4. **V0.4** — Diagnóstico de red y telemetría más completa
 5. **V0.5** — Módulos opcionales WeatherKit / HealthKit
