@@ -6,8 +6,17 @@ import UIKit
 final class DeviceTelemetryStore: ObservableObject {
     @Published private(set) var metrics: [DeviceMetric] = []
     @Published private(set) var lastUpdated: Date = .distantPast
-    @Published private(set) var networkDescription = "Checking…"
 
+    private enum NetworkInterface {
+        case checking
+        case offline
+        case wifi
+        case cellular
+        case ethernet
+        case other
+    }
+
+    private var networkInterface: NetworkInterface = .checking
     private var networkConstrained = false
     private var networkExpensive = false
     private var networkSupportsIPv4 = false
@@ -29,46 +38,47 @@ final class DeviceTelemetryStore: ObservableObject {
 
     func refresh() {
         let now = Date()
+        let language = AppLanguage.current
         let processInfo = ProcessInfo.processInfo
         let device = UIDevice.current
         let screen = UIScreen.main
 
         let batteryLevel = device.batteryLevel >= 0 ? Int((device.batteryLevel * 100).rounded()) : nil
         let memory = ByteCountFormatter.string(fromByteCount: Int64(processInfo.physicalMemory), countStyle: .memory)
-        let storage = storageValues()
+        let storage = storageValues(language: language)
         let refreshRate = screen.maximumFramesPerSecond
         let brightness = Int((screen.brightness * 100).rounded())
         let resolution = "\(Int(screen.nativeBounds.width))×\(Int(screen.nativeBounds.height)) px"
         let displayScale = String(format: "%.2f×", screen.nativeScale)
 
         metrics = [
-            DeviceMetric(kind: .battery, title: "Battery", value: batteryLevel.map { "\($0)%" } ?? "Unknown", symbol: batterySymbol(level: batteryLevel), updatedAt: now),
-            DeviceMetric(kind: .charging, title: "Power", value: chargingDescription(device.batteryState), symbol: "bolt.fill", updatedAt: now),
-            DeviceMetric(kind: .lowPower, title: "Low Power", value: processInfo.isLowPowerModeEnabled ? "On" : "Off", symbol: "leaf.fill", updatedAt: now),
-            DeviceMetric(kind: .thermal, title: "Thermal", value: thermalDescription(processInfo.thermalState), symbol: "thermometer.medium", updatedAt: now),
-            DeviceMetric(kind: .memory, title: "Memory Total", value: memory, symbol: "memorychip", updatedAt: now),
-            DeviceMetric(kind: .storage, title: "Storage", value: storage.summary, symbol: "internaldrive", updatedAt: now),
-            DeviceMetric(kind: .storageFree, title: "Storage Free", value: storage.free, symbol: "internaldrive", updatedAt: now),
-            DeviceMetric(kind: .storageUsed, title: "Storage Used", value: storage.used, symbol: "internaldrive", updatedAt: now),
-            DeviceMetric(kind: .storageTotal, title: "Storage Total", value: storage.total, symbol: "internaldrive", updatedAt: now),
-            DeviceMetric(kind: .cpuCores, title: "CPU Cores", value: "\(processInfo.processorCount)", symbol: "cpu", updatedAt: now),
-            DeviceMetric(kind: .activeCpuCores, title: "Active Cores", value: "\(processInfo.activeProcessorCount)", symbol: "cpu", updatedAt: now),
-            DeviceMetric(kind: .refreshRate, title: "Refresh Rate", value: "\(refreshRate) Hz max", symbol: "rectangle.inset.filled", updatedAt: now),
-            DeviceMetric(kind: .promotion, title: "ProMotion", value: refreshRate > 60 ? "Up to \(refreshRate) Hz" : "Not active", symbol: "speedometer", updatedAt: now),
-            DeviceMetric(kind: .displayResolution, title: "Resolution", value: resolution, symbol: "rectangle", updatedAt: now),
-            DeviceMetric(kind: .displayScale, title: "Display Scale", value: displayScale, symbol: "arrow.up.left.and.arrow.down.right", updatedAt: now),
-            DeviceMetric(kind: .brightness, title: "Brightness", value: "\(brightness)%", symbol: "sun.max.fill", updatedAt: now),
-            DeviceMetric(kind: .network, title: "Network", value: networkDescription, symbol: networkSymbol(), updatedAt: now),
-            DeviceMetric(kind: .lowDataMode, title: "Low Data", value: networkConstrained ? "On" : "Off", symbol: "tortoise.fill", updatedAt: now),
-            DeviceMetric(kind: .networkExpensive, title: "Network Cost", value: networkExpensive ? "Expensive" : "Normal", symbol: "antenna.radiowaves.left.and.right", updatedAt: now),
-            DeviceMetric(kind: .ipv4, title: "IPv4", value: supportDescription(networkSupportsIPv4), symbol: "4.circle.fill", updatedAt: now),
-            DeviceMetric(kind: .ipv6, title: "IPv6", value: supportDescription(networkSupportsIPv6), symbol: "6.circle.fill", updatedAt: now),
-            DeviceMetric(kind: .dns, title: "DNS", value: supportDescription(networkSupportsDNS), symbol: "network", updatedAt: now),
-            DeviceMetric(kind: .device, title: "Hardware", value: Self.hardwareIdentifier, symbol: "iphone", updatedAt: now),
-            DeviceMetric(kind: .deviceModel, title: "Device Model", value: device.localizedModel, symbol: "iphone", updatedAt: now),
-            DeviceMetric(kind: .system, title: "System", value: "\(device.systemName) \(device.systemVersion)", symbol: "gear", updatedAt: now),
-            DeviceMetric(kind: .locale, title: "Locale", value: Locale.current.identifier, symbol: "globe", updatedAt: now),
-            DeviceMetric(kind: .timeZone, title: "Time Zone", value: TimeZone.current.identifier, symbol: "clock", updatedAt: now)
+            DeviceMetric(kind: .battery, title: language.text("Battery", "Batería"), value: batteryLevel.map { "\($0)%" } ?? language.text("Unknown", "Desconocido"), symbol: batterySymbol(level: batteryLevel), updatedAt: now),
+            DeviceMetric(kind: .charging, title: language.text("Power", "Energía"), value: chargingDescription(device.batteryState, language: language), symbol: "bolt.fill", updatedAt: now),
+            DeviceMetric(kind: .lowPower, title: language.text("Low Power", "Bajo consumo"), value: booleanDescription(processInfo.isLowPowerModeEnabled, language: language), symbol: "leaf.fill", updatedAt: now),
+            DeviceMetric(kind: .thermal, title: language.text("Thermal", "Térmico"), value: thermalDescription(processInfo.thermalState, language: language), symbol: "thermometer.medium", updatedAt: now),
+            DeviceMetric(kind: .memory, title: language.text("Memory Total", "Memoria total"), value: memory, symbol: "memorychip", updatedAt: now),
+            DeviceMetric(kind: .storage, title: language.text("Storage", "Almacenamiento"), value: storage.summary, symbol: "internaldrive", updatedAt: now),
+            DeviceMetric(kind: .storageFree, title: language.text("Storage Free", "Almacenamiento libre"), value: storage.free, symbol: "internaldrive", updatedAt: now),
+            DeviceMetric(kind: .storageUsed, title: language.text("Storage Used", "Almacenamiento usado"), value: storage.used, symbol: "internaldrive", updatedAt: now),
+            DeviceMetric(kind: .storageTotal, title: language.text("Storage Total", "Almacenamiento total"), value: storage.total, symbol: "internaldrive", updatedAt: now),
+            DeviceMetric(kind: .cpuCores, title: language.text("CPU Cores", "Núcleos de CPU"), value: "\(processInfo.processorCount)", symbol: "cpu", updatedAt: now),
+            DeviceMetric(kind: .activeCpuCores, title: language.text("Active Cores", "Núcleos activos"), value: "\(processInfo.activeProcessorCount)", symbol: "cpu", updatedAt: now),
+            DeviceMetric(kind: .refreshRate, title: language.text("Refresh Rate", "Frecuencia"), value: language.text("\(refreshRate) Hz max", "\(refreshRate) Hz máx."), symbol: "rectangle.inset.filled", updatedAt: now),
+            DeviceMetric(kind: .promotion, title: "ProMotion", value: refreshRate > 60 ? language.text("Up to \(refreshRate) Hz", "Hasta \(refreshRate) Hz") : language.text("Not available", "No disponible"), symbol: "speedometer", updatedAt: now),
+            DeviceMetric(kind: .displayResolution, title: language.text("Resolution", "Resolución"), value: resolution, symbol: "rectangle", updatedAt: now),
+            DeviceMetric(kind: .displayScale, title: language.text("Display Scale", "Escala de pantalla"), value: displayScale, symbol: "arrow.up.left.and.arrow.down.right", updatedAt: now),
+            DeviceMetric(kind: .brightness, title: language.text("Brightness", "Brillo"), value: "\(brightness)%", symbol: "sun.max.fill", updatedAt: now),
+            DeviceMetric(kind: .network, title: language.text("Network", "Red"), value: networkDescription(language: language), symbol: networkSymbol(), updatedAt: now),
+            DeviceMetric(kind: .lowDataMode, title: language.text("Low Data", "Datos reducidos"), value: booleanDescription(networkConstrained, language: language), symbol: "tortoise.fill", updatedAt: now),
+            DeviceMetric(kind: .networkExpensive, title: language.text("Network Cost", "Costo de red"), value: networkExpensive ? language.text("Expensive", "Costosa") : language.text("Normal", "Normal"), symbol: "antenna.radiowaves.left.and.right", updatedAt: now),
+            DeviceMetric(kind: .ipv4, title: "IPv4", value: supportDescription(networkSupportsIPv4, language: language), symbol: "4.circle.fill", updatedAt: now),
+            DeviceMetric(kind: .ipv6, title: "IPv6", value: supportDescription(networkSupportsIPv6, language: language), symbol: "6.circle.fill", updatedAt: now),
+            DeviceMetric(kind: .dns, title: "DNS", value: supportDescription(networkSupportsDNS, language: language), symbol: "network", updatedAt: now),
+            DeviceMetric(kind: .device, title: language.text("Hardware", "Hardware"), value: Self.hardwareIdentifier, symbol: "iphone", updatedAt: now),
+            DeviceMetric(kind: .deviceModel, title: language.text("Device Model", "Modelo del dispositivo"), value: device.localizedModel, symbol: "iphone", updatedAt: now),
+            DeviceMetric(kind: .system, title: language.text("System", "Sistema"), value: "\(device.systemName) \(device.systemVersion)", symbol: "gear", updatedAt: now),
+            DeviceMetric(kind: .locale, title: language.text("Locale", "Configuración regional"), value: Locale.current.identifier, symbol: "globe", updatedAt: now),
+            DeviceMetric(kind: .timeZone, title: language.text("Time Zone", "Zona horaria"), value: TimeZone.current.identifier, symbol: "clock", updatedAt: now)
         ]
 
         lastUpdated = now
@@ -76,22 +86,23 @@ final class DeviceTelemetryStore: ObservableObject {
 
     private func startNetworkMonitor() {
         pathMonitor.pathUpdateHandler = { [weak self] path in
-            let description: String
+            let interface: NetworkInterface
+
             if path.status != .satisfied {
-                description = "Offline"
+                interface = .offline
             } else if path.usesInterfaceType(.wifi) {
-                description = path.isConstrained ? "Wi-Fi · Low Data" : "Wi-Fi"
+                interface = .wifi
             } else if path.usesInterfaceType(.cellular) {
-                description = path.isConstrained ? "Cellular · Low Data" : "Cellular"
+                interface = .cellular
             } else if path.usesInterfaceType(.wiredEthernet) {
-                description = "Ethernet"
+                interface = .ethernet
             } else {
-                description = "Connected"
+                interface = .other
             }
 
             Task { @MainActor [weak self] in
                 guard let self else { return }
-                self.networkDescription = description
+                self.networkInterface = interface
                 self.networkConstrained = path.isConstrained
                 self.networkExpensive = path.isExpensive
                 self.networkSupportsIPv4 = path.supportsIPv4
@@ -103,7 +114,7 @@ final class DeviceTelemetryStore: ObservableObject {
         pathMonitor.start(queue: monitorQueue)
     }
 
-    private func storageValues() -> (summary: String, free: String, used: String, total: String) {
+    private func storageValues(language: AppLanguage) -> (summary: String, free: String, used: String, total: String) {
         do {
             let values = try URL(fileURLWithPath: NSHomeDirectory()).resourceValues(
                 forKeys: [.volumeTotalCapacityKey, .volumeAvailableCapacityKey]
@@ -111,7 +122,8 @@ final class DeviceTelemetryStore: ObservableObject {
 
             guard let total = values.volumeTotalCapacity,
                   let available = values.volumeAvailableCapacity else {
-                return ("Unknown", "Unknown", "Unknown", "Unknown")
+                let unknown = language.text("Unknown", "Desconocido")
+                return (unknown, unknown, unknown, unknown)
             }
 
             let used = max(total - available, 0)
@@ -123,13 +135,14 @@ final class DeviceTelemetryStore: ObservableObject {
             let totalString = formatter.string(fromByteCount: Int64(total))
 
             return (
-                "\(freeString) free / \(totalString)",
+                language.text("\(freeString) free / \(totalString)", "\(freeString) libres / \(totalString)"),
                 freeString,
                 usedString,
                 totalString
             )
         } catch {
-            return ("Unavailable", "Unavailable", "Unavailable", "Unavailable")
+            let unavailable = language.text("Unavailable", "No disponible")
+            return (unavailable, unavailable, unavailable, unavailable)
         }
     }
 
@@ -144,35 +157,56 @@ final class DeviceTelemetryStore: ObservableObject {
         }
     }
 
-    private func chargingDescription(_ state: UIDevice.BatteryState) -> String {
+    private func chargingDescription(_ state: UIDevice.BatteryState, language: AppLanguage) -> String {
         switch state {
-        case .charging: return "Charging"
-        case .full: return "Full"
-        case .unplugged: return "On battery"
-        case .unknown: return "Unknown"
-        @unknown default: return "Unknown"
+        case .charging: return language.text("Charging", "Cargando")
+        case .full: return language.text("Full", "Completa")
+        case .unplugged: return language.text("On battery", "Usando batería")
+        case .unknown: return language.text("Unknown", "Desconocido")
+        @unknown default: return language.text("Unknown", "Desconocido")
         }
     }
 
-    private func thermalDescription(_ state: ProcessInfo.ThermalState) -> String {
+    private func thermalDescription(_ state: ProcessInfo.ThermalState, language: AppLanguage) -> String {
         switch state {
-        case .nominal: return "Nominal"
-        case .fair: return "Fair"
-        case .serious: return "Serious"
-        case .critical: return "Critical"
-        @unknown default: return "Unknown"
+        case .nominal: return language.text("Nominal", "Nominal")
+        case .fair: return language.text("Fair", "Moderado")
+        case .serious: return language.text("Serious", "Serio")
+        case .critical: return language.text("Critical", "Crítico")
+        @unknown default: return language.text("Unknown", "Desconocido")
         }
     }
 
-    private func supportDescription(_ supported: Bool) -> String {
-        supported ? "Supported" : "Unavailable"
+    private func booleanDescription(_ value: Bool, language: AppLanguage) -> String {
+        value ? language.text("On", "Activado") : language.text("Off", "Desactivado")
+    }
+
+    private func supportDescription(_ supported: Bool, language: AppLanguage) -> String {
+        supported ? language.text("Supported", "Compatible") : language.text("Unavailable", "No disponible")
+    }
+
+    private func networkDescription(language: AppLanguage) -> String {
+        switch networkInterface {
+        case .checking:
+            return language.text("Checking…", "Revisando…")
+        case .offline:
+            return language.text("Offline", "Sin conexión")
+        case .wifi:
+            return networkConstrained ? language.text("Wi-Fi · Low Data", "Wi-Fi · Datos reducidos") : "Wi-Fi"
+        case .cellular:
+            return networkConstrained ? language.text("Cellular · Low Data", "Celular · Datos reducidos") : language.text("Cellular", "Celular")
+        case .ethernet:
+            return "Ethernet"
+        case .other:
+            return language.text("Connected", "Conectado")
+        }
     }
 
     private func networkSymbol() -> String {
-        switch networkDescription {
-        case let value where value.hasPrefix("Wi-Fi"): return "wifi"
-        case let value where value.hasPrefix("Cellular"): return "antenna.radiowaves.left.and.right"
-        case "Offline": return "wifi.slash"
+        switch networkInterface {
+        case .wifi: return "wifi"
+        case .cellular: return "antenna.radiowaves.left.and.right"
+        case .offline: return "wifi.slash"
         default: return "network"
         }
     }
