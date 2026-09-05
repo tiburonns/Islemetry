@@ -1,7 +1,7 @@
 import Foundation
 
 struct DeviceMetric: Identifiable, Hashable, Codable {
-    enum Kind: String, Codable, CaseIterable, Identifiable {
+    enum Kind: String, Codable, CaseIterable, Identifiable, Hashable {
         case battery
         case charging
         case lowPower
