@@ -55,10 +55,15 @@ final class LiveActivityManager: ObservableObject {
     func start(
         with metrics: [DeviceMetric],
         configuration: IslandConfiguration = .current,
-        profileName: String = "Custom"
+        profileName: String? = nil
     ) async {
+        let language = AppLanguage.current
+
         guard ActivityAuthorizationInfo().areActivitiesEnabled else {
-            lastError = "Live Activities are disabled for Islemetry."
+            lastError = language.text(
+                "Live Activities are disabled for Islemetry.",
+                "Las Live Activities están desactivadas para Islemetry."
+            )
             return
         }
 
@@ -68,7 +73,8 @@ final class LiveActivityManager: ObservableObject {
         }
 
         let state = makeContentState(from: metrics, configuration: configuration)
-        let attributes = DeviceActivityAttributes(sessionID: UUID(), profileName: profileName)
+        let resolvedProfileName = profileName ?? language.text("Custom", "Personalizado")
+        let attributes = DeviceActivityAttributes(sessionID: UUID(), profileName: resolvedProfileName)
         let content = ActivityContent(state: state, staleDate: Date().addingTimeInterval(5 * 60))
 
         do {
@@ -116,16 +122,26 @@ final class LiveActivityManager: ObservableObject {
         from metrics: [DeviceMetric],
         configuration: IslandConfiguration
     ) -> DeviceActivityAttributes.ContentState {
+        let language = AppLanguage.current
+
         let leading = metric(
             configuration.leading,
             in: metrics,
-            fallback: fallbackMetric(title: "Islemetry", value: "Active", symbol: "waveform.path.ecg")
+            fallback: fallbackMetric(
+                title: "Islemetry",
+                value: language.text("Active", "Activo"),
+                symbol: "waveform.path.ecg"
+            )
         )
 
         let trailing = metric(
             configuration.trailing,
             in: metrics,
-            fallback: fallbackMetric(title: "Status", value: "Ready", symbol: "checkmark.circle.fill")
+            fallback: fallbackMetric(
+                title: language.text("Status", "Estado"),
+                value: language.text("Ready", "Listo"),
+                symbol: "checkmark.circle.fill"
+            )
         )
 
         var seen = Set<DeviceMetric.Kind>()
@@ -151,7 +167,8 @@ final class LiveActivityManager: ObservableObject {
             trailingValue: trailing.value,
             trailingSymbol: trailing.symbol,
             secondary: secondary,
-            updatedAt: .now
+            updatedAt: .now,
+            languageCode: language.rawValue
         )
     }
 
