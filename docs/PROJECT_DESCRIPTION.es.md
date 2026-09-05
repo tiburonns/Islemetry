@@ -12,7 +12,7 @@ Islemetry es una app nativa para iOS desarrollada con SwiftUI que muestra teleme
 
 ## Descripción corta del producto
 
-Islemetry convierte la Isla Dinámica en un monitor compacto del estado del dispositivo. Elige las métricas que te importan, mantenlas visibles mediante una Live Activity y expande la Isla cuando quieras consultar un snapshot más completo de tu iPhone.
+Islemetry convierte la Isla Dinámica en un monitor compacto del estado del dispositivo. Elige las métricas que te importan, personaliza su apariencia, mantenlas visibles mediante una Live Activity y expande la Isla cuando quieras consultar un snapshot más completo de tu iPhone.
 
 ## Descripción completa del proyecto
 
@@ -22,7 +22,7 @@ En lugar de esconder la información del dispositivo dentro de un panel convenci
 
 Actualmente la aplicación expone información relacionada con energía, estado térmico, CPU, memoria, almacenamiento, pantalla, red y sistema. Algunos ejemplos son porcentaje de batería, estado de carga, Modo de bajo consumo, estado térmico, memoria física, almacenamiento libre/usado/total, número de núcleos de CPU, frecuencia máxima de actualización de pantalla, indicador ProMotion, brillo, interfaz de red actual, Low Data Mode, compatibilidad con IPv4/IPv6/DNS, identificador del dispositivo, versión de iOS, configuración regional y zona horaria.
 
-Islemetry incluye en la pantalla principal una vista previa de la configuración real de la Isla Dinámica compacta y expandida, preferencias persistentes guardadas en el dispositivo y un selector de idioma con modos Sistema, English y Español. Cuando la Live Activity ya está activa, los cambios de distribución e idioma pueden enviarse a la actividad existente sin crear intencionalmente una sesión duplicada.
+Islemetry incluye en la pantalla principal una vista previa de la configuración real de la Isla Dinámica compacta y expandida, preferencias persistentes guardadas en el dispositivo, un Color Picker completo de iOS para personalizar el color del texto y símbolos de telemetría y un selector de idioma con modos Sistema, English y Español. El color elegido se guarda como un valor RGB HEX y se envía dentro del estado de ActivityKit. Cuando la Live Activity ya está activa, los cambios de distribución, apariencia e idioma pueden enviarse a la actividad existente sin crear intencionalmente una sesión duplicada.
 
 El proyecto está desarrollado de forma nativa con SwiftUI, ActivityKit, WidgetKit, Network, UIKit y Foundation. Evita intencionalmente dependencias externas en tiempo de ejecución y se desarrolla teniendo en cuenta la compatibilidad con App Store y los requisitos de privacidad de Apple.
 
@@ -31,7 +31,7 @@ Como iOS no permite que una aplicación normal se ejecute continuamente en segun
 ## Principios del proyecto
 
 - **Información inmediata:** las métricas importantes deben poder consultarse sin abrir un panel completo.
-- **Configurable:** el usuario decide qué aparece en la Isla Dinámica compacta y expandida.
+- **Configurable:** el usuario decide qué aparece en la Isla Dinámica compacta y expandida y cómo se presenta la telemetría.
 - **Nativo:** utilizar frameworks públicos de Apple e interfaces propias de la plataforma.
 - **Privado:** mantener la telemetría del dispositivo local siempre que sea posible.
 - **Transparente:** diferenciar valores reales, capacidades inferidas y snapshots.
@@ -42,6 +42,8 @@ Como iOS no permite que una aplicación normal se ejecute continuamente en segun
 - Iniciar, actualizar y detener una Live Activity
 - Selección de métricas izquierda/derecha en la Isla Dinámica compacta
 - Hasta seis métricas en la vista expandida
+- Color personalizado para texto/símbolos de telemetría mediante Color Picker de iOS
+- Preferencia de color RGB HEX persistente, con blanco como valor predeterminado
 - Live Activity en pantalla bloqueada
 - Vista previa de la Isla Dinámica en Inicio
 - Configuración persistente en el dispositivo
