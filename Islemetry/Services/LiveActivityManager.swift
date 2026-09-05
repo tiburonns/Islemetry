@@ -1,23 +1,73 @@
 import ActivityKit
 import Foundation
 
+struct IslandConfiguration: Equatable {
+    static let noneValue = "none"
+
+    static let leadingKey = "island.leadingMetric"
+    static let trailingKey = "island.trailingMetric"
+    static let expandedKeys = (1...6).map { "island.expandedMetric\($0)" }
+
+    let leading: DeviceMetric.Kind
+    let trailing: DeviceMetric.Kind
+    let expanded: [DeviceMetric.Kind]
+
+    static var current: IslandConfiguration {
+        let defaults = UserDefaults.standard
+
+        let leading = DeviceMetric.Kind(
+            rawValue: defaults.string(forKey: leadingKey) ?? DeviceMetric.Kind.battery.rawValue
+        ) ?? .battery
+
+        let trailing = DeviceMetric.Kind(
+            rawValue: defaults.string(forKey: trailingKey) ?? DeviceMetric.Kind.thermal.rawValue
+        ) ?? .thermal
+
+        let fallbackExpanded: [DeviceMetric.Kind] = [
+            .network,
+            .storageFree,
+            .memory,
+            .activeCpuCores,
+            .refreshRate,
+            .lowPower
+        ]
+
+        let expanded = expandedKeys.enumerated().compactMap { index, key -> DeviceMetric.Kind? in
+            let fallback = fallbackExpanded[index].rawValue
+            let rawValue = defaults.string(forKey: key) ?? fallback
+            guard rawValue != noneValue else { return nil }
+            return DeviceMetric.Kind(rawValue: rawValue)
+        }
+
+        return IslandConfiguration(
+            leading: leading,
+            trailing: trailing,
+            expanded: expanded
+        )
+    }
+}
+
 @MainActor
 final class LiveActivityManager: ObservableObject {
     @Published private(set) var activeActivityID: String?
     @Published private(set) var lastError: String?
 
-    func start(with metrics: [DeviceMetric], profileName: String = "Overview") async {
+    func start(
+        with metrics: [DeviceMetric],
+        configuration: IslandConfiguration = .current,
+        profileName: String = "Custom"
+    ) async {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else {
             lastError = "Live Activities are disabled for Islemetry."
             return
         }
 
         guard Activity<DeviceActivityAttributes>.activities.isEmpty else {
-            await update(with: metrics)
+            await update(with: metrics, configuration: configuration)
             return
         }
 
-        let state = makeContentState(from: metrics)
+        let state = makeContentState(from: metrics, configuration: configuration)
         let attributes = DeviceActivityAttributes(sessionID: UUID(), profileName: profileName)
         let content = ActivityContent(state: state, staleDate: Date().addingTimeInterval(5 * 60))
 
@@ -34,9 +84,12 @@ final class LiveActivityManager: ObservableObject {
         }
     }
 
-    func update(with metrics: [DeviceMetric]) async {
+    func update(
+        with metrics: [DeviceMetric],
+        configuration: IslandConfiguration = .current
+    ) async {
         let content = ActivityContent(
-            state: makeContentState(from: metrics),
+            state: makeContentState(from: metrics, configuration: configuration),
             staleDate: Date().addingTimeInterval(5 * 60)
         )
 
@@ -45,6 +98,7 @@ final class LiveActivityManager: ObservableObject {
         }
 
         activeActivityID = Activity<DeviceActivityAttributes>.activities.first?.id
+        lastError = nil
     }
 
     func stop() async {
@@ -58,18 +112,34 @@ final class LiveActivityManager: ObservableObject {
         activeActivityID = Activity<DeviceActivityAttributes>.activities.first?.id
     }
 
-    private func makeContentState(from metrics: [DeviceMetric]) -> DeviceActivityAttributes.ContentState {
-        let preferredOrder: [DeviceMetric.Kind] = [.battery, .thermal, .network, .storage, .memory, .lowPower, .refreshRate, .cpuCores]
-        let ordered = preferredOrder.compactMap { kind in metrics.first(where: { $0.kind == kind }) }
-        let leading = ordered.first ?? fallbackMetric(title: "Islemetry", value: "Active", symbol: "waveform.path.ecg")
-        let trailing = ordered.dropFirst().first ?? fallbackMetric(title: "Status", value: "Ready", symbol: "checkmark.circle.fill")
+    private func makeContentState(
+        from metrics: [DeviceMetric],
+        configuration: IslandConfiguration
+    ) -> DeviceActivityAttributes.ContentState {
+        let leading = metric(
+            configuration.leading,
+            in: metrics,
+            fallback: fallbackMetric(title: "Islemetry", value: "Active", symbol: "waveform.path.ecg")
+        )
 
-        let secondary = ordered.dropFirst(2).prefix(6).map {
-            DeviceActivityAttributes.LiveMetric(
-                key: $0.kind.rawValue,
-                title: $0.title,
-                value: $0.value,
-                symbol: $0.symbol
+        let trailing = metric(
+            configuration.trailing,
+            in: metrics,
+            fallback: fallbackMetric(title: "Status", value: "Ready", symbol: "checkmark.circle.fill")
+        )
+
+        var seen = Set<DeviceMetric.Kind>()
+        let secondary = configuration.expanded.compactMap { kind -> DeviceActivityAttributes.LiveMetric? in
+            guard seen.insert(kind).inserted,
+                  let item = metrics.first(where: { $0.kind == kind }) else {
+                return nil
+            }
+
+            return DeviceActivityAttributes.LiveMetric(
+                key: item.kind.rawValue,
+                title: item.title,
+                value: item.value,
+                symbol: item.symbol
             )
         }
 
@@ -80,9 +150,17 @@ final class LiveActivityManager: ObservableObject {
             trailingTitle: trailing.title,
             trailingValue: trailing.value,
             trailingSymbol: trailing.symbol,
-            secondary: Array(secondary),
+            secondary: secondary,
             updatedAt: .now
         )
+    }
+
+    private func metric(
+        _ kind: DeviceMetric.Kind,
+        in metrics: [DeviceMetric],
+        fallback: DeviceMetric
+    ) -> DeviceMetric {
+        metrics.first(where: { $0.kind == kind }) ?? fallback
     }
 
     private func fallbackMetric(title: String, value: String, symbol: String) -> DeviceMetric {
