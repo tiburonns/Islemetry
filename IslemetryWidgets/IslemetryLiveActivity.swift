@@ -19,7 +19,7 @@ struct IslemetryLiveActivity: Widget {
             let expandedMetrics = context.state.secondary
             let remainingExpandedMetrics = Array(expandedMetrics.dropFirst(2))
 
-            DynamicIsland {
+            return DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
                     if let metric = expandedMetrics.first {
                         expandedMetric(
