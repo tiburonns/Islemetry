@@ -3,6 +3,7 @@ import Foundation
 enum AppLanguage: String, CaseIterable, Identifiable {
     static let storageKey = "app.language"
 
+    case system = "system"
     case english = "en"
     case spanish = "es"
 
@@ -10,18 +11,26 @@ enum AppLanguage: String, CaseIterable, Identifiable {
 
     static var current: AppLanguage {
         let rawValue = UserDefaults.standard.string(forKey: storageKey)
-        return AppLanguage(rawValue: rawValue ?? AppLanguage.english.rawValue) ?? .english
+        return AppLanguage(rawValue: rawValue ?? AppLanguage.system.rawValue) ?? .system
+    }
+
+    var effective: AppLanguage {
+        guard self == .system else { return self }
+
+        let preferredLanguage = Locale.preferredLanguages.first?.lowercased() ?? "en"
+        return preferredLanguage.hasPrefix("es") ? .spanish : .english
     }
 
     var displayName: String {
         switch self {
+        case .system: return "System / Sistema"
         case .english: return "English"
         case .spanish: return "Español"
         }
     }
 
     func text(_ english: String, _ spanish: String) -> String {
-        self == .spanish ? spanish : english
+        effective == .spanish ? spanish : english
     }
 }
 
