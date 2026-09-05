@@ -1,16 +1,16 @@
-# Islemetry V0.1 — Plan de pruebas en dispositivo real
+# Islemetry V0.2 — Plan de pruebas en dispositivo real
 
 **Español** · [English](TESTING.md)
 
-Esta lista está pensada para la primera instalación de Islemetry en un iPhone físico con Isla Dinámica.
+Esta lista valida la compilación actual de Islemetry en un iPhone físico con Isla Dinámica. V0.1 ya fue compilada e instalada correctamente en hardware real; V0.2 agrega contenido configurable en la Isla Dinámica, telemetría ampliada, vista previa en Inicio y cambio de idioma English/Español dentro de la app.
 
 ## Objetivo
 
-Validar que la app compile, se firme correctamente, se abra, recopile el snapshot inicial de telemetría y pueda crear, actualizar y detener correctamente la Live Activity tanto en la pantalla bloqueada como en la Isla Dinámica.
+Validar que Islemetry compile, abra correctamente, recopile telemetría, muestre una vista previa fiel de la configuración guardada para la Isla Dinámica, cambie de idioma sin reiniciar y pueda crear, actualizar y detener correctamente la Live Activity tanto en la pantalla bloqueada como en la Isla Dinámica.
 
 ## Entorno de prueba
 
-Registra lo siguiente antes de comenzar:
+Registra:
 
 - Fecha y hora
 - Modelo de Mac
@@ -36,65 +36,103 @@ Registra lo siguiente antes de comenzar:
 - Islemetry se instala en el iPhone.
 - Islemetry abre sin cerrarse inesperadamente.
 
-## Prueba de la app principal
+## Prueba de telemetría de la app principal
 
 1. Abre Islemetry.
-2. Revisa la telemetría mostrada en la app.
-3. Confirma que aparezcan los siguientes valores cuando sean compatibles:
-   - Nivel de batería
-   - Estado de carga
-   - Modo de bajo consumo
-   - Estado térmico
-   - Memoria física
-   - Almacenamiento
-   - Número de núcleos de CPU
-   - Frecuencia máxima de actualización de pantalla
-   - Estado de red
-   - Identificador del dispositivo
-   - Versión de iOS
+2. Revisa todas las tarjetas de métricas.
+3. Confirma que las 27 métricas actuales se muestren sin SF Symbols faltantes, valores vacíos ni recortes graves.
+4. Compara valores fáciles de verificar: batería, carga, modo de bajo consumo, almacenamiento, frecuencia de pantalla, brillo, red, versión de iOS, configuración regional y zona horaria.
 
-### Registra
+## Prueba de vista previa de la Isla Dinámica
 
-Para cualquier valor incorrecto o ausente, captura:
+1. En Inicio, localiza **Vista previa de Isla Dinámica**.
+2. Confirma que la vista compacta muestre las métricas actuales de Izquierda y Derecha con sus valores actuales.
+3. Confirma que la vista expandida muestre las métricas expandidas seleccionadas.
+4. Abre **Configurar Isla Dinámica** y cambia Izquierda, Derecha y al menos tres posiciones expandidas.
+5. Configura al menos una posición expandida como **Ninguna**.
+6. Regresa a Inicio.
 
-- Nombre de la métrica
-- Valor mostrado
-- Valor esperado, si se conoce
-- Captura de pantalla
-- Si volver a abrir la app cambia el resultado
+### Resultado esperado
+
+- La vista previa de Inicio coincide con la configuración guardada.
+- Una posición configurada como Ninguna no aparece en la vista expandida.
+- La vista previa usa los valores del snapshot de telemetría más reciente.
+- Las selecciones expandidas duplicadas no generan tarjetas duplicadas.
+
+## Prueba de idioma
+
+1. En Inicio, cambia de **English** a **Español**.
+2. Revisa la tarjeta de estado, botones, selector de idioma, vista previa de Isla Dinámica, tarjeta de configuración, nombres de métricas y valores de estado traducibles.
+3. Abre **Configurar Isla Dinámica** y confirma que sus etiquetas y opciones estén en español.
+4. Regresa a Inicio y vuelve a **English**.
+5. Cierra Islemetry por completo, vuelve a abrirla y confirma que se conserve el último idioma elegido.
+
+### Resultado esperado
+
+- La interfaz visible cambia inmediatamente.
+- Los nombres de métricas y valores de estado traducibles cambian de idioma.
+- La selección de idioma persiste al volver a abrir la app.
+- Cambiar el idioma no borra la configuración guardada de la Isla Dinámica.
 
 ## Prueba de inicio de Live Activity
 
-1. En Islemetry, inicia la Live Activity.
-2. Regresa a la pantalla de inicio.
-3. Bloquea el iPhone.
-4. Desbloquea el iPhone.
-5. Observa la Isla Dinámica.
+1. Configura la Isla Dinámica como prefieras.
+2. Inicia la Live Activity.
+3. Regresa a la pantalla de inicio.
+4. Bloquea el iPhone y revisa la pantalla bloqueada.
+5. Desbloquea el iPhone y revisa la Isla Dinámica compacta.
+6. Mantén presionada la Isla Dinámica y revisa la presentación expandida.
 
 ### Resultado esperado
 
 - La Live Activity inicia correctamente.
-- La presentación de pantalla bloqueada es visible.
-- La presentación compacta de la Isla Dinámica es visible.
-- Al mantener presionada la Isla Dinámica aparece la vista expandida.
-- No se crean Live Activities duplicadas de forma no intencional.
+- La Isla Dinámica compacta coincide con las selecciones Izquierda y Derecha.
+- La vista expandida contiene las métricas seleccionadas esperadas.
+- La presentación de pantalla bloqueada se renderiza correctamente.
+- No se crean Live Activities duplicadas accidentalmente.
 
-## Prueba de actualización de Live Activity
+## Prueba de actualización de configuración con Live Activity activa
 
-1. Anota la telemetría mostrada actualmente.
-2. Cambia un valor que pueda variar razonablemente, como estado de batería, estado de carga, red o Modo de bajo consumo.
-3. Regresa a Islemetry y pulsa **Refresh**.
-4. Revisa nuevamente la Live Activity.
+1. Mantén la Live Activity activa.
+2. Cambia Izquierda, Derecha y las posiciones expandidas en Islemetry.
+3. Pulsa **Aplicar a Live Activity**.
+4. Vuelve a revisar las presentaciones compacta y expandida.
 
 ### Resultado esperado
 
+- La Live Activity existente permanece activa.
+- Su contenido cambia a la nueva distribución seleccionada.
+- No se crea una segunda Live Activity.
+
+## Prueba de cambio de idioma con Live Activity activa
+
+1. Mantén la Live Activity activa en inglés.
+2. Abre Islemetry y cambia a **Español**.
+3. Regresa a la Isla Dinámica y a la vista expandida.
+4. Repite cambiando de nuevo a English.
+
+### Resultado esperado
+
+- Islemetry envía automáticamente un nuevo estado de ActivityKit después de cambiar el idioma.
+- Los nombres de métricas y valores traducibles de la Live Activity utilizan el nuevo idioma.
+- Los textos auxiliares como Updated / Actualizado cambian correctamente.
+- La actividad sigue siendo la misma sesión y no se duplica.
+
+## Prueba de actualización de Live Activity
+
+1. Cambia un valor que pueda variar, como estado de batería, carga, red, modo de bajo consumo o brillo.
+2. Regresa a Islemetry y pulsa **Refresh / Actualizar**.
+3. Revisa nuevamente la vista previa de Inicio y la Live Activity.
+
+### Resultado esperado
+
+- La vista previa de Inicio refleja el nuevo snapshot.
 - La Live Activity permanece activa.
-- Los valores actualizados se reflejan después del refresh.
-- La Live Activity no desaparece ni se duplica.
+- Los valores actualizados se reflejan después de actualizar.
 
 ## Prueba de detención de Live Activity
 
-1. Pulsa **Stop** en Islemetry.
+1. Pulsa **Stop / Detener** en Islemetry.
 2. Revisa la Isla Dinámica.
 3. Revisa la pantalla bloqueada.
 
@@ -104,22 +142,7 @@ Para cualquier valor incorrecto o ausente, captura:
 - Islemetry desaparece de la Isla Dinámica.
 - Islemetry desaparece de la pantalla bloqueada cuando el sistema complete la retirada.
 
-## Prueba de estados y presentación
-
-Comprueba la app y la Live Activity en estados comunes:
-
-- iPhone desbloqueado
-- iPhone bloqueado
-- Always-On Display, si el dispositivo lo soporta
-- Modo de bajo consumo activado/desactivado
-- Wi-Fi conectado
-- Conexión celular
-- Modo avión / sin conexión
-- Cargando / desconectado del cargador
-
 ## Plantilla para reportar fallos
-
-Usa este formato cuando encuentres un problema:
 
 ```text
 Prueba:
@@ -127,6 +150,7 @@ Dispositivo:
 iOS:
 Xcode:
 Rama / commit:
+Idioma:
 
 Esperado:
 
@@ -142,16 +166,15 @@ Error de Xcode o salida de consola:
 Captura / grabación de pantalla:
 ```
 
-## Criterios de aceptación de V0.1
+## Criterios de aceptación de V0.2
 
-La validación de hardware de V0.1 se considera exitosa cuando:
+La validación de hardware de V0.2 se considera exitosa cuando:
 
-- El proyecto compila en un iPhone físico.
-- La app abre de forma confiable.
-- La telemetría principal es visible.
-- Se puede iniciar una Live Activity.
-- Se renderizan las presentaciones compacta, expandida y de pantalla bloqueada.
-- La Live Activity puede actualizarse.
-- La Live Activity puede detenerse sin dejar una sesión activa no deseada.
-
-Cualquier problema de compilación, firma, ActivityKit, diseño o métricas encontrado durante esta prueba debe documentarse antes de fusionar el PR de bootstrap.
+- El proyecto compila y abre en un iPhone físico.
+- Todas las tarjetas de métricas actuales se muestran correctamente.
+- La vista previa de Isla Dinámica en Inicio coincide con la configuración guardada.
+- Las selecciones compactas y expandidas pueden cambiarse y persisten.
+- El cambio English / Español funciona y persiste.
+- Una Live Activity activa se actualiza al cambiar distribución o idioma.
+- Las presentaciones compacta, expandida y de pantalla bloqueada se renderizan correctamente.
+- La Live Activity puede actualizarse y detenerse sin duplicados ni sesiones residuales.
