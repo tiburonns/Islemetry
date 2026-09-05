@@ -5,7 +5,10 @@ import WidgetKit
 struct IslemetryLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: DeviceActivityAttributes.self) { context in
-            lockScreenView(context.state, profileName: context.attributes.profileName)
+            lockScreenView(
+                context.state,
+                profileName: context.state.languageCode == "es" ? "Personalizado" : "Custom"
+            )
                 .activityBackgroundTint(.black.opacity(0.88))
                 .activitySystemActionForegroundColor(.white)
         } dynamicIsland: { context in
@@ -27,7 +30,7 @@ struct IslemetryLiveActivity: Widget {
                 }
 
                 DynamicIslandExpandedRegion(.center) {
-                    Text(context.attributes.profileName)
+                    Text(context.state.languageCode == "es" ? "Personalizado" : "Custom")
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(.secondary)
                 }
@@ -57,6 +60,7 @@ struct IslemetryLiveActivity: Widget {
 
                         HStack(spacing: 4) {
                             Image(systemName: "clock")
+                            Text(context.state.languageCode == "es" ? "Actualizado" : "Updated")
                             Text(context.state.updatedAt, style: .relative)
                         }
                         .font(.caption2)
@@ -121,9 +125,12 @@ struct IslemetryLiveActivity: Widget {
                 }
             }
 
-            Text("Updated \(state.updatedAt, style: .relative) ago")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
+            HStack(spacing: 4) {
+                Text(state.languageCode == "es" ? "Actualizado" : "Updated")
+                Text(state.updatedAt, style: .relative)
+            }
+            .font(.caption2)
+            .foregroundStyle(.secondary)
         }
         .padding(.horizontal, 4)
     }
