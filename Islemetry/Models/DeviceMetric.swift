@@ -75,7 +75,7 @@ extension Color {
         var alpha: CGFloat = 1
 
         guard uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha) else {
-            return IslandConfiguration.defaultTextColorHex
+            return "#FFFFFF"
         }
 
         return String(
