@@ -1,4 +1,6 @@
 import Foundation
+import SwiftUI
+import UIKit
 
 enum AppLanguage: String, CaseIterable, Identifiable {
     static let storageKey = "app.language"
@@ -31,6 +33,57 @@ enum AppLanguage: String, CaseIterable, Identifiable {
 
     func text(_ english: String, _ spanish: String) -> String {
         effective == .spanish ? spanish : english
+    }
+}
+
+extension Color {
+    init(islemetryHex hex: String) {
+        let source = hex
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: "#", with: "")
+
+        var value: UInt64 = 0
+        guard Scanner(string: source).scanHexInt64(&value) else {
+            self = .white
+            return
+        }
+
+        switch source.count {
+        case 6:
+            let red = Double((value >> 16) & 0xFF) / 255
+            let green = Double((value >> 8) & 0xFF) / 255
+            let blue = Double(value & 0xFF) / 255
+            self = Color(red: red, green: green, blue: blue)
+
+        case 8:
+            let red = Double((value >> 24) & 0xFF) / 255
+            let green = Double((value >> 16) & 0xFF) / 255
+            let blue = Double((value >> 8) & 0xFF) / 255
+            let alpha = Double(value & 0xFF) / 255
+            self = Color(red: red, green: green, blue: blue, opacity: alpha)
+
+        default:
+            self = .white
+        }
+    }
+
+    var islemetryHex: String {
+        let uiColor = UIColor(self)
+        var red: CGFloat = 1
+        var green: CGFloat = 1
+        var blue: CGFloat = 1
+        var alpha: CGFloat = 1
+
+        guard uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha) else {
+            return IslandConfiguration.defaultTextColorHex
+        }
+
+        return String(
+            format: "#%02X%02X%02X",
+            Int((red * 255).rounded()),
+            Int((green * 255).rounded()),
+            Int((blue * 255).rounded())
+        )
     }
 }
 
