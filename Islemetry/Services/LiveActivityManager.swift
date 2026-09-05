@@ -6,11 +6,14 @@ struct IslandConfiguration: Equatable {
 
     static let leadingKey = "island.leadingMetric"
     static let trailingKey = "island.trailingMetric"
+    static let textColorKey = "island.textColorHex"
+    static let defaultTextColorHex = "#FFFFFF"
     static let expandedKeys = (1...6).map { "island.expandedMetric\($0)" }
 
     let leading: DeviceMetric.Kind
     let trailing: DeviceMetric.Kind
     let expanded: [DeviceMetric.Kind]
+    let textColorHex: String
 
     static var current: IslandConfiguration {
         let defaults = UserDefaults.standard
@@ -39,10 +42,13 @@ struct IslandConfiguration: Equatable {
             return DeviceMetric.Kind(rawValue: rawValue)
         }
 
+        let textColorHex = defaults.string(forKey: textColorKey) ?? defaultTextColorHex
+
         return IslandConfiguration(
             leading: leading,
             trailing: trailing,
-            expanded: expanded
+            expanded: expanded,
+            textColorHex: textColorHex
         )
     }
 }
@@ -168,7 +174,8 @@ final class LiveActivityManager: ObservableObject {
             trailingSymbol: trailing.symbol,
             secondary: secondary,
             updatedAt: .now,
-            languageCode: language.effective.rawValue
+            languageCode: language.effective.rawValue,
+            textColorHex: configuration.textColorHex
         )
     }
 
