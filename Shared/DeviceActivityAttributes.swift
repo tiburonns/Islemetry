@@ -12,6 +12,7 @@ struct DeviceActivityAttributes: ActivityAttributes {
         var secondary: [LiveMetric]
         var updatedAt: Date
         var languageCode: String?
+        var textColorHex: String?
     }
 
     struct LiveMetric: Codable, Hashable, Identifiable {
