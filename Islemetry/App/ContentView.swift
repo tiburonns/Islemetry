@@ -5,13 +5,16 @@ struct ContentView: View {
     @StateObject private var liveActivity = LiveActivityManager()
 
     @AppStorage(AppLanguage.storageKey)
-    private var appLanguageRaw = AppLanguage.english.rawValue
+    private var appLanguageRaw = AppLanguage.system.rawValue
 
     @AppStorage(IslandConfiguration.leadingKey)
     private var leadingMetricRaw = DeviceMetric.Kind.battery.rawValue
 
     @AppStorage(IslandConfiguration.trailingKey)
     private var trailingMetricRaw = DeviceMetric.Kind.thermal.rawValue
+
+    @AppStorage(IslandConfiguration.textColorKey)
+    private var islandTextColorHex = IslandConfiguration.defaultTextColorHex
 
     @AppStorage("island.expandedMetric1")
     private var expanded1 = DeviceMetric.Kind.network.rawValue
@@ -37,7 +40,11 @@ struct ContentView: View {
     ]
 
     private var language: AppLanguage {
-        AppLanguage(rawValue: appLanguageRaw) ?? .english
+        AppLanguage(rawValue: appLanguageRaw) ?? .system
+    }
+
+    private var islandTextColor: Color {
+        Color(islemetryHex: islandTextColorHex)
     }
 
     private var leadingKind: DeviceMetric.Kind {
@@ -179,10 +186,29 @@ struct ContentView: View {
                     )
                 }
 
+                HStack(spacing: 8) {
+                    Circle()
+                        .fill(islandTextColor)
+                        .frame(width: 14, height: 14)
+                        .overlay {
+                            Circle().stroke(.secondary.opacity(0.35), lineWidth: 1)
+                        }
+
+                    Text(language.text("Text color", "Color del texto"))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    Spacer()
+
+                    Text(islandTextColorHex.uppercased())
+                        .font(.caption.monospaced())
+                        .foregroundStyle(.secondary)
+                }
+
                 Text(
                     language.text(
-                        "Choose the two compact metrics and up to six expanded metrics.",
-                        "Elige las dos métricas compactas y hasta seis métricas expandidas."
+                        "Choose the compact metrics, expanded metrics, and text color.",
+                        "Elige las métricas compactas, las métricas expandidas y el color del texto."
                     )
                 )
                 .font(.caption)
@@ -225,7 +251,7 @@ struct ContentView: View {
                 }
                 .padding(.horizontal, 14)
                 .padding(.vertical, 10)
-                .foregroundStyle(.white)
+                .foregroundStyle(islandTextColor)
                 .background(.black, in: Capsule())
             }
 
@@ -249,7 +275,7 @@ struct ContentView: View {
                             )
                         )
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(islandTextColor.opacity(0.68))
                         .frame(maxWidth: .infinity, alignment: .leading)
                     } else {
                         LazyVGrid(columns: columns, spacing: 10) {
@@ -260,14 +286,14 @@ struct ContentView: View {
                     }
                 }
                 .padding(14)
-                .foregroundStyle(.white)
+                .foregroundStyle(islandTextColor)
                 .background(.black, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
             }
 
             Text(
                 language.text(
-                    "This preview uses the same saved selections that are sent to ActivityKit.",
-                    "Esta vista usa las mismas selecciones guardadas que se envían a ActivityKit."
+                    "This preview uses the same saved selections and text color sent to ActivityKit.",
+                    "Esta vista usa las mismas selecciones guardadas y el color de texto enviados a ActivityKit."
                 )
             )
             .font(.caption)
@@ -293,8 +319,8 @@ struct ContentView: View {
 
             Text(
                 language.text(
-                    "The selected language is used by Islemetry and is applied to the Live Activity when it updates.",
-                    "El idioma seleccionado se usa en Islemetry y se aplica a la Live Activity cuando se actualiza."
+                    "System follows the current iOS language. English and Español override it inside Islemetry.",
+                    "Sistema sigue el idioma actual de iOS. English y Español lo reemplazan dentro de Islemetry."
                 )
             )
             .font(.caption)
@@ -375,14 +401,16 @@ struct ContentView: View {
         return HStack(spacing: 7) {
             Image(systemName: metric.symbol)
                 .font(.caption)
+                .foregroundStyle(islandTextColor)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(metric.title)
                     .font(.caption2)
-                    .foregroundStyle(.gray)
+                    .foregroundStyle(islandTextColor.opacity(0.68))
 
                 Text(metric.value)
                     .font(.caption.weight(.semibold))
+                    .foregroundStyle(islandTextColor)
                     .lineLimit(1)
                     .minimumScaleFactor(0.65)
             }
@@ -428,13 +456,16 @@ private struct IslandConfigurationView: View {
     let onApply: () -> Void
 
     @AppStorage(AppLanguage.storageKey)
-    private var appLanguageRaw = AppLanguage.english.rawValue
+    private var appLanguageRaw = AppLanguage.system.rawValue
 
     @AppStorage(IslandConfiguration.leadingKey)
     private var leadingMetricRaw = DeviceMetric.Kind.battery.rawValue
 
     @AppStorage(IslandConfiguration.trailingKey)
     private var trailingMetricRaw = DeviceMetric.Kind.thermal.rawValue
+
+    @AppStorage(IslandConfiguration.textColorKey)
+    private var textColorHex = IslandConfiguration.defaultTextColorHex
 
     @AppStorage("island.expandedMetric1")
     private var expanded1 = DeviceMetric.Kind.network.rawValue
@@ -455,7 +486,14 @@ private struct IslandConfigurationView: View {
     private var expanded6 = DeviceMetric.Kind.lowPower.rawValue
 
     private var language: AppLanguage {
-        AppLanguage(rawValue: appLanguageRaw) ?? .english
+        AppLanguage(rawValue: appLanguageRaw) ?? .system
+    }
+
+    private var textColorBinding: Binding<Color> {
+        Binding(
+            get: { Color(islemetryHex: textColorHex) },
+            set: { textColorHex = $0.islemetryHex }
+        )
     }
 
     var body: some View {
@@ -499,6 +537,40 @@ private struct IslandConfigurationView: View {
             }
 
             Section {
+                ColorPicker(
+                    language.text("Text color", "Color del texto"),
+                    selection: textColorBinding,
+                    supportsOpacity: false
+                )
+
+                HStack {
+                    Text("HEX")
+                    Spacer()
+                    Text(textColorHex.uppercased())
+                        .font(.body.monospaced())
+                        .foregroundStyle(.secondary)
+                }
+
+                Button {
+                    textColorHex = IslandConfiguration.defaultTextColorHex
+                } label: {
+                    Label(
+                        language.text("Reset to white", "Restablecer a blanco"),
+                        systemImage: "arrow.counterclockwise"
+                    )
+                }
+            } header: {
+                Text(language.text("Appearance", "Apariencia"))
+            } footer: {
+                Text(
+                    language.text(
+                        "The selected color is used for text and metric symbols in the compact, expanded, minimal, and Lock Screen Live Activity views. White is the default.",
+                        "El color seleccionado se usa para el texto y los símbolos de las métricas en las vistas compacta, expandida, mínima y de pantalla bloqueada. El blanco es el valor predeterminado."
+                    )
+                )
+            }
+
+            Section {
                 Button {
                     onApply()
                 } label: {
@@ -512,8 +584,8 @@ private struct IslandConfigurationView: View {
             } footer: {
                 Text(
                     language.text(
-                        "Selections are saved automatically. Apply updates an activity that is already running; otherwise they are used the next time you press Start.",
-                        "Las selecciones se guardan automáticamente. Aplicar actualiza una actividad que ya está activa; de lo contrario se usarán la próxima vez que pulses Iniciar."
+                        "Selections and color are saved automatically. Apply updates an activity that is already running; otherwise they are used the next time you press Start.",
+                        "Las selecciones y el color se guardan automáticamente. Aplicar actualiza una actividad que ya está activa; de lo contrario se usarán la próxima vez que pulses Iniciar."
                     )
                 )
             }
