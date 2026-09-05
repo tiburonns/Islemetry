@@ -12,7 +12,7 @@ Islemetry is a native SwiftUI iOS app that exposes configurable device telemetry
 
 ## Short product description
 
-Islemetry turns the Dynamic Island into a compact device-status monitor. Choose the metrics that matter to you, keep them visible through a Live Activity, and expand the Island whenever you want a richer snapshot of your iPhone.
+Islemetry turns the Dynamic Island into a compact device-status monitor. Choose the metrics that matter to you, customize their appearance, keep them visible through a Live Activity, and expand the Island whenever you want a richer snapshot of your iPhone.
 
 ## Full project description
 
@@ -22,7 +22,7 @@ Instead of hiding device information inside a conventional dashboard, Islemetry 
 
 The application currently exposes information across power, thermal state, CPU, memory, storage, display, network, and system categories. Examples include battery percentage, charging state, Low Power Mode, thermal state, physical memory, free/used/total storage, CPU core counts, maximum display refresh rate, ProMotion indication, brightness, current network interface, Low Data Mode, IPv4/IPv6/DNS support, device identifier, iOS version, locale, and time zone.
 
-Islemetry includes a main-screen preview of the exact compact and expanded Dynamic Island configuration, persistent on-device preferences, and an in-app language selector with System, English, and Spanish modes. When the Live Activity is already running, layout and language changes can be pushed to the existing activity without intentionally creating a duplicate session.
+Islemetry includes a main-screen preview of the exact compact and expanded Dynamic Island configuration, persistent on-device preferences, a full iOS Color Picker for customizing telemetry text and symbol color, and an in-app language selector with System, English, and Spanish modes. The selected Dynamic Island color is stored as an RGB HEX value and sent in the ActivityKit state. When the Live Activity is already running, layout, appearance, and language changes can be pushed to the existing activity without intentionally creating a duplicate session.
 
 The project is built natively with SwiftUI, ActivityKit, WidgetKit, Network, UIKit, and Foundation. It intentionally avoids third-party runtime dependencies and is being developed with App Store compatibility and privacy requirements in mind.
 
@@ -31,7 +31,7 @@ Because iOS does not allow an ordinary application to run continuously in the ba
 ## Core principles
 
 - **Glanceable:** important metrics should be visible without opening a full dashboard.
-- **Configurable:** the user decides what the compact and expanded Dynamic Island show.
+- **Configurable:** the user decides what the compact and expanded Dynamic Island show and how telemetry is presented.
 - **Native:** use public Apple frameworks and platform-native UI.
 - **Private:** keep device telemetry local whenever possible.
 - **Transparent:** distinguish true device values from inferred capabilities and snapshots.
@@ -42,6 +42,8 @@ Because iOS does not allow an ordinary application to run continuously in the ba
 - Live Activity start, refresh, and stop lifecycle
 - Dynamic Island compact Leading / Trailing metric selection
 - Up to six expanded metrics
+- Custom Dynamic Island telemetry text/symbol color via iOS Color Picker
+- Persistent RGB HEX color preference with white as default
 - Lock Screen Live Activity
 - Main-screen Dynamic Island preview
 - Persistent on-device configuration
