@@ -68,9 +68,9 @@ struct ContentView: View {
                 VStack(spacing: 20) {
                     statusCard
                     controls
-                    languageCard
-                    islandPreviewCard
                     islandConfigurationCard
+                    islandPreviewCard
+                    languageCard
                     metricsGrid
                 }
                 .padding()
@@ -94,8 +94,8 @@ struct ContentView: View {
                 Image(systemName: liveActivity.activeActivityID == nil ? "circle" : "circle.fill")
                 Text(
                     liveActivity.activeActivityID == nil
-                    ? language.text("Live Monitor Stopped", "Monitor en vivo detenido")
-                    : language.text("Live Monitor Running", "Monitor en vivo activo")
+                        ? language.text("Live Monitor Stopped", "Monitor en vivo detenido")
+                        : language.text("Live Monitor Running", "Monitor en vivo activo")
                 )
                 .font(.headline)
                 Spacer()
@@ -147,31 +147,52 @@ struct ContentView: View {
         }
     }
 
-    private var languageCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label(language.text("Language", "Idioma"), systemImage: "globe")
-                .font(.headline)
-
-            Picker(language.text("Language", "Idioma"), selection: $appLanguageRaw) {
-                ForEach(AppLanguage.allCases) { option in
-                    Text(option.displayName)
-                        .tag(option.rawValue)
-                }
+    private var islandConfigurationCard: some View {
+        NavigationLink {
+            IslandConfigurationView {
+                refreshLiveActivity(startIfNeeded: false)
             }
-            .pickerStyle(.segmented)
+        } label: {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Label(
+                        language.text("Configure Dynamic Island", "Configurar Isla Dinámica"),
+                        systemImage: "slider.horizontal.3"
+                    )
+                    .font(.headline)
 
-            Text(
-                language.text(
-                    "The selected language is used by Islemetry and is applied to the Live Activity when it updates.",
-                    "El idioma seleccionado se usa en Islemetry y se aplica a la Live Activity cuando se actualiza."
+                    Spacer()
+
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
+
+                HStack(spacing: 10) {
+                    islandSlot(
+                        title: language.text("Leading", "Izquierda"),
+                        kind: leadingKind
+                    )
+                    islandSlot(
+                        title: language.text("Trailing", "Derecha"),
+                        kind: trailingKind
+                    )
+                }
+
+                Text(
+                    language.text(
+                        "Choose the two compact metrics and up to six expanded metrics.",
+                        "Elige las dos métricas compactas y hasta seis métricas expandidas."
+                    )
                 )
-            )
-            .font(.caption)
-            .foregroundStyle(.secondary)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding()
+            .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .buttonStyle(.plain)
     }
 
     private var islandPreviewCard: some View {
@@ -221,10 +242,15 @@ struct ContentView: View {
                     }
 
                     if expandedKinds.isEmpty {
-                        Text(language.text("No expanded metrics selected", "No hay métricas expandidas seleccionadas"))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Text(
+                            language.text(
+                                "No expanded metrics selected",
+                                "No hay métricas expandidas seleccionadas"
+                            )
+                        )
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     } else {
                         LazyVGrid(columns: columns, spacing: 10) {
                             ForEach(expandedKinds) { kind in
@@ -252,47 +278,31 @@ struct ContentView: View {
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 
-    private var islandConfigurationCard: some View {
-        NavigationLink {
-            IslandConfigurationView {
-                refreshLiveActivity(startIfNeeded: false)
+    private var languageCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label(language.text("Language", "Idioma"), systemImage: "globe")
+                .font(.headline)
+
+            Picker(language.text("Language", "Idioma"), selection: $appLanguageRaw) {
+                ForEach(AppLanguage.allCases) { option in
+                    Text(option.displayName)
+                        .tag(option.rawValue)
+                }
             }
-        } label: {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Label(language.text("Configure Dynamic Island", "Configurar Isla Dinámica"), systemImage: "slider.horizontal.3")
-                        .font(.headline)
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                }
+            .pickerStyle(.segmented)
 
-                HStack(spacing: 10) {
-                    islandSlot(
-                        title: language.text("Leading", "Izquierda"),
-                        kind: leadingKind
-                    )
-                    islandSlot(
-                        title: language.text("Trailing", "Derecha"),
-                        kind: trailingKind
-                    )
-                }
-
-                Text(
-                    language.text(
-                        "Choose the two compact metrics and up to six expanded metrics.",
-                        "Elige las dos métricas compactas y hasta seis métricas expandidas."
-                    )
+            Text(
+                language.text(
+                    "The selected language is used by Islemetry and is applied to the Live Activity when it updates.",
+                    "El idioma seleccionado se usa en Islemetry y se aplica a la Live Activity cuando se actualiza."
                 )
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding()
-            .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+            )
+            .font(.caption)
+            .foregroundStyle(.secondary)
         }
-        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 
     private func islandSlot(title: String, kind: DeviceMetric.Kind) -> some View {
@@ -300,6 +310,7 @@ struct ContentView: View {
             Text(title)
                 .font(.caption2)
                 .foregroundStyle(.secondary)
+
             Text(kind.selectionTitle(language: language))
                 .font(.caption.weight(.semibold))
                 .lineLimit(1)
@@ -315,7 +326,9 @@ struct ContentView: View {
             HStack {
                 Text(language.text("Available Metrics", "Métricas disponibles"))
                     .font(.headline)
+
                 Spacer()
+
                 Text("\(telemetry.metrics.count)")
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(.secondary)
@@ -362,15 +375,18 @@ struct ContentView: View {
         return HStack(spacing: 7) {
             Image(systemName: metric.symbol)
                 .font(.caption)
+
             VStack(alignment: .leading, spacing: 2) {
                 Text(metric.title)
                     .font(.caption2)
                     .foregroundStyle(.gray)
+
                 Text(metric.value)
                     .font(.caption.weight(.semibold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.65)
             }
+
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -445,8 +461,14 @@ private struct IslandConfigurationView: View {
     var body: some View {
         Form {
             Section {
-                metricPicker(language.text("Leading", "Izquierda"), selection: $leadingMetricRaw)
-                metricPicker(language.text("Trailing", "Derecha"), selection: $trailingMetricRaw)
+                metricPicker(
+                    language.text("Leading", "Izquierda"),
+                    selection: $leadingMetricRaw
+                )
+                metricPicker(
+                    language.text("Trailing", "Derecha"),
+                    selection: $trailingMetricRaw
+                )
             } header: {
                 Text(language.text("Compact Dynamic Island", "Isla Dinámica compacta"))
             } footer: {
