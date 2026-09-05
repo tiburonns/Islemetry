@@ -18,6 +18,18 @@ Islemetry te permite decidir qué métricas del dispositivo aparecen en la Isla 
 
 Si ya hay una Live Activity activa, **Aplicar a Live Activity** la actualiza con la nueva distribución y el nuevo color. Si no hay ninguna actividad activa, la selección queda guardada y se utilizará la próxima vez que pulses **Iniciar**.
 
+## Distribución compacta vs expandida
+
+Las vistas compacta y expandida son ahora independientes:
+
+- **Izquierda / Derecha** se usan únicamente mientras la Isla Dinámica está contraída.
+- La vista expandida utiliza directamente las seis posiciones de **Isla Dinámica expandida**.
+- Las posiciones 1 y 2 se muestran en las regiones superiores izquierda/derecha.
+- Las posiciones 3–6 se muestran en una cuadrícula compacta 2×2 debajo.
+- Las métricas compactas Izquierda/Derecha ya no se repiten en la vista expandida.
+
+Esto mantiene la vista expandida en un máximo de seis métricas y evita que las filas inferiores se recorten por la altura disponible de la Isla Dinámica.
+
 ## Color del texto de la Isla Dinámica
 
 La sección **Apariencia** utiliza el Color Picker completo de iOS, no una paleta fija.
