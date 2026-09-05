@@ -168,7 +168,7 @@ final class LiveActivityManager: ObservableObject {
             trailingSymbol: trailing.symbol,
             secondary: secondary,
             updatedAt: .now,
-            languageCode: language.rawValue
+            languageCode: language.effective.rawValue
         )
     }
 
