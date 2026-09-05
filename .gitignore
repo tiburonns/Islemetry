@@ -1,10 +1,16 @@
 # Xcode
 DerivedData/
 build/
+*.xcarchive
+*.dSYM
 *.xcuserstate
 xcuserdata/
 *.xccheckout
 *.moved-aside
+
+# Exported app artifacts
+*.ipa
+ExportOptions.local.plist
 
 # Swift Package Manager
 .build/
@@ -16,5 +22,7 @@ Package.resolved
 
 # Local signing / environment
 *.mobileprovision
+*.provisionprofile
 *.p12
+*.cer
 .env
