@@ -1,0 +1,40 @@
+{
+  "name": "Islemetry",
+  "identifier": "io.github.tiburonns.islemetry",
+  "subtitle": "Telemetría privada en tu Isla Dinámica",
+  "description": "Fuente oficial de Islemetry para AltStore Classic. Métricas locales del iPhone en la app, Live Activity e Isla Dinámica. Español y English.",
+  "website": "https://github.com/tiburonns/Islemetry",
+  "iconURL": "https://raw.githubusercontent.com/tiburonns/Islemetry/main/Islemetry/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png",
+  "tintColor": "#14C8F5",
+  "featuredApps": [
+    "com.tiburonns.islemetry"
+  ],
+  "apps": [
+    {
+      "name": "Islemetry",
+      "bundleIdentifier": "com.tiburonns.islemetry",
+      "developerName": "tiburonns",
+      "subtitle": "Telemetría local en la Isla Dinámica",
+      "localizedDescription": "Consulta métricas del iPhone sin cuentas ni nube y elige qué datos mostrar en la Live Activity, la pantalla bloqueada y la Isla Dinámica. Incluye Español, English y apariencia Sistema, Clara u Oscura.",
+      "iconURL": "https://raw.githubusercontent.com/tiburonns/Islemetry/main/Islemetry/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png",
+      "tintColor": "#14C8F5",
+      "category": "utilities",
+      "versions": [
+        {
+          "version": "0.2.0",
+          "buildVersion": "2",
+          "date": "2026-09-08T22:00:00-07:00",
+          "localizedDescription": "Primera versión distribuida para AltStore: 27 métricas, Isla Dinámica configurable, Live Activity, vista previa, selector Español/English y apariencia Sistema/Clara/Oscura. Incluye icono y privacy manifest.",
+          "downloadURL": "https://github.com/tiburonns/Islemetry/releases/download/v0.2.0/Islemetry-0.2.0.ipa",
+          "size": 1595284,
+          "minOSVersion": "17.0"
+        }
+      ],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {}
+      }
+    }
+  ],
+  "news": []
+}
