@@ -36,6 +36,32 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     }
 }
 
+enum AppAppearance: String, CaseIterable, Identifiable {
+    static let storageKey = "app.appearance"
+
+    case system
+    case light
+    case dark
+
+    var id: String { rawValue }
+
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system: return nil
+        case .light: return .light
+        case .dark: return .dark
+        }
+    }
+
+    func displayName(language: AppLanguage) -> String {
+        switch self {
+        case .system: return language.text("System", "Sistema")
+        case .light: return language.text("Light", "Claro")
+        case .dark: return language.text("Dark", "Oscuro")
+        }
+    }
+}
+
 extension Color {
     init(islemetryHex hex: String) {
         let source = hex

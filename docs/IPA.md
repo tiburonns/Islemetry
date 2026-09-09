@@ -96,6 +96,18 @@ xcodebuild \
 
 Because export options vary by developer account and distribution method, Islemetry does not commit account-specific export credentials or profiles.
 
+## Option D — Unsigned IPA for AltStore Classic
+
+The repository includes the same reproducible unsigned-device workflow used by the other tiburonns apps:
+
+```bash
+./script/build_altstore_ipa.sh
+python3 script/update_altstore_source.py dist/Islemetry-0.2.0.ipa altstore/source.json
+python3 script/validate_altstore.py altstore/source.json dist/Islemetry-0.2.0.ipa
+```
+
+The script builds the app and embedded widget for `iPhoneOS`/`arm64`, removes no signing material because signing is disabled at build time, packages `Payload/Islemetry.app`, and rejects signatures, provisioning profiles, missing privacy metadata, missing icons, or a missing widget. AltStore Classic signs this IPA with the installing user's account. It is not an AltStore PAL or App Store package.
+
 ## Installing an exported IPA
 
 How the IPA can be installed depends on how it was signed.
@@ -123,7 +135,7 @@ Before attaching an IPA to a GitHub Release:
 Suggested release asset name:
 
 ```text
-Islemetry-v0.2.0.ipa
+Islemetry-0.2.0.ipa
 ```
 
 Suggested source archive name:
@@ -154,4 +166,4 @@ Islemetry-v0.2.0-source.zip
 
 ## Current repository status
 
-The repository currently contains the source project and development documentation. A real distributable IPA should only be published after the current V0.2 branch completes on-device validation and a Release archive has been exported from Xcode with the intended signing configuration.
+The repository contains the source project, AltStore source, reproducible unsigned IPA script, and validators. A release IPA must still pass compilation and package validation; Live Activity behavior must be confirmed on a compatible physical iPhone.

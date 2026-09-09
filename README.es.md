@@ -19,6 +19,7 @@ Puedes elegir:
 - Hasta **seis métricas expandidas**
 - Un **color personalizado para la telemetría de la Isla Dinámica**
 - Comportamiento de idioma **Sistema / English / Español**
+- Apariencia **Sistema / Clara / Oscura**
 
 La misma Live Activity también aparece en la pantalla bloqueada y la app incluye una vista previa en Inicio que refleja la configuración guardada de la Isla Dinámica y el color de telemetría elegido.
 
@@ -33,6 +34,7 @@ La misma Live Activity también aparece en la pantalla bloqueada y la app incluy
 - Configuración persistente guardada en el dispositivo
 - Vista previa en Inicio con exactamente la distribución y el color guardados
 - Selector de idioma **Sistema / English / Español**
+- Selector persistente de apariencia **Sistema / Clara / Oscura**
 - Nombres de métricas, estados, configuración y textos auxiliares de Live Activity según el idioma efectivo
 - Cambios de idioma/distribución/color pueden actualizar una Live Activity ya activa
 - 27 métricas actuales del dispositivo/sistema
@@ -72,13 +74,20 @@ Consulta la guía completa en **[Comenzar con Islemetry](docs/GETTING_STARTED.es
 
 No necesitas un IPA para instalar Islemetry directamente desde Xcode.
 
-Un archivo `.ipa` distribuible debe generarse a partir de un Xcode Archive correctamente firmado. El repositorio no contiene certificados privados, perfiles de aprovisionamiento, credenciales ni un IPA universal prefirmado.
+El IPA de la release es una compilación unsigned para dispositivo físico que AltStore Classic vuelve a firmar con la cuenta del usuario. El repositorio no contiene certificados privados, perfiles de aprovisionamiento ni credenciales de cuentas Apple.
+
+Agrega la fuente estable en **AltStore Classic → Browse → Sources → +**:
+
+```text
+https://raw.githubusercontent.com/tiburonns/Islemetry/main/altstore/source.json
+```
 
 Consulta **[Guía de IPA](docs/IPA.es.md)** para:
 
 - exportación mediante Xcode Organizer
 - comandos `xcodebuild` para Archive/exportación
 - consideraciones de firma
+- scripts de compilación y validación para AltStore
 - opciones de instalación
 - checklist para GitHub Releases
 
@@ -96,6 +105,7 @@ Descripción corta:
 Islemetry/
 ├── App/
 ├── Models/
+├── Resources/
 ├── Services/
 ├── Info.plist
 └── PrivacyInfo.xcprivacy
@@ -114,6 +124,14 @@ docs/
 ├── PROJECT_DESCRIPTION.md / PROJECT_DESCRIPTION.es.md
 ├── CONFIGURATION.md / CONFIGURATION.es.md
 └── TESTING.md / TESTING.es.md
+
+altstore/
+└── source.json
+
+script/
+├── build_altstore_ipa.sh
+├── update_altstore_source.py
+└── validate_altstore.py
 ```
 
 ## Frameworks de Apple
@@ -138,7 +156,7 @@ Islemetry está diseñada para mantener la telemetría local siempre que sea pos
 Decisiones actuales relacionadas con Required Reason APIs:
 
 - El espacio en disco se muestra al usuario bajo el motivo aprobado `85F4.1`.
-- UserDefaults almacena preferencias propias de distribución, idioma y color de la Isla Dinámica bajo el motivo aprobado `CA92.1`.
+- UserDefaults almacena preferencias propias de distribución, idioma, apariencia y color de la Isla Dinámica bajo el motivo aprobado `CA92.1`.
 - El uptime general del dispositivo se excluye intencionalmente porque los motivos aprobados para la API correspondiente no incluyen usarlo como una estadística genérica de monitor de sistema.
 
 Nunca deben almacenarse credenciales de firma ni material privado de cuentas Apple en este repositorio.
@@ -166,7 +184,7 @@ Cuando cambien funcionalidad, arquitectura, instalación, privacidad o distribuc
 
 ## Logo
 
-La identidad seleccionada de Islemetry combina la letra **I** con una onda azul de telemetría sobre un icono cuadrado oscuro con esquinas redondeadas. El App Icon final utilizará únicamente el símbolo para conservar legibilidad en tamaños pequeños de iOS.
+El icono de Islemetry combina un pulso de telemetría luminoso en cian y violeta con una cápsula inspirada en la Isla Dinámica sobre un fondo azul marino profundo.
 
 ## Repositorio
 

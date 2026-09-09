@@ -2,11 +2,11 @@
 
 **Español** · [English](TESTING.md)
 
-Esta lista valida la compilación actual de Islemetry en un iPhone físico con Isla Dinámica. V0.1 ya fue compilada e instalada correctamente en hardware real; V0.2 agrega contenido configurable en la Isla Dinámica, telemetría ampliada, vista previa en Inicio, controles de idioma y color personalizado para el texto de la Isla Dinámica.
+Esta lista valida la compilación actual de Islemetry en un iPhone físico con Isla Dinámica. V0.1 ya fue compilada e instalada correctamente en hardware real; V0.2 agrega contenido configurable en la Isla Dinámica, telemetría ampliada, vista previa en Inicio, controles de idioma y apariencia, y color personalizado para el texto de la Isla Dinámica.
 
 ## Objetivo
 
-Validar que Islemetry compile, abra correctamente, recopile telemetría, muestre una vista previa fiel de la distribución y color guardados para la Isla Dinámica, cambie de idioma sin reiniciar y pueda crear, actualizar y detener correctamente la Live Activity tanto en la pantalla bloqueada como en la Isla Dinámica.
+Validar que Islemetry compile, abra correctamente, recopile telemetría, muestre una vista previa fiel de la distribución y color guardados para la Isla Dinámica, cambie de idioma y apariencia sin reiniciar y pueda crear, actualizar y detener correctamente la Live Activity tanto en la pantalla bloqueada como en la Isla Dinámica.
 
 ## Entorno de prueba
 
@@ -90,6 +90,21 @@ Registra:
 - Los nombres de métricas y valores traducibles cambian de idioma.
 - La selección de idioma persiste al volver a abrir la app.
 - Cambiar el idioma no borra la configuración guardada de métricas ni color.
+
+## Prueba de apariencia de la app
+
+1. Selecciona **Sistema**, **Claro** y **Oscuro** en la tarjeta Apariencia.
+2. En cada modo revisa la barra de navegación, tarjetas, controles segmentados, etiquetas, botones, cuadrícula de métricas y vista previa de Isla Dinámica.
+3. En modo Sistema, cambia la apariencia del iPhone desde el Centro de control o Ajustes y vuelve a Islemetry.
+4. Cierra la app por completo y vuelve a abrirla después de seleccionar Oscuro.
+
+### Resultado esperado
+
+- Claro y Oscuro se aplican de inmediato sin reiniciar.
+- Sistema sigue la apariencia actual de iOS.
+- Texto, materiales, controles y fondos conservan contraste legible en los tres modos.
+- La vista previa de Isla Dinámica sigue siendo negra y conserva su color de telemetría configurado.
+- La apariencia elegida persiste al volver a abrir la app.
 
 ## Prueba de inicio de Live Activity
 
@@ -199,6 +214,7 @@ La validación de hardware de V0.2 se considera exitosa cuando:
 - Las selecciones compactas y expandidas pueden cambiarse y persisten.
 - El color del texto de la Isla Dinámica puede cambiarse, restablecerse, aplicarse y persistir.
 - El comportamiento Sistema / English / Español funciona y persiste.
+- La apariencia Sistema / Clara / Oscura funciona, conserva la legibilidad y persiste.
 - Una Live Activity activa se actualiza al cambiar distribución, color o idioma.
 - Las presentaciones compacta, expandida, mínima y de pantalla bloqueada se renderizan correctamente cuando estén disponibles.
 - La Live Activity puede actualizarse y detenerse sin duplicados ni sesiones residuales.

@@ -19,6 +19,7 @@ You can choose:
 - Up to **six expanded metrics**
 - A custom **Dynamic Island telemetry color**
 - **System / English / Español** language behavior
+- **System / Light / Dark** app appearance
 
 The same Live Activity also appears on the Lock Screen, and the app includes a Home-screen preview that mirrors the saved Dynamic Island configuration and selected telemetry color.
 
@@ -33,6 +34,7 @@ The same Live Activity also appears on the Lock Screen, and the app includes a H
 - Persistent on-device Dynamic Island configuration
 - Home-screen preview of the exact saved Island layout and color
 - **System / English / Español** language selector
+- Persistent **System / Light / Dark** appearance selector
 - Metric names, states, configuration UI, and Live Activity auxiliary text follow the effective language
 - Language/layout/color changes can update an already-running Live Activity
 - 27 current device/system metrics
@@ -72,13 +74,20 @@ For the complete setup guide, see **[Getting Started](docs/GETTING_STARTED.md)**
 
 You do **not** need an IPA when installing Islemetry directly from Xcode.
 
-A distributable `.ipa` must be produced from a successful signed Xcode Archive. The repository intentionally does not contain private signing certificates, provisioning profiles, credentials, or a universal pre-signed IPA.
+The release IPA is an unsigned physical-device build intended for AltStore Classic to re-sign with the user's account. The repository intentionally does not contain private signing certificates, provisioning profiles, or Apple account credentials.
+
+Add the stable source in **AltStore Classic → Browse → Sources → +**:
+
+```text
+https://raw.githubusercontent.com/tiburonns/Islemetry/main/altstore/source.json
+```
 
 See **[IPA Guide](docs/IPA.md)** for:
 
 - Xcode Organizer export
 - `xcodebuild` archive/export commands
 - signing considerations
+- unsigned AltStore build and validation scripts
 - installation options
 - GitHub Release checklist
 
@@ -96,6 +105,7 @@ Short description:
 Islemetry/
 ├── App/
 ├── Models/
+├── Resources/
 ├── Services/
 ├── Info.plist
 └── PrivacyInfo.xcprivacy
@@ -114,6 +124,14 @@ docs/
 ├── PROJECT_DESCRIPTION.md / PROJECT_DESCRIPTION.es.md
 ├── CONFIGURATION.md / CONFIGURATION.es.md
 └── TESTING.md / TESTING.es.md
+
+altstore/
+└── source.json
+
+script/
+├── build_altstore_ipa.sh
+├── update_altstore_source.py
+└── validate_altstore.py
 ```
 
 ## Apple frameworks
@@ -138,7 +156,7 @@ Islemetry is designed to keep device telemetry on-device whenever possible and u
 Current Required Reason API decisions include:
 
 - Disk-space information is displayed to the user under Apple's approved reason `85F4.1`.
-- UserDefaults stores Islemetry's own metric-layout, language, and Dynamic Island color preferences under approved reason `CA92.1`.
+- UserDefaults stores Islemetry's own metric-layout, language, appearance, and Dynamic Island color preferences under approved reason `CA92.1`.
 - General device uptime is intentionally excluded because the approved reasons for the relevant system-boot-time API do not include using it as a generic system-monitor statistic.
 
 No signing credentials or private Apple account material should ever be committed to this repository.
@@ -166,7 +184,7 @@ When functionality, architecture, installation, privacy, or release behavior cha
 
 ## Logo
 
-The selected Islemetry identity combines the letter **I** with a blue telemetry waveform on a dark rounded-square icon. The final App Icon asset will use the symbol-only version so it remains recognizable at iOS icon sizes.
+The Islemetry icon combines a luminous cyan-to-violet telemetry pulse with a Dynamic Island-inspired capsule on a deep navy background.
 
 ## Repository
 

@@ -2,11 +2,11 @@
 
 [Español](TESTING.es.md) · **English**
 
-This checklist validates the current Islemetry build on a physical iPhone with Dynamic Island. V0.1 has already been successfully built and installed on real hardware; V0.2 adds configurable Island content, expanded telemetry, a Home-screen Island preview, language controls, and custom Dynamic Island text color.
+This checklist validates the current Islemetry build on a physical iPhone with Dynamic Island. V0.1 has already been successfully built and installed on real hardware; V0.2 adds configurable Island content, expanded telemetry, a Home-screen Island preview, language and appearance controls, and custom Dynamic Island text color.
 
 ## Goal
 
-Validate that Islemetry builds, launches, collects telemetry, previews the saved Dynamic Island layout and color correctly, changes language without restarting, and successfully creates, updates, and stops the Live Activity on both the Lock Screen and Dynamic Island.
+Validate that Islemetry builds, launches, collects telemetry, previews the saved Dynamic Island layout and color correctly, changes language and appearance without restarting, and successfully creates, updates, and stops the Live Activity on both the Lock Screen and Dynamic Island.
 
 ## Test environment
 
@@ -90,6 +90,21 @@ Record:
 - Metric names and localized state values change language.
 - The language preference persists after reopening the app.
 - Changing language does not clear the saved Dynamic Island metric or color configuration.
+
+## App appearance test
+
+1. Select **System**, **Light**, and **Dark** in the Appearance card.
+2. In each mode, review the navigation bar, cards, segmented controls, labels, buttons, metric grid, and Dynamic Island preview.
+3. In System mode, change the iPhone appearance in Control Center or Settings and return to Islemetry.
+4. Force-quit and reopen Islemetry after selecting Dark.
+
+### Expected result
+
+- Light and Dark apply immediately without restarting.
+- System follows the current iOS appearance.
+- Text, materials, controls, and backgrounds retain readable contrast in all three modes.
+- The Dynamic Island preview remains black and preserves its configured telemetry color.
+- The selected appearance persists after reopening the app.
 
 ## Live Activity start test
 
@@ -199,6 +214,7 @@ V0.2 hardware validation is successful when:
 - Compact and expanded Island selections can be changed and persist.
 - Dynamic Island text color can be changed, reset, applied, and persisted.
 - System / English / Español language behavior works and persists.
+- System / Light / Dark appearance works, remains readable, and persists.
 - A running Live Activity updates when layout, color, or language changes.
 - Compact, expanded, minimal, and Lock Screen presentations render correctly where available.
 - The Live Activity can be refreshed and stopped without duplication or a stranded session.

@@ -7,6 +7,9 @@ struct ContentView: View {
     @AppStorage(AppLanguage.storageKey)
     private var appLanguageRaw = AppLanguage.system.rawValue
 
+    @AppStorage(AppAppearance.storageKey)
+    private var appAppearanceRaw = AppAppearance.system.rawValue
+
     @AppStorage(IslandConfiguration.leadingKey)
     private var leadingMetricRaw = DeviceMetric.Kind.battery.rawValue
 
@@ -77,6 +80,7 @@ struct ContentView: View {
                     controls
                     islandConfigurationCard
                     islandPreviewCard
+                    appearanceCard
                     languageCard
                     metricsGrid
                 }
@@ -331,6 +335,33 @@ struct ContentView: View {
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 
+    private var appearanceCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label(language.text("Appearance", "Apariencia"), systemImage: "circle.lefthalf.filled")
+                .font(.headline)
+
+            Picker(language.text("Appearance", "Apariencia"), selection: $appAppearanceRaw) {
+                ForEach(AppAppearance.allCases) { option in
+                    Text(option.displayName(language: language))
+                        .tag(option.rawValue)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            Text(
+                language.text(
+                    "System follows the iPhone appearance. Light and Dark keep Islemetry in the selected mode.",
+                    "Sistema sigue la apariencia del iPhone. Claro y Oscuro mantienen Islemetry en el modo elegido."
+                )
+            )
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
     private func islandSlot(title: String, kind: DeviceMetric.Kind) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
@@ -560,7 +591,7 @@ private struct IslandConfigurationView: View {
                     )
                 }
             } header: {
-                Text(language.text("Appearance", "Apariencia"))
+                Text(language.text("Live Activity Appearance", "Apariencia de Live Activity"))
             } footer: {
                 Text(
                     language.text(

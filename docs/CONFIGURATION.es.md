@@ -32,7 +32,7 @@ Esto mantiene la vista expandida en un máximo de seis métricas y evita que las
 
 ## Color del texto de la Isla Dinámica
 
-La sección **Apariencia** utiliza el Color Picker completo de iOS, no una paleta fija.
+La sección **Apariencia de Live Activity** utiliza el Color Picker completo de iOS, no una paleta fija.
 
 - Color predeterminado: blanco (`#FFFFFF`).
 - La opacidad está desactivada intencionalmente para mantener una legibilidad predecible sobre el fondo negro de la Isla Dinámica.
@@ -55,6 +55,16 @@ Islemetry ofrece tres opciones de idioma:
 - **Español** — usa siempre español.
 
 Cuando seleccionas **System / Sistema**, los idiomas de iOS en español (`es-*`) utilizan Español y cualquier otro idioma del sistema que todavía no soporte Islemetry usa English como respaldo. La preferencia se guarda localmente. Una Live Activity activa recibe el idioma resuelto `en` o `es` cuando Islemetry la actualiza.
+
+## Apariencia de la app
+
+La tarjeta Apariencia controla la interfaz de la app de forma independiente al color de telemetría:
+
+- **Sistema** sigue la apariencia actual de iOS.
+- **Claro** mantiene Islemetry en modo claro.
+- **Oscuro** mantiene Islemetry en modo oscuro.
+
+La selección se aplica de inmediato y se guarda localmente. Los colores semánticos y materiales de SwiftUI se adaptan automáticamente para conservar el contraste del panel, formularios, controles y tarjetas de métricas. La vista previa de Isla Dinámica permanece negra intencionalmente porque representa esa superficie del sistema.
 
 ## Distribución predeterminada
 

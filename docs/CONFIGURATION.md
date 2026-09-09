@@ -32,7 +32,7 @@ This keeps the expanded view to a maximum of six telemetry metrics and prevents 
 
 ## Dynamic Island text color
 
-The **Appearance** section contains a full iOS Color Picker rather than a fixed palette.
+The **Live Activity Appearance** section contains a full iOS Color Picker rather than a fixed palette.
 
 - Default color: white (`#FFFFFF`).
 - Opacity is intentionally disabled for predictable legibility against the Dynamic Island's black background.
@@ -55,6 +55,16 @@ Islemetry offers three language choices:
 - **Español** — always uses Spanish.
 
 When **System / Sistema** is selected, Spanish iOS locales (`es-*`) use Spanish and other currently unsupported system languages fall back to English. The preference is stored locally. A running Live Activity receives the resolved `en` or `es` language when Islemetry refreshes it.
+
+## App appearance
+
+The Appearance card controls the app interface independently from the telemetry color:
+
+- **System** follows the current iOS appearance.
+- **Light** keeps Islemetry in light mode.
+- **Dark** keeps Islemetry in dark mode.
+
+The selection is applied immediately and stored locally. SwiftUI semantic colors and materials adapt automatically so the dashboard, forms, controls, and metric cards retain contrast. The Dynamic Island preview intentionally stays black because it represents the system surface.
 
 ## Default layout
 
