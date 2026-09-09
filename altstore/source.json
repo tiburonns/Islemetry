@@ -26,7 +26,7 @@
           "date": "2026-09-08T22:00:00-07:00",
           "localizedDescription": "Primera versión distribuida para AltStore: 27 métricas, Isla Dinámica configurable, Live Activity, vista previa, selector Español/English y apariencia Sistema/Clara/Oscura. Incluye icono y privacy manifest.",
           "downloadURL": "https://github.com/tiburonns/Islemetry/releases/download/v0.2.0/Islemetry-0.2.0.ipa",
-          "size": 1570050,
+          "size": 1595284,
           "minOSVersion": "17.0"
         }
       ],
