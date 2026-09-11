@@ -141,9 +141,9 @@ Storage is calculated from the volume capacity values exposed by Foundation.
 
 ## Update behavior
 
-The Live Activity displays the latest telemetry snapshot sent by Islemetry. iOS does not allow Islemetry to run continuously in the background like a desktop system monitor, so many metrics are refreshed when the app is active and Islemetry sends a new ActivityKit state.
+The Live Activity displays the latest telemetry snapshot sent by Islemetry. While the app is active, Islemetry automatically captures a snapshot and requests a Live Activity update every three seconds. iOS controls the final Live Activity rendering cadence and does not allow Islemetry to keep this loop running after the app is suspended in the background.
 
-The **Refresh** button captures a new snapshot and updates the active Live Activity. Layout and color changes can also be pushed with **Apply to Live Activity**.
+The **Refresh** button remains available for an immediate snapshot. Layout and color changes can also be pushed with **Apply to Live Activity**.
 
 ## Privacy and App Store compatibility
 

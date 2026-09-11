@@ -141,9 +141,9 @@ El almacenamiento se calcula con los valores de capacidad del volumen expuestos 
 
 ## Comportamiento de actualización
 
-La Live Activity muestra el último snapshot de telemetría enviado por Islemetry. iOS no permite que Islemetry se ejecute continuamente en segundo plano como un monitor de sistema de escritorio, por lo que muchas métricas se actualizan cuando la app está activa y envía un nuevo estado a ActivityKit.
+La Live Activity muestra el último snapshot de telemetría enviado por Islemetry. Mientras la app está activa, Islemetry toma automáticamente un snapshot y solicita una actualización de la Live Activity cada tres segundos. iOS controla la frecuencia final de renderizado de la Live Activity y no permite que Islemetry mantenga este ciclo después de suspender la app en segundo plano.
 
-El botón **Actualizar** toma un nuevo snapshot y actualiza la Live Activity activa. Los cambios de distribución y color también se pueden enviar con **Aplicar a Live Activity**.
+El botón **Actualizar** continúa disponible para tomar un snapshot inmediato. Los cambios de distribución y color también se pueden enviar con **Aplicar a Live Activity**.
 
 ## Privacidad y compatibilidad con App Store
 

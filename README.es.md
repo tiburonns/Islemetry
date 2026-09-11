@@ -147,7 +147,7 @@ script/
 
 Islemetry no pretende simular un monitor de escritorio ejecutándose continuamente en segundo plano cuando iOS no lo permite.
 
-Muchas métricas son **snapshots**. Islemetry las actualiza cuando recibe tiempo de ejecución y después envía un nuevo estado a ActivityKit. Algunas presentaciones controladas por el sistema pueden continuar mientras el proceso principal está suspendido, pero una app normal suspendida no puede muestrear arbitrariamente CPU/RAM de forma continua.
+Muchas métricas son **snapshots**. Mientras Islemetry está activa, toma automáticamente un snapshot nuevo cada tres segundos y actualiza cualquier Live Activity en ejecución. Las notificaciones del sistema sobre batería, energía, estado térmico, brillo y red también pueden provocar actualizaciones inmediatas. Algunas presentaciones controladas por el sistema pueden continuar mientras el proceso principal está suspendido, pero iOS pausa el ciclo de tres segundos de Islemetry en segundo plano y una app normal suspendida no puede muestrear arbitrariamente CPU/RAM de forma continua.
 
 ## Privacidad y orientación a App Store
 
