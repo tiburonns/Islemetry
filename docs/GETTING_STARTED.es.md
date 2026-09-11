@@ -165,3 +165,23 @@ Mantén Islemetry en primer plano durante al menos tres segundos. La app se actu
 ## Distribución mediante IPA
 
 Ejecutar directamente desde Xcode no requiere un archivo `.ipa`. Si quieres un paquete distribuible, consulta [IPA.es.md](IPA.es.md).
+
+
+## Ubicación y clima local
+
+Islemetry puede mostrar el clima local utilizando la ubicación actual del iPhone.
+
+La compilación predeterminada usa **Core Location + Open-Meteo** y no requiere entitlement de WeatherKit, lo que simplifica la firma con Personal Team y AltStore.
+
+1. Abre Islemetry en un iPhone físico.
+2. Busca **Ubicación y clima**.
+3. Pulsa **Permitir ubicación** y concede acceso.
+4. Pulsa **Actualizar clima** para obtener un snapshot local reciente.
+5. Para permitir actualizaciones basadas en ubicación mientras Islemetry está en segundo plano, activa **Ubicación en segundo plano**.
+6. iOS puede solicitar más tarde permiso de ubicación **Siempre**; el momento exacto lo controla iOS.
+
+El target principal declara los textos de privacidad necesarios y `UIBackgroundModes = location`. En Xcode, el target principal debe mostrar **Background Modes → Location updates**.
+
+La ubicación en segundo plano es opcional y está ligada únicamente a ubicación/clima. No se utiliza para mantener activo continuamente el muestreo de CPU/RAM. Cuando iOS entrega un evento de ubicación en segundo plano, Islemetry puede actualizar el clima y una Live Activity existente.
+
+El clima actual es proporcionado por **Open-Meteo**. Se necesita Internet para obtener un dato nuevo y Islemetry muestra un enlace visible al proveedor.
