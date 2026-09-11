@@ -150,3 +150,29 @@ El botón **Actualizar** continúa disponible para tomar un snapshot inmediato. 
 Islemetry utiliza intencionalmente frameworks públicos de Apple. La información de espacio en disco pertenece a las Required Reason APIs; el motivo aprobado por Apple `85F4.1` permite mostrar información de almacenamiento al usuario. UserDefaults se utiliza únicamente para guardar la configuración propia de Islemetry, incluida la selección de métricas, idioma y color del texto, correspondiente al motivo aprobado `CA92.1`.
 
 El uptime del sistema se excluye intencionalmente de esta compilación orientada a App Store porque los motivos aprobados por Apple para la API de tiempo de arranque del sistema no incluyen simplemente mostrar el uptime del dispositivo como estadística de monitorización.
+
+
+## Métricas de ubicación y clima local
+
+Hay cuatro métricas dependientes de la ubicación disponibles en el selector normal de la Isla Dinámica:
+
+- **Temperatura local** — temperatura exterior actual para la última ubicación del iPhone.
+- **Sensación térmica** — temperatura aparente.
+- **Clima** — condición meteorológica actual.
+- **Ubicación** — coordenadas redondeadas del último snapshot de ubicación.
+
+Pueden asignarse a Izquierda, Derecha o a cualquiera de las posiciones expandidas.
+
+### Ubicación en segundo plano
+
+La tarjeta **Ubicación y clima** de Inicio incluye **Ubicación en segundo plano**. Cuando está desactivada, Islemetry utiliza solicitudes puntuales mientras la app está activa. Cuando está activada, Islemetry solicita el permiso necesario e inicia Core Location con precisión aproximada de un kilómetro y filtro de distancia de 2 km para reducir consumo de batería.
+
+Los eventos de ubicación pueden provocar una actualización meteorológica y de ActivityKit. Esto **no** convierte a Islemetry en un proceso permanente; iOS controla la entrega en segundo plano.
+
+### Política de actualización
+
+Las consultas automáticas están limitadas. Islemetry evita otra consulta si el último resultado correcto tiene menos de 15 minutos y el dispositivo se ha desplazado menos de 5 km. **Actualizar clima** fuerza una nueva solicitud.
+
+### Proveedor meteorológico
+
+El clima actual es proporcionado por **Open-Meteo** e Islemetry muestra un enlace de atribución visible junto a la tarjeta del clima.
