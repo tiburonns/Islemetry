@@ -33,7 +33,8 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
 
     private var localTemperatureValue: String?
     private var feelsLikeValue: String?
-    private var weatherConditionValue: String?
+    private var lastWeatherCode: Int?
+    private var lastWeatherIsDay = true
     private var weatherSymbolName = "cloud.sun.fill"
     private var locationValue: String?
     private var lastWeatherFetchAt: Date?
@@ -181,6 +182,9 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
 
         let weatherUnavailable = weatherStatusMessage
             ?? language.text("Waiting for location", "Esperando ubicación")
+        let localizedWeatherCondition = lastWeatherCode.map {
+            Self.weatherDescription(code: $0, language: language)
+        }
 
         metrics = [
             DeviceMetric(kind: .battery, title: language.text("Battery", "Batería"), value: batteryLevel.map { "\($0)%" } ?? language.text("Unknown", "Desconocido"), symbol: batterySymbol(level: batteryLevel), updatedAt: now),
@@ -212,7 +216,7 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
             DeviceMetric(kind: .timeZone, title: language.text("Time Zone", "Zona horaria"), value: TimeZone.current.identifier, symbol: "clock", updatedAt: now),
             DeviceMetric(kind: .localTemperature, title: language.text("Local Temperature", "Temperatura local"), value: localTemperatureValue ?? weatherUnavailable, symbol: weatherSymbolName, updatedAt: now),
             DeviceMetric(kind: .feelsLike, title: language.text("Feels Like", "Sensación térmica"), value: feelsLikeValue ?? weatherUnavailable, symbol: "thermometer.medium", updatedAt: now),
-            DeviceMetric(kind: .weatherCondition, title: language.text("Weather", "Clima"), value: weatherConditionValue ?? weatherUnavailable, symbol: weatherSymbolName, updatedAt: now),
+            DeviceMetric(kind: .weatherCondition, title: language.text("Weather", "Clima"), value: localizedWeatherCondition ?? weatherUnavailable, symbol: weatherSymbolName, updatedAt: now),
             DeviceMetric(kind: .location, title: language.text("Location", "Ubicación"), value: locationValue ?? locationAuthorizationDescription(language: language), symbol: "location.fill", updatedAt: now)
         ]
 
@@ -349,13 +353,11 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
 
             localTemperatureValue = Self.temperatureString(current.temperature2M)
             feelsLikeValue = Self.temperatureString(current.apparentTemperature)
-            weatherConditionValue = Self.weatherDescription(
-                code: current.weatherCode,
-                language: language
-            )
+            lastWeatherCode = current.weatherCode
+            lastWeatherIsDay = current.isDay == 1
             weatherSymbolName = Self.weatherSymbol(
                 code: current.weatherCode,
-                isDay: current.isDay == 1
+                isDay: lastWeatherIsDay
             )
             lastWeatherFetchAt = Date()
             lastWeatherLocation = location
