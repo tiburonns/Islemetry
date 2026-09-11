@@ -40,7 +40,7 @@ Record:
 
 1. Launch Islemetry.
 2. Review all metric cards.
-3. Confirm that the 27 current metrics render without missing SF Symbols, blank values, or severe clipping.
+3. Confirm that the 31 current metrics render without missing SF Symbols, blank values, or severe clipping.
 4. Compare values that can be verified easily: battery, charging, Low Power Mode, storage, refresh rate, brightness, network, iOS version, locale, and time zone.
 
 ## Dynamic Island preview test
@@ -221,3 +221,43 @@ V0.2 hardware validation is successful when:
 - A running Live Activity updates when layout, color, or language changes.
 - Compact, expanded, minimal, and Lock Screen presentations render correctly where available.
 - The Live Activity can be refreshed and stopped without duplication or a stranded session.
+
+
+## Location and local weather test
+
+1. Install the latest build on a physical iPhone.
+2. Open **Location & Weather**.
+3. Tap **Allow Location** and grant access.
+4. Tap **Refresh Weather**.
+5. Confirm **Local Temperature**, **Feels Like**, **Weather**, and **Location** show values rather than a waiting state.
+6. Assign **Local Temperature** to Compact Leading or Trailing.
+7. Apply the configuration to a running Live Activity.
+8. Confirm the temperature appears in the Dynamic Island.
+9. Open the Open-Meteo attribution link.
+
+### Expected result
+
+- Permission state updates correctly.
+- Local temperature is shown in °C.
+- Apparent temperature and weather condition render correctly.
+- The selected weather metric appears in the Live Activity.
+- Attribution is visible and tappable.
+
+## Background location test
+
+1. Enable **Background location**.
+2. Follow any additional iOS authorization prompt.
+3. Confirm Islemetry reports **Always** if iOS grants it.
+4. Keep a Live Activity running with Local Temperature selected.
+5. Put Islemetry in the background.
+6. Move far enough to generate a Core Location event, or use Xcode location simulation.
+7. Re-check the existing Live Activity after iOS delivers the update.
+8. Disable **Background location**.
+
+### Expected result
+
+- No duplicate Live Activity is created.
+- Background location is active only when explicitly enabled.
+- A delivered background location event can refresh weather and update the existing Live Activity.
+- Disabling the switch stops standard background location updates.
+- No fixed background interval is assumed; iOS controls scheduling.
