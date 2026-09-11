@@ -80,6 +80,7 @@ struct ContentView: View {
                     controls
                     islandConfigurationCard
                     islandPreviewCard
+                    locationWeatherCard
                     appearanceCard
                     languageCard
                     metricsGrid
@@ -89,6 +90,7 @@ struct ContentView: View {
             .navigationTitle("Islemetry")
             .task {
                 liveActivity.syncState()
+                telemetry.prepareLocationWeather()
             }
             .onChange(of: appLanguageRaw) { _, _ in
                 telemetry.refresh()
@@ -302,6 +304,122 @@ struct ContentView: View {
             )
             .font(.caption)
             .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private var locationWeatherCard: some View {
+        let temperature = metric(for: .localTemperature)
+        let condition = metric(for: .weatherCondition)
+
+        return VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                Label(
+                    language.text("Location & Weather", "Ubicación y clima"),
+                    systemImage: condition.symbol
+                )
+                .font(.headline)
+
+                Spacer()
+
+                Text(temperature.value)
+                    .font(.headline.monospacedDigit())
+            }
+
+            HStack {
+                Text(language.text("Location permission", "Permiso de ubicación"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Spacer()
+
+                Text(telemetry.locationAuthorizationDescription(language: language))
+                    .font(.caption.weight(.semibold))
+            }
+
+            Toggle(
+                language.text(
+                    "Background location",
+                    "Ubicación en segundo plano"
+                ),
+                isOn: Binding(
+                    get: { telemetry.backgroundLocationEnabled },
+                    set: { telemetry.setBackgroundLocationEnabled($0) }
+                )
+            )
+
+            Text(
+                language.text(
+                    "When enabled, Islemetry can receive location updates in the background and refresh local WeatherKit telemetry when iOS gives the app execution time.",
+                    "Al activarlo, Islemetry puede recibir actualizaciones de ubicación en segundo plano y refrescar la telemetría local de WeatherKit cuando iOS le concede tiempo de ejecución."
+                )
+            )
+            .font(.caption)
+            .foregroundStyle(.secondary)
+
+            HStack(spacing: 10) {
+                Button {
+                    telemetry.requestLocationAccess()
+                } label: {
+                    Label(
+                        language.text("Allow Location", "Permitir ubicación"),
+                        systemImage: "location.fill"
+                    )
+                }
+                .buttonStyle(.bordered)
+
+                Button {
+                    telemetry.refreshLocationWeather(force: true)
+                } label: {
+                    Label(
+                        language.text("Refresh Weather", "Actualizar clima"),
+                        systemImage: "arrow.clockwise"
+                    )
+                }
+                .buttonStyle(.bordered)
+            }
+
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(language.text("Current", "Actual"))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    Text(temperature.value)
+                        .font(.title3.weight(.semibold))
+                }
+
+                Spacer()
+
+                VStack(alignment: .trailing, spacing: 3) {
+                    Text(language.text("Conditions", "Condiciones"))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    Label(condition.value, systemImage: condition.symbol)
+                        .font(.caption.weight(.semibold))
+                        .lineLimit(1)
+                }
+            }
+
+            if let message = telemetry.weatherStatusMessage {
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            if let attributionURL = telemetry.weatherAttributionURL {
+                Link(destination: attributionURL) {
+                    Label(
+                        language.text(
+                            "Weather data: \(telemetry.weatherServiceName)",
+                            "Datos meteorológicos: \(telemetry.weatherServiceName)"
+                        ),
+                        systemImage: "apple.logo"
+                    )
+                    .font(.caption)
+                }
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
