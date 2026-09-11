@@ -1,11 +1,20 @@
+import CoreLocation
 import Foundation
 import Network
 import UIKit
+import WeatherKit
 
 @MainActor
-final class DeviceTelemetryStore: ObservableObject {
+final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerDelegate {
+    static let backgroundLocationKey = "location.backgroundEnabled"
+
     @Published private(set) var metrics: [DeviceMetric] = []
     @Published private(set) var lastUpdated: Date = .distantPast
+    @Published private(set) var locationAuthorizationStatus: CLAuthorizationStatus = .notDetermined
+    @Published private(set) var backgroundLocationEnabled: Bool
+    @Published private(set) var weatherAttributionURL: URL?
+    @Published private(set) var weatherServiceName = "Apple Weather"
+    @Published private(set) var weatherStatusMessage: String?
 
     private enum NetworkInterface {
         case checking
@@ -23,17 +32,140 @@ final class DeviceTelemetryStore: ObservableObject {
     private var networkSupportsIPv6 = false
     private var networkSupportsDNS = false
 
+    private var localTemperatureValue: String?
+    private var feelsLikeValue: String?
+    private var weatherConditionValue: String?
+    private var weatherSymbolName = "cloud.sun.fill"
+    private var locationValue: String?
+    private var lastWeatherFetchAt: Date?
+    private var lastWeatherLocation: CLLocation?
+    private var pendingForcedWeatherRefresh = false
+    private var weatherRefreshInFlight = false
+
     private let pathMonitor = NWPathMonitor()
     private let monitorQueue = DispatchQueue(label: "com.tiburonns.islemetry.network")
+    private let locationManager = CLLocationManager()
 
-    init() {
+    override init() {
+        backgroundLocationEnabled = UserDefaults.standard.bool(
+            forKey: Self.backgroundLocationKey
+        )
+
+        super.init()
+
         UIDevice.current.isBatteryMonitoringEnabled = true
+
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyKilometer
+        locationManager.distanceFilter = 2_000
+        locationManager.activityType = .other
+        locationManager.pausesLocationUpdatesAutomatically = true
+        locationManager.showsBackgroundLocationIndicator = true
+
+        locationAuthorizationStatus = locationManager.authorizationStatus
+
         startNetworkMonitor()
         refresh()
     }
 
     deinit {
         pathMonitor.cancel()
+        locationManager.stopUpdatingLocation()
+    }
+
+    func prepareLocationWeather() {
+        locationAuthorizationStatus = locationManager.authorizationStatus
+
+        if backgroundLocationEnabled {
+            configureBackgroundLocation()
+        } else if isLocationAuthorized {
+            locationManager.requestLocation()
+        }
+
+        Task {
+            await loadWeatherAttribution()
+        }
+    }
+
+    func requestLocationAccess() {
+        guard CLLocationManager.locationServicesEnabled() else {
+            weatherStatusMessage = AppLanguage.current.text(
+                "Location Services are disabled.",
+                "Los Servicios de localización están desactivados."
+            )
+            refresh()
+            return
+        }
+
+        locationAuthorizationStatus = locationManager.authorizationStatus
+
+        switch locationAuthorizationStatus {
+        case .notDetermined:
+            locationManager.requestWhenInUseAuthorization()
+
+        case .authorizedWhenInUse, .authorizedAlways:
+            refreshLocationWeather(force: true)
+
+        case .denied, .restricted:
+            weatherStatusMessage = AppLanguage.current.text(
+                "Location access is not available. Enable it in Settings.",
+                "El acceso a la ubicación no está disponible. Actívalo en Configuración."
+            )
+            refresh()
+
+        @unknown default:
+            break
+        }
+    }
+
+    func setBackgroundLocationEnabled(_ enabled: Bool) {
+        backgroundLocationEnabled = enabled
+        UserDefaults.standard.set(enabled, forKey: Self.backgroundLocationKey)
+
+        if enabled {
+            configureBackgroundLocation()
+        } else {
+            locationManager.allowsBackgroundLocationUpdates = false
+            locationManager.stopUpdatingLocation()
+
+            if isLocationAuthorized {
+                locationManager.requestLocation()
+            }
+        }
+
+        refresh()
+    }
+
+    func refreshLocationWeather(force: Bool = true) {
+        guard isLocationAuthorized else {
+            requestLocationAccess()
+            return
+        }
+
+        pendingForcedWeatherRefresh = force
+
+        if backgroundLocationEnabled {
+            configureBackgroundLocation()
+        } else {
+            locationManager.requestLocation()
+        }
+    }
+
+    func locationAuthorizationDescription(language: AppLanguage) -> String {
+        switch locationAuthorizationStatus {
+        case .notDetermined:
+            return language.text("Not requested", "No solicitado")
+        case .restricted:
+            return language.text("Restricted", "Restringido")
+        case .denied:
+            return language.text("Denied", "Denegado")
+        case .authorizedAlways:
+            return language.text("Always", "Siempre")
+        case .authorizedWhenInUse:
+            return language.text("While Using", "Al usar la app")
+        @unknown default:
+            return language.text("Unknown", "Desconocido")
+        }
     }
 
     func refresh() {
@@ -50,6 +182,9 @@ final class DeviceTelemetryStore: ObservableObject {
         let brightness = Int((screen.brightness * 100).rounded())
         let resolution = "\(Int(screen.nativeBounds.width))×\(Int(screen.nativeBounds.height)) px"
         let displayScale = String(format: "%.2f×", screen.nativeScale)
+
+        let weatherUnavailable = weatherStatusMessage
+            ?? language.text("Waiting for location", "Esperando ubicación")
 
         metrics = [
             DeviceMetric(kind: .battery, title: language.text("Battery", "Batería"), value: batteryLevel.map { "\($0)%" } ?? language.text("Unknown", "Desconocido"), symbol: batterySymbol(level: batteryLevel), updatedAt: now),
@@ -78,10 +213,188 @@ final class DeviceTelemetryStore: ObservableObject {
             DeviceMetric(kind: .deviceModel, title: language.text("Device Model", "Modelo del dispositivo"), value: device.localizedModel, symbol: "iphone", updatedAt: now),
             DeviceMetric(kind: .system, title: language.text("System", "Sistema"), value: "\(device.systemName) \(device.systemVersion)", symbol: "gear", updatedAt: now),
             DeviceMetric(kind: .locale, title: language.text("Locale", "Configuración regional"), value: Locale.current.identifier, symbol: "globe", updatedAt: now),
-            DeviceMetric(kind: .timeZone, title: language.text("Time Zone", "Zona horaria"), value: TimeZone.current.identifier, symbol: "clock", updatedAt: now)
+            DeviceMetric(kind: .timeZone, title: language.text("Time Zone", "Zona horaria"), value: TimeZone.current.identifier, symbol: "clock", updatedAt: now),
+            DeviceMetric(kind: .localTemperature, title: language.text("Local Temperature", "Temperatura local"), value: localTemperatureValue ?? weatherUnavailable, symbol: weatherSymbolName, updatedAt: now),
+            DeviceMetric(kind: .feelsLike, title: language.text("Feels Like", "Sensación térmica"), value: feelsLikeValue ?? weatherUnavailable, symbol: "thermometer.medium", updatedAt: now),
+            DeviceMetric(kind: .weatherCondition, title: language.text("Weather", "Clima"), value: weatherConditionValue ?? weatherUnavailable, symbol: weatherSymbolName, updatedAt: now),
+            DeviceMetric(kind: .location, title: language.text("Location", "Ubicación"), value: locationValue ?? locationAuthorizationDescription(language: language), symbol: "location.fill", updatedAt: now)
         ]
 
         lastUpdated = now
+    }
+
+    private var isLocationAuthorized: Bool {
+        locationAuthorizationStatus == .authorizedAlways
+            || locationAuthorizationStatus == .authorizedWhenInUse
+    }
+
+    private func configureBackgroundLocation() {
+        locationAuthorizationStatus = locationManager.authorizationStatus
+
+        switch locationAuthorizationStatus {
+        case .notDetermined:
+            locationManager.requestWhenInUseAuthorization()
+
+        case .authorizedWhenInUse:
+            locationManager.requestAlwaysAuthorization()
+            startBackgroundLocationUpdates()
+
+        case .authorizedAlways:
+            startBackgroundLocationUpdates()
+
+        case .denied, .restricted:
+            weatherStatusMessage = AppLanguage.current.text(
+                "Background location requires location permission.",
+                "La ubicación en segundo plano requiere permiso de ubicación."
+            )
+
+        @unknown default:
+            break
+        }
+    }
+
+    private func startBackgroundLocationUpdates() {
+        locationManager.allowsBackgroundLocationUpdates = true
+        locationManager.startUpdatingLocation()
+    }
+
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        locationAuthorizationStatus = manager.authorizationStatus
+
+        switch manager.authorizationStatus {
+        case .authorizedWhenInUse:
+            if backgroundLocationEnabled {
+                manager.requestAlwaysAuthorization()
+                startBackgroundLocationUpdates()
+            } else {
+                manager.requestLocation()
+            }
+
+        case .authorizedAlways:
+            if backgroundLocationEnabled {
+                startBackgroundLocationUpdates()
+            } else {
+                manager.requestLocation()
+            }
+
+        case .denied, .restricted:
+            manager.stopUpdatingLocation()
+            weatherStatusMessage = AppLanguage.current.text(
+                "Location access is unavailable.",
+                "El acceso a la ubicación no está disponible."
+            )
+            refresh()
+
+        case .notDetermined:
+            break
+
+        @unknown default:
+            break
+        }
+    }
+
+    func locationManager(
+        _ manager: CLLocationManager,
+        didUpdateLocations locations: [CLLocation]
+    ) {
+        guard let location = locations.last else { return }
+
+        locationValue = String(
+            format: "%.3f°, %.3f°",
+            location.coordinate.latitude,
+            location.coordinate.longitude
+        )
+
+        let force = pendingForcedWeatherRefresh
+        pendingForcedWeatherRefresh = false
+
+        Task {
+            await updateWeather(for: location, force: force)
+        }
+
+        if !backgroundLocationEnabled {
+            manager.stopUpdatingLocation()
+        }
+    }
+
+    func locationManager(
+        _ manager: CLLocationManager,
+        didFailWithError error: Error
+    ) {
+        if let locationError = error as? CLError,
+           locationError.code == .locationUnknown {
+            return
+        }
+
+        weatherStatusMessage = error.localizedDescription
+        refresh()
+    }
+
+    private func updateWeather(for location: CLLocation, force: Bool) async {
+        if weatherRefreshInFlight {
+            return
+        }
+
+        if !force,
+           let lastWeatherFetchAt,
+           let lastWeatherLocation,
+           Date().timeIntervalSince(lastWeatherFetchAt) < 15 * 60,
+           location.distance(from: lastWeatherLocation) < 5_000 {
+            refresh()
+            return
+        }
+
+        weatherRefreshInFlight = true
+        defer { weatherRefreshInFlight = false }
+
+        do {
+            let current = try await WeatherService.shared.weather(
+                for: location,
+                including: .current
+            )
+
+            localTemperatureValue = Self.temperatureString(current.temperature)
+            feelsLikeValue = Self.temperatureString(current.apparentTemperature)
+            weatherConditionValue = current.condition.description
+            weatherSymbolName = current.symbolName
+            lastWeatherFetchAt = Date()
+            lastWeatherLocation = location
+            weatherStatusMessage = nil
+
+            await loadWeatherAttribution()
+            refresh()
+            await pushWeatherSnapshotToLiveActivity()
+        } catch {
+            weatherStatusMessage = error.localizedDescription
+            refresh()
+        }
+    }
+
+    private func loadWeatherAttribution() async {
+        guard weatherAttributionURL == nil else { return }
+
+        do {
+            let attribution = try await WeatherService.shared.attribution
+            weatherAttributionURL = attribution.legalPageURL
+            weatherServiceName = attribution.serviceName
+        } catch {
+            // Weather itself may still work; attribution will retry on a later refresh.
+        }
+    }
+
+    private func pushWeatherSnapshotToLiveActivity() async {
+        let manager = LiveActivityManager()
+        await manager.update(
+            with: metrics,
+            configuration: .current
+        )
+    }
+
+    private static func temperatureString(
+        _ measurement: Measurement<UnitTemperature>
+    ) -> String {
+        let celsius = measurement.converted(to: .celsius).value
+        return String(format: "%.0f °C", celsius)
     }
 
     private func startNetworkMonitor() {
