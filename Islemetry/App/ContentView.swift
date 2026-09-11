@@ -266,13 +266,7 @@ struct ContentView: View {
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
 
-                VStack(spacing: 12) {
-                    HStack(spacing: 16) {
-                        expandedPreviewMetric(leadingKind)
-                        Spacer(minLength: 12)
-                        expandedPreviewMetric(trailingKind)
-                    }
-
+                VStack(spacing: 10) {
                     if expandedKinds.isEmpty {
                         Text(
                             language.text(
@@ -284,9 +278,24 @@ struct ContentView: View {
                         .foregroundStyle(islandTextColor.opacity(0.68))
                         .frame(maxWidth: .infinity, alignment: .leading)
                     } else {
-                        LazyVGrid(columns: columns, spacing: 10) {
-                            ForEach(expandedKinds) { kind in
-                                expandedPreviewMetric(kind)
+                        if let first = expandedKinds.first {
+                            HStack(spacing: 16) {
+                                expandedPreviewMetric(first)
+
+                                if expandedKinds.count > 1 {
+                                    expandedPreviewMetric(expandedKinds[1])
+                                } else {
+                                    Spacer(minLength: 0)
+                                }
+                            }
+                        }
+
+                        let remaining = Array(expandedKinds.dropFirst(2))
+                        if !remaining.isEmpty {
+                            LazyVGrid(columns: columns, spacing: 8) {
+                                ForEach(remaining) { kind in
+                                    expandedPreviewMetric(kind)
+                                }
                             }
                         }
                     }
@@ -415,7 +424,7 @@ struct ContentView: View {
                             "Weather data: \(telemetry.weatherServiceName)",
                             "Datos meteorológicos: \(telemetry.weatherServiceName)"
                         ),
-                        systemImage: "apple.logo"
+                        systemImage: "cloud.sun.fill"
                     )
                     .font(.caption)
                 }
