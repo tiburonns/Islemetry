@@ -150,3 +150,29 @@ The **Refresh** button captures a new snapshot and updates the active Live Activ
 Islemetry intentionally uses public Apple frameworks. Disk-space information is a Required Reason API use case; Apple's approved reason `85F4.1` permits displaying disk-space information to the user. UserDefaults is used only to save Islemetry's own configuration, including metric selection, language, and text color, corresponding to approved reason `CA92.1`.
 
 System uptime is intentionally not exposed as a metric in this App Store-oriented build because Apple's approved reasons for the system-boot-time API do not include simply displaying device uptime as a system-monitor statistic.
+
+
+## Location and local weather metrics
+
+Islemetry adds four location-aware metrics to the normal Dynamic Island picker:
+
+- **Local Temperature** — current outdoor temperature for the latest iPhone location.
+- **Feels Like** — apparent temperature.
+- **Weather** — current weather condition.
+- **Location** — rounded latitude and longitude of the latest location snapshot.
+
+These metrics can be assigned to Compact Leading, Compact Trailing, or any expanded slot.
+
+### Background location
+
+The main-screen **Location & Weather** card includes a **Background location** switch. When disabled, Islemetry uses one-shot location requests while the app is active. When enabled, Islemetry requests the permission level needed for background location and starts Core Location updates with a coarse, battery-conscious configuration.
+
+Location events can trigger a local weather refresh and an ActivityKit update. This does **not** turn Islemetry into an always-running process; background delivery remains controlled by iOS.
+
+### Weather refresh policy
+
+Automatic weather refreshes are throttled to reduce network and battery use. Islemetry avoids another weather request when the last successful fetch is recent and the device has not moved meaningfully. **Refresh Weather** forces a new location/weather request.
+
+### Weather attribution
+
+Current weather is provided by **Open-Meteo**. Islemetry shows a visible attribution link next to weather data.
