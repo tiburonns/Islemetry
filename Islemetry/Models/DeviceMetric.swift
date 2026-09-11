@@ -182,7 +182,6 @@ struct DeviceMetric: Identifiable, Hashable, Codable {
         }
     }
 
-    let id: UUID
     let kind: Kind
     let title: String
     let value: String
@@ -190,18 +189,20 @@ struct DeviceMetric: Identifiable, Hashable, Codable {
     let updatedAt: Date
 
     init(
-        id: UUID = UUID(),
         kind: Kind,
         title: String,
         value: String,
         symbol: String,
         updatedAt: Date = .now
     ) {
-        self.id = id
         self.kind = kind
         self.title = title
         self.value = value
         self.symbol = symbol
         self.updatedAt = updatedAt
     }
+
+    /// Metrics are refreshed in place. A domain identifier keeps SwiftUI from
+    /// destroying and recreating every card whenever the values change.
+    var id: Kind { kind }
 }
