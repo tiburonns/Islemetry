@@ -361,8 +361,8 @@ struct ContentView: View {
 
             Text(
                 language.text(
-                    "When enabled, Islemetry can receive location updates in the background and refresh local WeatherKit telemetry when iOS gives the app execution time.",
-                    "Al activarlo, Islemetry puede recibir actualizaciones de ubicación en segundo plano y refrescar la telemetría local de WeatherKit cuando iOS le concede tiempo de ejecución."
+                    "When enabled, Islemetry can receive location updates in the background and refresh local weather telemetry when iOS gives the app execution time.",
+                    "Al activarlo, Islemetry puede recibir actualizaciones de ubicación en segundo plano y refrescar la telemetría del clima local cuando iOS le concede tiempo de ejecución."
                 )
             )
             .font(.caption)
