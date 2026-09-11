@@ -20,11 +20,11 @@ Islemetry es una aplicación de telemetría para iOS diseñada alrededor de Live
 
 En lugar de esconder la información del dispositivo dentro de un panel convencional, Islemetry permite que el usuario elija qué métricas desea mantener visibles de un vistazo. Dos métricas pueden asignarse a la Isla Dinámica compacta y hasta seis métricas adicionales pueden mostrarse en la presentación expandida. La misma Live Activity también aparece en la pantalla bloqueada.
 
-Actualmente la aplicación expone información relacionada con energía, estado térmico, CPU, memoria, almacenamiento, pantalla, red y sistema. Algunos ejemplos son porcentaje de batería, estado de carga, Modo de bajo consumo, estado térmico, memoria física, almacenamiento libre/usado/total, número de núcleos de CPU, frecuencia máxima de actualización de pantalla, indicador ProMotion, brillo, interfaz de red actual, Low Data Mode, compatibilidad con IPv4/IPv6/DNS, identificador del dispositivo, versión de iOS, configuración regional y zona horaria.
+Actualmente la aplicación expone información relacionada con energía, estado térmico, CPU, memoria, almacenamiento, pantalla, red, sistema, ubicación y clima local. Algunos ejemplos son porcentaje de batería, estado de carga, Modo de bajo consumo, estado térmico, memoria física, almacenamiento libre/usado/total, número de núcleos de CPU, frecuencia máxima de actualización de pantalla, indicador ProMotion, brillo, interfaz de red actual, Low Data Mode, compatibilidad con IPv4/IPv6/DNS, identificador del dispositivo, versión de iOS, configuración regional, zona horaria, coordenadas actuales, temperatura local, sensación térmica y condición meteorológica actual.
 
 Islemetry incluye en la pantalla principal una vista previa de la configuración real de la Isla Dinámica compacta y expandida, preferencias persistentes guardadas en el dispositivo, un Color Picker completo de iOS para personalizar el color del texto y símbolos de telemetría, un selector de idioma con modos Sistema, English y Español, y un selector de apariencia Sistema, Clara u Oscura. El color elegido se guarda como un valor RGB HEX y se envía dentro del estado de ActivityKit. Cuando la Live Activity ya está activa, los cambios de distribución, color de telemetría e idioma pueden enviarse a la actividad existente sin crear intencionalmente una sesión duplicada.
 
-El proyecto está desarrollado de forma nativa con SwiftUI, ActivityKit, WidgetKit, Network, UIKit y Foundation. Evita intencionalmente dependencias externas en tiempo de ejecución y se desarrolla teniendo en cuenta la compatibilidad con App Store y los requisitos de privacidad de Apple.
+El proyecto está desarrollado de forma nativa con SwiftUI, ActivityKit, WidgetKit, Core Location, Network, UIKit y Foundation. Evita intencionalmente dependencias externas en tiempo de ejecución y se desarrolla teniendo en cuenta la compatibilidad con App Store y los requisitos de privacidad de Apple.
 
 Como iOS no permite que una aplicación normal se ejecute continuamente en segundo plano como un monitor de sistema de escritorio, Islemetry trata muchos valores como snapshots de telemetría. La app actualiza esos valores cuando recibe tiempo de ejecución y envía un nuevo estado de ActivityKit a la Live Activity.
 
@@ -48,7 +48,9 @@ Como iOS no permite que una aplicación normal se ejecute continuamente en segun
 - Vista previa de la Isla Dinámica en Inicio
 - Configuración persistente en el dispositivo
 - Modos de idioma Sistema / English / Español
-- 27 métricas del dispositivo/sistema
+- 31 métricas del dispositivo/sistema/ubicación/clima
+- Actualización opcional del clima mediante ubicación en segundo plano
+- Clima actual mediante Open-Meteo con atribución visible
 - Sin dependencias externas en tiempo de ejecución
 
 ## Topics sugeridos para GitHub
@@ -80,4 +82,4 @@ Telemetría configurable del dispositivo para la Isla Dinámica.
 
 ## Descripción a futuro
 
-La arquitectura está pensada para crecer más allá de V0.2 con perfiles, Shortcuts/App Intents, diagnósticos de red más completos, módulos opcionales de WeatherKit y HealthKit y mejores flujos de Release/distribución.
+La arquitectura está pensada para crecer más allá de V0.2 con perfiles, Shortcuts/App Intents, diagnósticos de red más completos, HealthKit y módulos ambientales más completos y mejores flujos de Release/distribución.
