@@ -41,6 +41,7 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
     private var lastWeatherLocation: CLLocation?
     private var pendingForcedWeatherRefresh = false
     private var weatherRefreshInFlight = false
+    private var requestedAlwaysAuthorizationThisSession = false
 
     private let pathMonitor = NWPathMonitor()
     private let monitorQueue = DispatchQueue(label: "com.tiburonns.islemetry.network")
@@ -258,8 +259,11 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
             locationManager.requestWhenInUseAuthorization()
 
         case .authorizedWhenInUse:
-            locationManager.requestAlwaysAuthorization()
-            startBackgroundLocationUpdates()
+            if !requestedAlwaysAuthorizationThisSession {
+                requestedAlwaysAuthorizationThisSession = true
+                locationManager.requestAlwaysAuthorization()
+            }
+            locationManager.requestLocation()
 
         case .authorizedAlways:
             startBackgroundLocationUpdates()
@@ -285,12 +289,12 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
 
         switch manager.authorizationStatus {
         case .authorizedWhenInUse:
-            if backgroundLocationEnabled {
+            if backgroundLocationEnabled,
+               !requestedAlwaysAuthorizationThisSession {
+                requestedAlwaysAuthorizationThisSession = true
                 manager.requestAlwaysAuthorization()
-                startBackgroundLocationUpdates()
-            } else {
-                manager.requestLocation()
             }
+            manager.requestLocation()
 
         case .authorizedAlways:
             if backgroundLocationEnabled {
@@ -371,7 +375,6 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
 
         do {
             let current = try await fetchOpenMeteoCurrentWeather(for: location)
-            let language = AppLanguage.current
 
             localTemperatureValue = Self.temperatureString(current.temperature2M)
             feelsLikeValue = Self.temperatureString(current.apparentTemperature)
