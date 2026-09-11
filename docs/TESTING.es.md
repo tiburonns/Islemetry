@@ -40,7 +40,7 @@ Registra:
 
 1. Abre Islemetry.
 2. Revisa todas las tarjetas de métricas.
-3. Confirma que las 27 métricas actuales se muestren sin SF Symbols faltantes, valores vacíos ni recortes graves.
+3. Confirma que las 31 métricas actuales se muestren sin SF Symbols faltantes, valores vacíos ni recortes graves.
 4. Compara valores fáciles de verificar: batería, carga, modo de bajo consumo, almacenamiento, frecuencia de pantalla, brillo, red, versión de iOS, configuración regional y zona horaria.
 
 ## Prueba de vista previa de la Isla Dinámica
@@ -218,3 +218,44 @@ La validación de hardware de V0.2 se considera exitosa cuando:
 - Una Live Activity activa se actualiza al cambiar distribución, color o idioma.
 - Las presentaciones compacta, expandida, mínima y de pantalla bloqueada se renderizan correctamente cuando estén disponibles.
 - La Live Activity puede actualizarse y detenerse sin duplicados ni sesiones residuales.
+
+
+## Prueba de ubicación y clima local
+
+1. Instala la compilación más reciente en un iPhone físico.
+2. Abre **Ubicación y clima**.
+3. Pulsa **Permitir ubicación** y concede acceso.
+4. Pulsa **Actualizar clima**.
+5. Confirma que **Temperatura local**, **Sensación térmica**, **Clima** y **Ubicación** muestren valores en lugar del estado de espera.
+6. Abre **Configurar Isla Dinámica**.
+7. Asigna **Temperatura local** a Izquierda o Derecha.
+8. Aplica la configuración a una Live Activity activa.
+9. Confirma que la temperatura aparezca en la Isla Dinámica.
+10. Abre el enlace de atribución de Open-Meteo y confirma que funcione.
+
+### Resultado esperado
+
+- El estado del permiso de ubicación se actualiza correctamente.
+- Se muestra una temperatura local reciente en °C.
+- La condición meteorológica y la sensación térmica se muestran correctamente.
+- La métrica meteorológica seleccionada aparece en las vistas compacta/expandida de la Live Activity.
+- La atribución del proveedor meteorológico es visible y se puede tocar.
+
+## Prueba de ubicación en segundo plano
+
+1. Activa **Ubicación en segundo plano**.
+2. Sigue los avisos adicionales de permisos de iOS si aparecen.
+3. Confirma que Islemetry muestre el estado **Siempre** cuando iOS conceda ese permiso.
+4. Mantén una Live Activity activa con Temperatura local seleccionada.
+5. Envía Islemetry a segundo plano.
+6. Desplázate lo suficiente para que Core Location genere un nuevo evento, o utiliza la simulación de ubicación de Xcode durante las pruebas.
+7. Revisa de nuevo la Live Activity después de que iOS entregue una actualización.
+8. Desactiva **Ubicación en segundo plano** y confirma que Islemetry regrese al comportamiento de solicitudes puntuales en primer plano.
+
+### Resultado esperado
+
+- Activar el interruptor no crea Live Activities duplicadas.
+- La ubicación en segundo plano solo está activa cuando el usuario la habilita explícitamente.
+- Cuando iOS entrega un evento de ubicación en segundo plano, Islemetry puede actualizar el clima y la Live Activity existente.
+- Desactivar el interruptor detiene las actualizaciones estándar de ubicación en segundo plano.
+- La prueba no presupone un intervalo fijo: iOS controla la planificación en segundo plano.
