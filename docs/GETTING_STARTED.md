@@ -165,3 +165,32 @@ Open Islemetry and use **Refresh**, or change the configuration and choose **App
 ## IPA distribution
 
 Running directly from Xcode does not require an `.ipa` file. If you want a distributable package, see [IPA.md](IPA.md).
+
+
+## Location and local weather
+
+Islemetry can show local weather using the iPhone's current location.
+
+The default build uses **Core Location + Open-Meteo**. It does not require a WeatherKit entitlement, which keeps local development and AltStore/Personal Team signing simpler.
+
+### First permission flow
+
+1. Open Islemetry on a physical iPhone.
+2. Find **Location & Weather** on the main screen.
+3. Tap **Allow Location**.
+4. Grant location access when iOS asks.
+5. Tap **Refresh Weather** to request a fresh local weather snapshot.
+6. To allow location-driven refreshes while Islemetry is in the background, enable **Background location**.
+7. iOS may then request **Always** location access. The exact prompt timing is controlled by iOS.
+
+The main target declares the When In Use and Always location privacy descriptions and the location background mode. In Xcode, the main target should show **Background Modes → Location updates** under **Signing & Capabilities**.
+
+### Important background behavior
+
+Background Location is optional and is used only for the location/weather feature. It is not a mechanism for keeping arbitrary CPU, RAM, or other device sampling alive continuously.
+
+When iOS delivers a background location update, Islemetry can refresh local weather and update a running Live Activity. iOS still controls when and how often the app receives execution time.
+
+### Weather provider
+
+Current weather comes from **Open-Meteo**. The app shows a visible provider link beside weather information. Internet access is required for a fresh weather fetch.
