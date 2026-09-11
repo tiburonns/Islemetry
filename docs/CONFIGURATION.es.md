@@ -150,3 +150,29 @@ El botón **Actualizar** toma un nuevo snapshot y actualiza la Live Activity act
 Islemetry utiliza intencionalmente frameworks públicos de Apple. La información de espacio en disco pertenece a las Required Reason APIs; el motivo aprobado por Apple `85F4.1` permite mostrar información de almacenamiento al usuario. UserDefaults se utiliza únicamente para guardar la configuración propia de Islemetry, incluida la selección de métricas, idioma y color del texto, correspondiente al motivo aprobado `CA92.1`.
 
 El uptime del sistema se excluye intencionalmente de esta compilación orientada a App Store porque los motivos aprobados por Apple para la API de tiempo de arranque del sistema no incluyen simplemente mostrar el uptime del dispositivo como estadística de monitorización.
+
+
+## Métricas de ubicación y clima local
+
+Islemetry agrega cuatro métricas dependientes de la ubicación al selector normal de la Isla Dinámica:
+
+- **Temperatura local** — temperatura exterior actual para la última ubicación del iPhone.
+- **Sensación térmica** — temperatura aparente.
+- **Clima** — condición meteorológica actual.
+- **Ubicación** — latitud y longitud redondeadas del último snapshot de ubicación.
+
+Estas métricas se pueden asignar a Izquierda, Derecha o a cualquiera de las posiciones expandidas.
+
+### Ubicación en segundo plano
+
+La tarjeta **Ubicación y clima** de la pantalla principal incluye un interruptor **Ubicación en segundo plano**. Cuando está desactivado, Islemetry utiliza solicitudes puntuales de ubicación mientras la app está activa. Cuando está activado, Islemetry solicita el nivel de permiso necesario para ubicación en segundo plano e inicia actualizaciones de Core Location con una configuración aproximada y consciente del consumo de batería.
+
+Los eventos de ubicación pueden provocar una actualización del clima local y del estado de ActivityKit. Esto **no** convierte a Islemetry en un proceso ejecutándose permanentemente; la entrega en segundo plano sigue bajo control de iOS.
+
+### Política de actualización del clima
+
+Las actualizaciones meteorológicas automáticas están limitadas para reducir consumo de red y batería. Islemetry evita otra consulta cuando la última actualización correcta es reciente y el dispositivo no se ha desplazado de forma significativa. **Actualizar clima** fuerza una nueva solicitud de ubicación/clima.
+
+### Atribución meteorológica
+
+El clima actual es proporcionado por **Open-Meteo**. Islemetry muestra un enlace visible de atribución junto a los datos meteorológicos.
