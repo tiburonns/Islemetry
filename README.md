@@ -20,6 +20,8 @@ You can choose:
 - A custom **Dynamic Island telemetry color**
 - **System / English / Español** language behavior
 - **System / Light / Dark** app appearance
+- Optional **background location** for local weather refreshes
+- Local temperature, feels-like temperature, weather condition, and current coordinates
 
 The same Live Activity also appears on the Lock Screen, and the app includes a Home-screen preview that mirrors the saved Dynamic Island configuration and selected telemetry color.
 
@@ -37,7 +39,7 @@ The same Live Activity also appears on the Lock Screen, and the app includes a H
 - Persistent **System / Light / Dark** appearance selector
 - Metric names, states, configuration UI, and Live Activity auxiliary text follow the effective language
 - Language/layout/color changes can update an already-running Live Activity
-- 27 current device/system metrics
+- 31 current device/system/location/weather metrics
 - No third-party runtime dependencies
 
 ### Metric categories
@@ -48,6 +50,7 @@ The same Live Activity also appears on the Lock Screen, and the app includes a H
 - **Display:** maximum refresh rate, ProMotion indication, native resolution, native scale
 - **Network:** current interface, Low Data Mode, expensive-path state, IPv4, IPv6, DNS
 - **Device / system:** hardware identifier, device model, iOS version, locale, time zone
+- **Location / weather:** current coordinates, local temperature, feels-like temperature, current condition
 
 ## Quick start
 
@@ -142,12 +145,15 @@ script/
 - Network
 - UIKit
 - Foundation
+- CoreLocation
 
 ## Background-update model
 
 Islemetry is intentionally not designed to pretend that iOS provides desktop-style continuous system monitoring in the background.
 
 Many metrics are **snapshots**. Islemetry refreshes them when the app receives execution time and then updates the ActivityKit state. Time-based or system-managed Live Activity presentation can continue while the main application process is suspended, but arbitrary CPU/RAM-style telemetry cannot be sampled continuously by a normal suspended app.
+
+When the user explicitly enables **Background Location**, Core Location may deliver location updates while Islemetry is in the background. Islemetry uses those opportunities to refresh local weather and update a running Live Activity. This is not a promise of continuous execution; iOS remains in control of background scheduling. Local weather is retrieved from Open-Meteo and displayed with the required provider attribution.
 
 ## Privacy and App Store orientation
 
@@ -179,7 +185,7 @@ When functionality, architecture, installation, privacy, or release behavior cha
 2. **V0.2** — Configurable Dynamic Island + expanded telemetry + preview + language and appearance controls ✅ released
 3. **V0.3** — Profiles + Shortcuts / App Intents
 4. **V0.4** — Network diagnostics and richer telemetry
-5. **V0.5** — Optional WeatherKit / HealthKit modules
+5. **V0.5** — HealthKit and richer environmental modules
 6. **V1.0** — Polished App Store-ready release
 
 ## Logo
