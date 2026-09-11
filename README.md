@@ -147,7 +147,7 @@ script/
 
 Islemetry is intentionally not designed to pretend that iOS provides desktop-style continuous system monitoring in the background.
 
-Many metrics are **snapshots**. Islemetry refreshes them when the app receives execution time and then updates the ActivityKit state. Time-based or system-managed Live Activity presentation can continue while the main application process is suspended, but arbitrary CPU/RAM-style telemetry cannot be sampled continuously by a normal suspended app.
+Many metrics are **snapshots**. While Islemetry is active, it automatically captures a new snapshot every three seconds and updates any running Live Activity. System notifications for battery, power, thermal state, brightness, and network changes can also trigger immediate refreshes. Time-based or system-managed Live Activity presentation can continue while the main application process is suspended, but iOS pauses Islemetry's three-second refresh loop in the background and arbitrary CPU/RAM-style telemetry cannot be sampled continuously by a normal suspended app.
 
 ## Privacy and App Store orientation
 

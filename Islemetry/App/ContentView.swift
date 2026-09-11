@@ -1,8 +1,11 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @EnvironmentObject private var telemetry: DeviceTelemetryStore
     @StateObject private var liveActivity = LiveActivityManager()
+
+    private static let automaticRefreshInterval: Duration = .seconds(3)
 
     @AppStorage(AppLanguage.storageKey)
     private var appLanguageRaw = AppLanguage.system.rawValue
@@ -89,6 +92,9 @@ struct ContentView: View {
             .navigationTitle("Islemetry")
             .task {
                 liveActivity.syncState()
+            }
+            .task(id: scenePhase) {
+                await refreshAutomaticallyWhileActive()
             }
             .onChange(of: appLanguageRaw) { _, _ in
                 telemetry.refresh()
@@ -462,23 +468,43 @@ struct ContentView: View {
     }
 
     private func refreshLiveActivity(startIfNeeded: Bool) {
+        Task {
+            await refreshSnapshot(startIfNeeded: startIfNeeded)
+        }
+    }
+
+    @MainActor
+    private func refreshAutomaticallyWhileActive() async {
+        guard scenePhase == .active else { return }
+
+        while !Task.isCancelled, scenePhase == .active {
+            await refreshSnapshot(startIfNeeded: false)
+
+            do {
+                try await Task.sleep(for: Self.automaticRefreshInterval)
+            } catch {
+                return
+            }
+        }
+    }
+
+    @MainActor
+    private func refreshSnapshot(startIfNeeded: Bool) async {
         telemetry.refresh()
         let configuration = IslandConfiguration.current
 
-        Task {
-            if liveActivity.activeActivityID == nil {
-                if startIfNeeded {
-                    await liveActivity.start(
-                        with: telemetry.metrics,
-                        configuration: configuration
-                    )
-                }
-            } else {
-                await liveActivity.update(
+        if liveActivity.activeActivityID == nil {
+            if startIfNeeded {
+                await liveActivity.start(
                     with: telemetry.metrics,
                     configuration: configuration
                 )
             }
+        } else {
+            await liveActivity.update(
+                with: telemetry.metrics,
+                configuration: configuration
+            )
         }
     }
 }

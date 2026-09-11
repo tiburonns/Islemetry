@@ -156,16 +156,19 @@ Registra:
 
 ## Prueba de actualización de Live Activity
 
-1. Cambia un valor que pueda variar, como estado de batería, carga, red, modo de bajo consumo o brillo.
-2. Regresa a Islemetry y pulsa **Refresh / Actualizar**.
-3. Revisa nuevamente la vista previa de Inicio y la Live Activity.
+1. Inicia una Live Activity y observa el tiempo relativo de **Última captura**.
+2. Mantén Islemetry en primer plano durante al menos cuatro segundos sin pulsar ningún botón.
+3. Confirma que **Última captura** avanza y revisa la vista previa de Inicio y la Live Activity.
+4. Pulsa **Refresh / Actualizar** y confirma que todavía solicita una actualización inmediata.
 
 ### Resultado esperado
 
+- Se toma un snapshot nuevo aproximadamente cada tres segundos mientras la app está activa.
 - La vista previa de Inicio refleja el nuevo snapshot.
 - La Live Activity permanece activa.
-- Los valores actualizados se reflejan después de actualizar.
+- Los valores nuevos se envían automáticamente y después de una actualización manual.
 - El color seleccionado se conserva.
+- Al enviar Islemetry a segundo plano, el ciclo de tres segundos se detiene hasta que la app vuelve a estar activa.
 
 ## Prueba de detención de Live Activity
 

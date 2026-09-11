@@ -156,16 +156,19 @@ Record:
 
 ## Live Activity refresh test
 
-1. Change a value that can reasonably vary, such as battery state, charging state, network path, Low Power Mode, or brightness.
-2. Return to Islemetry and press **Refresh / Actualizar**.
-3. Check the Home preview and Live Activity again.
+1. Start a Live Activity and note the relative **Last snapshot** time.
+2. Keep Islemetry in the foreground for at least four seconds without pressing a button.
+3. Confirm that **Last snapshot** advances and check the Home preview and Live Activity.
+4. Press **Refresh / Actualizar** and confirm that it still requests an immediate update.
 
 ### Expected result
 
+- A new snapshot is captured approximately every three seconds while the app is active.
 - The Home preview reflects the new snapshot.
 - The Live Activity remains active.
-- Updated values are reflected after refresh.
+- Updated values are sent automatically and after a manual refresh.
 - The selected text color is preserved.
+- Moving Islemetry to the background stops the three-second loop until the app becomes active again.
 
 ## Live Activity stop test
 

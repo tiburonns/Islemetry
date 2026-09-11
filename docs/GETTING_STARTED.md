@@ -160,7 +160,7 @@ Confirm that Live Activities are enabled for Islemetry in iOS settings and that 
 
 ### Dynamic Island still shows old values
 
-Open Islemetry and use **Refresh**, or change the configuration and choose **Apply to Live Activity**. Many device metrics are snapshots because iOS does not allow Islemetry to run continuously as a desktop-style system monitor while suspended.
+Keep Islemetry in the foreground for at least three seconds. The app refreshes automatically while active; **Refresh** remains available for an immediate snapshot, and **Apply to Live Activity** immediately sends configuration changes. iOS pauses automatic sampling after suspending the app in the background.
 
 ## IPA distribution
 

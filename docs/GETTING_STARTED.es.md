@@ -160,7 +160,7 @@ Confirma que las Live Activities estén habilitadas para Islemetry en los ajuste
 
 ### La Isla Dinámica muestra valores anteriores
 
-Abre Islemetry y usa **Actualizar**, o cambia la configuración y pulsa **Aplicar a Live Activity**. Muchas métricas son snapshots porque iOS no permite ejecutar Islemetry continuamente en segundo plano como un monitor de escritorio.
+Mantén Islemetry en primer plano durante al menos tres segundos. La app se actualiza automáticamente mientras está activa; **Actualizar** continúa disponible para tomar un snapshot inmediato y **Aplicar a Live Activity** envía inmediatamente los cambios de configuración. iOS pausa el muestreo automático después de suspender la app en segundo plano.
 
 ## Distribución mediante IPA
 
