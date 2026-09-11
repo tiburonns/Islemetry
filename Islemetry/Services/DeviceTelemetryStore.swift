@@ -25,15 +25,37 @@ final class DeviceTelemetryStore: ObservableObject {
 
     private let pathMonitor = NWPathMonitor()
     private let monitorQueue = DispatchQueue(label: "com.tiburonns.islemetry.network")
+    private var systemObservers: [NSObjectProtocol] = []
 
     init() {
         UIDevice.current.isBatteryMonitoringEnabled = true
+        startSystemObservers()
         startNetworkMonitor()
         refresh()
     }
 
     deinit {
         pathMonitor.cancel()
+        systemObservers.forEach(NotificationCenter.default.removeObserver)
+    }
+
+    private func startSystemObservers() {
+        let center = NotificationCenter.default
+        let names: [Notification.Name] = [
+            UIDevice.batteryLevelDidChangeNotification,
+            UIDevice.batteryStateDidChangeNotification,
+            Notification.Name.NSProcessInfoPowerStateDidChange,
+            ProcessInfo.thermalStateDidChangeNotification,
+            UIScreen.brightnessDidChangeNotification
+        ]
+
+        systemObservers = names.map { name in
+            center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+                Task { @MainActor [weak self] in
+                    self?.refresh()
+                }
+            }
+        }
     }
 
     func refresh() {

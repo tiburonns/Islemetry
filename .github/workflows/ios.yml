@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
       - name: Build for Simulator
         run: >-
           xcodebuild
@@ -22,13 +22,18 @@ jobs:
           build
       - name: Build unsigned AltStore IPA
         run: ./script/build_altstore_ipa.sh
+      - name: Locate versioned IPA
+        run: |
+          IPA_PATH="$(find dist -maxdepth 1 -type f -name 'Islemetry-*.ipa' -print -quit)"
+          test -n "$IPA_PATH"
+          echo "IPA_PATH=$IPA_PATH" >> "$GITHUB_ENV"
       - name: Finalize and validate AltStore source
         run: |
-          python3 script/update_altstore_source.py dist/Islemetry-0.2.0.ipa altstore/source.json
-          python3 script/validate_altstore.py altstore/source.json dist/Islemetry-0.2.0.ipa
-      - uses: actions/upload-artifact@v4
+          python3 script/update_altstore_source.py "$IPA_PATH" altstore/source.json
+          python3 script/validate_altstore.py altstore/source.json "$IPA_PATH"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: Islemetry-AltStore-0.2.0
+          name: Islemetry-AltStore
           path: |
-            dist/Islemetry-0.2.0.ipa
+            ${{ env.IPA_PATH }}
             altstore/source.json

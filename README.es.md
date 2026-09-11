@@ -56,7 +56,7 @@ Clona el repositorio:
 ```bash
 git clone https://github.com/tiburonns/Islemetry.git
 cd Islemetry
-git switch bootstrap/v0.1
+git switch main
 open Islemetry.xcodeproj
 ```
 
