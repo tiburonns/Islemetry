@@ -179,7 +179,12 @@
 				LastSwiftUpdateCheck = 2600;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
-					T10000000000000000000001 = {CreatedOnToolsVersion = 26.0; };
+					T10000000000000000000001 = {
+						CreatedOnToolsVersion = 26.0;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = { enabled = 1; };
+						};
+					};
 					T10000000000000000000002 = {CreatedOnToolsVersion = 26.0; };
 				};
 			};
