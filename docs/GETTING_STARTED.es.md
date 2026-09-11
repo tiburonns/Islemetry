@@ -165,3 +165,32 @@ Abre Islemetry y usa **Actualizar**, o cambia la configuración y pulsa **Aplica
 ## Distribución mediante IPA
 
 Ejecutar directamente desde Xcode no requiere un archivo `.ipa`. Si quieres un paquete distribuible, consulta [IPA.es.md](IPA.es.md).
+
+
+## Ubicación y clima local
+
+Islemetry puede mostrar el clima local utilizando la ubicación actual del iPhone.
+
+La compilación predeterminada usa **Core Location + Open-Meteo**. No requiere entitlement de WeatherKit, lo que mantiene más simple la firma local con Personal Team y la distribución mediante AltStore.
+
+### Primer flujo de permisos
+
+1. Abre Islemetry en un iPhone físico.
+2. Busca **Ubicación y clima** en la pantalla principal.
+3. Pulsa **Permitir ubicación**.
+4. Concede acceso a la ubicación cuando iOS lo solicite.
+5. Pulsa **Actualizar clima** para pedir un nuevo snapshot meteorológico local.
+6. Para permitir actualizaciones basadas en ubicación mientras Islemetry está en segundo plano, activa **Ubicación en segundo plano**.
+7. iOS puede solicitar después permiso de ubicación **Siempre**. El momento exacto del aviso lo controla iOS.
+
+El target principal declara las descripciones de privacidad para ubicación al usar la app y ubicación siempre, además del modo de segundo plano para ubicación. En Xcode, el target principal debe mostrar **Background Modes → Location updates** dentro de **Signing & Capabilities**.
+
+### Comportamiento importante en segundo plano
+
+La ubicación en segundo plano es opcional y se utiliza únicamente para la función de ubicación/clima. No se usa como mecanismo para mantener activo continuamente el muestreo arbitrario de CPU, RAM u otras métricas.
+
+Cuando iOS entrega una actualización de ubicación en segundo plano, Islemetry puede actualizar el clima local y enviar un nuevo estado a una Live Activity activa. iOS sigue controlando cuándo y con qué frecuencia la app recibe tiempo de ejecución.
+
+### Proveedor meteorológico
+
+El clima actual se obtiene de **Open-Meteo**. La app muestra un enlace visible al proveedor junto a la información meteorológica. Se requiere conexión a Internet para obtener un dato nuevo.
