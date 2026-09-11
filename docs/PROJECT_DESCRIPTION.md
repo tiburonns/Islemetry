@@ -20,11 +20,11 @@ Islemetry is an iOS device-telemetry application designed around Live Activities
 
 Instead of hiding device information inside a conventional dashboard, Islemetry lets the user choose which metrics should remain visible at a glance. Two metrics can be assigned to the compact Dynamic Island, while up to six additional metrics can be selected for the expanded presentation. The same Live Activity is also rendered on the Lock Screen.
 
-The application currently exposes information across power, thermal state, CPU, memory, storage, display, network, and system categories. Examples include battery percentage, charging state, Low Power Mode, thermal state, physical memory, free/used/total storage, CPU core counts, maximum display refresh rate, ProMotion indication, brightness, current network interface, Low Data Mode, IPv4/IPv6/DNS support, device identifier, iOS version, locale, and time zone.
+The application currently exposes information across power, thermal state, CPU, memory, storage, display, network, system, location, and local-weather categories. Examples include battery percentage, charging state, Low Power Mode, thermal state, physical memory, free/used/total storage, CPU core counts, maximum display refresh rate, ProMotion indication, brightness, current network interface, Low Data Mode, IPv4/IPv6/DNS support, device identifier, iOS version, locale, time zone, latest coordinates, local temperature, feels-like temperature, and current weather condition.
 
 Islemetry includes a main-screen preview of the exact compact and expanded Dynamic Island configuration, persistent on-device preferences, a full iOS Color Picker for customizing telemetry text and symbol color, an in-app language selector with System, English, and Spanish modes, and a System, Light, or Dark app appearance selector. The selected Dynamic Island color is stored as an RGB HEX value and sent in the ActivityKit state. When the Live Activity is already running, layout, telemetry-color, and language changes can be pushed to the existing activity without intentionally creating a duplicate session.
 
-The project is built natively with SwiftUI, ActivityKit, WidgetKit, Network, UIKit, and Foundation. It intentionally avoids third-party runtime dependencies and is being developed with App Store compatibility and privacy requirements in mind.
+The project is built natively with SwiftUI, ActivityKit, WidgetKit, Core Location, Network, UIKit, and Foundation. It intentionally avoids third-party runtime dependencies and is being developed with App Store compatibility and privacy requirements in mind.
 
 Because iOS does not allow an ordinary application to run continuously in the background like a desktop system monitor, Islemetry treats many values as telemetry snapshots. The app refreshes those values when it receives execution time and sends updated ActivityKit state to the Live Activity.
 
@@ -48,7 +48,9 @@ Because iOS does not allow an ordinary application to run continuously in the ba
 - Main-screen Dynamic Island preview
 - Persistent on-device configuration
 - System / English / Español language modes
-- 27 device/system metrics
+- 31 device/system/location/weather metrics
+- Optional background-location weather refresh
+- Open-Meteo current-weather integration with visible attribution
 - No third-party runtime dependencies
 
 ## Suggested repository topics
