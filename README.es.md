@@ -20,6 +20,8 @@ Puedes elegir:
 - Un **color personalizado para la telemetría de la Isla Dinámica**
 - Comportamiento de idioma **Sistema / English / Español**
 - Apariencia **Sistema / Clara / Oscura**
+- **Ubicación en segundo plano** opcional para actualizar el clima local
+- Temperatura local, sensación térmica, condición meteorológica y coordenadas actuales
 
 La misma Live Activity también aparece en la pantalla bloqueada y la app incluye una vista previa en Inicio que refleja la configuración guardada de la Isla Dinámica y el color de telemetría elegido.
 
@@ -37,7 +39,7 @@ La misma Live Activity también aparece en la pantalla bloqueada y la app incluy
 - Selector persistente de apariencia **Sistema / Clara / Oscura**
 - Nombres de métricas, estados, configuración y textos auxiliares de Live Activity según el idioma efectivo
 - Cambios de idioma/distribución/color pueden actualizar una Live Activity ya activa
-- 27 métricas actuales del dispositivo/sistema
+- 31 métricas actuales del dispositivo/sistema/ubicación/clima
 - Sin dependencias externas en tiempo de ejecución
 
 ### Categorías de métricas
@@ -48,6 +50,7 @@ La misma Live Activity también aparece en la pantalla bloqueada y la app incluy
 - **Pantalla:** frecuencia máxima, indicador ProMotion, resolución nativa, escala nativa
 - **Red:** interfaz actual, Low Data Mode, conexión considerada costosa, IPv4, IPv6, DNS
 - **Dispositivo / sistema:** identificador de hardware, modelo, versión de iOS, configuración regional, zona horaria
+- **Ubicación / clima:** coordenadas actuales, temperatura local, sensación térmica y condición actual
 
 ## Inicio rápido
 
@@ -142,12 +145,15 @@ script/
 - Network
 - UIKit
 - Foundation
+- CoreLocation
 
 ## Modelo de actualización en segundo plano
 
 Islemetry no pretende simular un monitor de escritorio ejecutándose continuamente en segundo plano cuando iOS no lo permite.
 
 Muchas métricas son **snapshots**. Islemetry las actualiza cuando recibe tiempo de ejecución y después envía un nuevo estado a ActivityKit. Algunas presentaciones controladas por el sistema pueden continuar mientras el proceso principal está suspendido, pero una app normal suspendida no puede muestrear arbitrariamente CPU/RAM de forma continua.
+
+Cuando el usuario activa explícitamente **Ubicación en segundo plano**, Core Location puede entregar actualizaciones de ubicación mientras Islemetry está en segundo plano. Islemetry aprovecha esas oportunidades para actualizar el clima local y una Live Activity activa. Esto no implica ejecución continua: iOS sigue controlando la planificación en segundo plano. El clima local se obtiene de Open-Meteo y se muestra con la atribución requerida al proveedor.
 
 ## Privacidad y orientación a App Store
 
@@ -179,7 +185,7 @@ Cuando cambien funcionalidad, arquitectura, instalación, privacidad o distribuc
 2. **V0.2** — Isla configurable + telemetría ampliada + preview + controles de idioma y apariencia ✅ publicada
 3. **V0.3** — Perfiles + Shortcuts / App Intents
 4. **V0.4** — Diagnóstico de red y telemetría más completa
-5. **V0.5** — Módulos opcionales WeatherKit / HealthKit
+5. **V0.5** — HealthKit y módulos ambientales más completos
 6. **V1.0** — Release pulido y preparado para App Store
 
 ## Logo
