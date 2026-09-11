@@ -2,7 +2,6 @@ import CoreLocation
 import Foundation
 import Network
 import UIKit
-import WeatherKit
 
 @MainActor
 final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerDelegate {
@@ -12,8 +11,8 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
     @Published private(set) var lastUpdated: Date = .distantPast
     @Published private(set) var locationAuthorizationStatus: CLAuthorizationStatus = .notDetermined
     @Published private(set) var backgroundLocationEnabled: Bool
-    @Published private(set) var weatherAttributionURL: URL?
-    @Published private(set) var weatherServiceName = "Apple Weather"
+    @Published private(set) var weatherAttributionURL = URL(string: "https://open-meteo.com/")
+    @Published private(set) var weatherServiceName = "Open-Meteo"
     @Published private(set) var weatherStatusMessage: String?
 
     private enum NetworkInterface {
@@ -82,9 +81,6 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
             locationManager.requestLocation()
         }
 
-        Task {
-            await loadWeatherAttribution()
-        }
     }
 
     func requestLocationAccess() {
@@ -348,20 +344,23 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
         defer { weatherRefreshInFlight = false }
 
         do {
-            let current = try await WeatherService.shared.weather(
-                for: location,
-                including: .current
-            )
+            let current = try await fetchOpenMeteoCurrentWeather(for: location)
+            let language = AppLanguage.current
 
-            localTemperatureValue = Self.temperatureString(current.temperature)
+            localTemperatureValue = Self.temperatureString(current.temperature2M)
             feelsLikeValue = Self.temperatureString(current.apparentTemperature)
-            weatherConditionValue = current.condition.description
-            weatherSymbolName = current.symbolName
+            weatherConditionValue = Self.weatherDescription(
+                code: current.weatherCode,
+                language: language
+            )
+            weatherSymbolName = Self.weatherSymbol(
+                code: current.weatherCode,
+                isDay: current.isDay == 1
+            )
             lastWeatherFetchAt = Date()
             lastWeatherLocation = location
             weatherStatusMessage = nil
 
-            await loadWeatherAttribution()
             refresh()
             await pushWeatherSnapshotToLiveActivity()
         } catch {
@@ -370,16 +369,63 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
         }
     }
 
-    private func loadWeatherAttribution() async {
-        guard weatherAttributionURL == nil else { return }
+    private struct OpenMeteoResponse: Decodable {
+        let current: Current
 
-        do {
-            let attribution = try await WeatherService.shared.attribution
-            weatherAttributionURL = attribution.legalPageURL
-            weatherServiceName = attribution.serviceName
-        } catch {
-            // Weather itself may still work; attribution will retry on a later refresh.
+        struct Current: Decodable {
+            let temperature2M: Double
+            let apparentTemperature: Double
+            let weatherCode: Int
+            let isDay: Int
+
+            enum CodingKeys: String, CodingKey {
+                case temperature2M = "temperature_2m"
+                case apparentTemperature = "apparent_temperature"
+                case weatherCode = "weather_code"
+                case isDay = "is_day"
+            }
         }
+    }
+
+    private func fetchOpenMeteoCurrentWeather(
+        for location: CLLocation
+    ) async throws -> OpenMeteoResponse.Current {
+        var components = URLComponents(
+            string: "https://api.open-meteo.com/v1/forecast"
+        )
+
+        components?.queryItems = [
+            URLQueryItem(
+                name: "latitude",
+                value: String(format: "%.5f", location.coordinate.latitude)
+            ),
+            URLQueryItem(
+                name: "longitude",
+                value: String(format: "%.5f", location.coordinate.longitude)
+            ),
+            URLQueryItem(
+                name: "current",
+                value: "temperature_2m,apparent_temperature,weather_code,is_day"
+            ),
+            URLQueryItem(name: "temperature_unit", value: "celsius"),
+            URLQueryItem(name: "timezone", value: "auto"),
+            URLQueryItem(name: "forecast_days", value: "1")
+        ]
+
+        guard let url = components?.url else {
+            throw URLError(.badURL)
+        }
+
+        let (data, response) = try await URLSession.shared.data(from: url)
+
+        if let httpResponse = response as? HTTPURLResponse,
+           !(200...299).contains(httpResponse.statusCode) {
+            throw URLError(.badServerResponse)
+        }
+
+        return try JSONDecoder()
+            .decode(OpenMeteoResponse.self, from: data)
+            .current
     }
 
     private func pushWeatherSnapshotToLiveActivity() async {
@@ -390,11 +436,71 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
         )
     }
 
-    private static func temperatureString(
-        _ measurement: Measurement<UnitTemperature>
+    private static func temperatureString(_ celsius: Double) -> String {
+        String(format: "%.0f °C", celsius)
+    }
+
+    private static func weatherDescription(
+        code: Int,
+        language: AppLanguage
     ) -> String {
-        let celsius = measurement.converted(to: .celsius).value
-        return String(format: "%.0f °C", celsius)
+        switch code {
+        case 0:
+            return language.text("Clear", "Despejado")
+        case 1:
+            return language.text("Mostly clear", "Mayormente despejado")
+        case 2:
+            return language.text("Partly cloudy", "Parcialmente nublado")
+        case 3:
+            return language.text("Cloudy", "Nublado")
+        case 45, 48:
+            return language.text("Fog", "Niebla")
+        case 51, 53, 55:
+            return language.text("Drizzle", "Llovizna")
+        case 56, 57:
+            return language.text("Freezing drizzle", "Llovizna helada")
+        case 61, 63, 65:
+            return language.text("Rain", "Lluvia")
+        case 66, 67:
+            return language.text("Freezing rain", "Lluvia helada")
+        case 71, 73, 75, 77:
+            return language.text("Snow", "Nieve")
+        case 80, 81, 82:
+            return language.text("Rain showers", "Chubascos")
+        case 85, 86:
+            return language.text("Snow showers", "Chubascos de nieve")
+        case 95:
+            return language.text("Thunderstorm", "Tormenta")
+        case 96, 99:
+            return language.text("Thunderstorm with hail", "Tormenta con granizo")
+        default:
+            return language.text("Weather", "Clima")
+        }
+    }
+
+    private static func weatherSymbol(code: Int, isDay: Bool) -> String {
+        switch code {
+        case 0:
+            return isDay ? "sun.max.fill" : "moon.stars.fill"
+        case 1, 2:
+            return isDay ? "cloud.sun.fill" : "cloud.moon.fill"
+        case 3:
+            return "cloud.fill"
+        case 45, 48:
+            return "cloud.fog.fill"
+        case 51, 53, 55:
+            return "cloud.drizzle.fill"
+        case 56, 57, 66, 67:
+            return "cloud.sleet.fill"
+        case 61, 63, 65, 80, 81, 82:
+            return "cloud.rain.fill"
+        case 71, 73, 75, 77, 85, 86:
+            return "cloud.snow.fill"
+        case 95, 96, 99:
+            return "cloud.bolt.rain.fill"
+        default:
+            return "cloud.sun.fill"
+        }
     }
 
     private func startNetworkMonitor() {
