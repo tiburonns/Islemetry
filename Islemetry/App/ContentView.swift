@@ -81,6 +81,7 @@ struct ContentView: View {
                 VStack(spacing: 20) {
                     statusCard
                     controls
+                    backgroundRefreshCard
                     islandConfigurationCard
                     islandPreviewCard
                     locationWeatherCard
@@ -97,6 +98,11 @@ struct ContentView: View {
             }
             .task(id: scenePhase) {
                 await refreshAutomaticallyWhileActive()
+            }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .background {
+                    BackgroundRefreshCoordinator.shared.schedule()
+                }
             }
             .onChange(of: appLanguageRaw) { _, _ in
                 telemetry.refresh()
@@ -132,6 +138,58 @@ struct ContentView: View {
                     .font(.caption)
                     .foregroundStyle(.red)
             }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private var backgroundRefreshCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Label(
+                    language.text("Background Refresh", "Actualización en segundo plano"),
+                    systemImage: "arrow.triangle.2.circlepath"
+                )
+                .font(.headline)
+
+                Spacer()
+
+                Text(language.text("ALL METRICS", "TODAS"))
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(.green)
+            }
+
+            HStack {
+                Text(language.text("Foreground", "Primer plano"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Spacer()
+
+                Text(language.text("Every 3 seconds", "Cada 3 segundos"))
+                    .font(.caption.weight(.semibold))
+            }
+
+            HStack {
+                Text(language.text("Background", "Segundo plano"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Spacer()
+
+                Text(language.text("Scheduled by iOS", "Programado por iOS"))
+                    .font(.caption.weight(.semibold))
+            }
+
+            Text(
+                language.text(
+                    "When iOS grants background execution time, Islemetry refreshes the full telemetry snapshot and updates the existing Live Activity. Location events can provide additional refresh opportunities when background location is enabled.",
+                    "Cuando iOS concede tiempo de ejecución en segundo plano, Islemetry actualiza el snapshot completo de telemetría y la Live Activity existente. Los eventos de ubicación pueden ofrecer oportunidades adicionales de actualización cuando la ubicación en segundo plano está activada."
+                )
+            )
+            .font(.caption)
+            .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
@@ -368,8 +426,8 @@ struct ContentView: View {
 
             Text(
                 language.text(
-                    "When enabled, Islemetry can receive location updates in the background and refresh local weather when iOS gives the app execution time.",
-                    "Al activarlo, Islemetry puede recibir actualizaciones de ubicación en segundo plano y refrescar el clima local cuando iOS le concede tiempo de ejecución."
+                    "When enabled, Core Location can wake Islemetry for genuine location changes. Each delivered event refreshes the full telemetry snapshot and local weather.",
+                    "Al activarlo, Core Location puede despertar Islemetry por cambios reales de ubicación. Cada evento entregado actualiza el snapshot completo de telemetría y el clima local."
                 )
             )
             .font(.caption)
