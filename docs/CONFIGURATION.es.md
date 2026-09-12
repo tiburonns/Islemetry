@@ -176,3 +176,14 @@ Las consultas automáticas están limitadas. Islemetry evita otra consulta si el
 ### Proveedor meteorológico
 
 El clima actual es proporcionado por **Open-Meteo** e Islemetry muestra un enlace de atribución visible junto a la tarjeta del clima.
+
+
+## Actualización de todas las métricas en segundo plano
+
+La telemetría general en segundo plano se programa siempre desde Islemetry; es independiente del interruptor opcional Ubicación en segundo plano.
+
+- Primer plano: snapshot completo aproximadamente cada 3 segundos mientras la app está activa.
+- Actualización de app en segundo plano: snapshot completo cuando iOS ejecuta `com.tiburonns.islemetry.refresh`.
+- Ubicación en segundo plano: cada evento de ubicación entregado también se utiliza como oportunidad para actualizar el snapshot completo antes de actualizar el clima local.
+
+La Live Activity recibe las mismas métricas seleccionadas después de cada oportunidad de ejecución. iOS no garantiza una cadencia de 15 minutos: `earliestBeginDate` únicamente impide ejecutar la tarea antes de ese momento.
