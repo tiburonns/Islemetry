@@ -59,5 +59,4 @@ struct IslemetryShortcuts: AppShortcutsProvider {
         )
     }
 
-    static var shortcutTileColor: ShortcutTileColor { .cyan }
 }
