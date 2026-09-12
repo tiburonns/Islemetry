@@ -284,3 +284,11 @@ La validación de hardware de V0.2 se considera exitosa cuando:
 - No se promete una cadencia fija de 3 segundos ni 15 minutos en segundo plano; iOS decide el momento real.
 
 > Para pruebas de segundo plano, envía Islemetry al Home pero **no la cierres a la fuerza** desde el selector de apps. Después de un cierre forzado, iOS puede no volver a lanzar la app en segundo plano hasta que el usuario la abra manualmente otra vez.
+
+
+## Controles de diagnóstico 0.3.3
+
+- **Programar** envía la solicitud `BGAppRefreshTask` y luego consulta a `BGTaskScheduler` para confirmar si existe una solicitud pendiente.
+- **Actualizar ahora** ejecuta inmediatamente el snapshot completo y actualiza la Live Activity existente.
+- La tarjeta muestra solicitud pendiente, primera fecha elegible, última actualización manual y resultado manual.
+- Programar una tarea no obliga a iOS a ejecutarla en ese momento; el sistema decide cuándo lanzar la tarea.
