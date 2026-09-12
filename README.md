@@ -20,7 +20,8 @@ You can choose:
 - A custom **Dynamic Island telemetry color**
 - **System / English / Español** language behavior
 - **System / Light / Dark** app appearance
-- Optional **background location** for local weather refreshes
+- **All-metric background refresh** using iOS `BGAppRefreshTask`
+- Optional **background location** for additional location-driven refresh opportunities
 - Local temperature, feels-like temperature, weather condition, and latest coordinates
 
 The same Live Activity also appears on the Lock Screen, and the app includes a Home-screen preview that mirrors the saved Dynamic Island configuration and selected telemetry color.
@@ -197,3 +198,10 @@ https://github.com/tiburonns/Islemetry
 ```
 
 Islemetry is currently an actively developed project and intentionally favors public APIs, transparent telemetry behavior, and native iOS technologies over private system-monitoring APIs.
+
+
+## Refresh behavior
+
+Foreground telemetry refreshes every 3 seconds while Islemetry is active. When the app is suspended, iOS does not allow Islemetry to keep a 3-second timer running. Instead, Islemetry schedules a `BGAppRefreshTask`. Whenever iOS grants that background execution window, Islemetry refreshes the **entire telemetry snapshot** and updates the existing Live Activity.
+
+If Background Location is enabled and iOS delivers a genuine location event, that event is also used as an opportunity to refresh **all metrics**, followed by local weather. These mechanisms are complementary; neither provides a guaranteed fixed background interval because iOS controls scheduling and delivery.
