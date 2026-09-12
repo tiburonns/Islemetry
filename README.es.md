@@ -6,7 +6,7 @@
 
 Islemetry es una aplicación nativa para iOS desarrollada con SwiftUI que convierte la Isla Dinámica en un monitor configurable y visible de un vistazo. Elige la información que te importa, mantén dos métricas visibles en la Isla compacta y mantenla presionada para abrir un snapshot de telemetría más completo.
 
-> **Release actual:** V0.3.3 (build 6). Corrige los controles de actualización en segundo plano: Programar confirma una solicitud pendiente real de `BGTaskScheduler`, y Actualizar ahora ejecuta una prueba completa de telemetría → Live Activity con resultado y hora visibles.
+> **Release actual:** V0.4.0 (build 7). Agrega la acción **Actualizar Islemetry** a Apple Atajos para que automatizaciones personales como Cargador, Wi-Fi, Bluetooth, Modo de bajo consumo y nivel de batería puedan refrescar todas las métricas y la Live Activity sin abrir la app.
 
 ## Qué hace Islemetry
 
@@ -72,7 +72,7 @@ Después, en Xcode:
 4. Selecciónalo como destino de ejecución.
 5. Presiona `⌘R`.
 
-Consulta la guía completa en **[Comenzar con Islemetry](docs/GETTING_STARTED.es.md)**.
+Consulta la guía completa en **[Comenzar con Islemetry](docs/GETTING_STARTED.es.md)** y la guía de **[Automatizaciones de Atajos](docs/AUTOMATIONS.es.md)**.
 
 ## IPA
 
