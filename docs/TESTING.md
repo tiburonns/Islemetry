@@ -292,3 +292,25 @@ V0.2 hardware validation is successful when:
 - **Update now** immediately runs the complete snapshot path and updates the existing Live Activity.
 - The card shows pending-request confirmation, earliest eligible time, last manual refresh, and manual result.
 - Scheduling a task does not force iOS to run it immediately; the system still decides the actual launch time.
+
+
+## Physical Shortcuts automation test
+
+Run this test on a physical iPhone with Islemetry 0.4.0 installed.
+
+1. Launch Islemetry at least once and start a Live Activity.
+2. In the **Shortcuts Automations** card, tap the Shortcuts button.
+3. Confirm that **Refresh Islemetry** appears.
+4. In Shortcuts, create **Automation → Charger → Is Connected**.
+5. Choose **Run Immediately**.
+6. Add **Refresh Islemetry** and save.
+7. Leave Islemetry and connect the charger.
+8. Confirm that the Live Activity reflects the new state without opening Islemetry.
+9. Open Islemetry after the test and check:
+   - **Last automation start** shows the event time.
+   - **Last automation refresh** shows a recent time.
+   - **Automation result** shows **Success**.
+
+Repeat with **Charger → Is Disconnected**, then Wi-Fi, Bluetooth, Low Power Mode, and battery-level thresholds.
+
+If the automation runs but the Live Activity does not change, record which metric was visible and check the result shown in the automations card.
