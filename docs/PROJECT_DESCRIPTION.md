@@ -49,7 +49,8 @@ Because iOS does not allow an ordinary application to run continuously in the ba
 - Persistent on-device configuration
 - System / English / Español language modes
 - 31 device/system/location/weather metrics
-- Optional background-location weather refresh
+- System-scheduled all-metric background refresh using BGAppRefreshTask
+- Optional background-location refresh opportunities
 - Open-Meteo current-weather integration with visible attribution
 - No third-party runtime dependencies
 
