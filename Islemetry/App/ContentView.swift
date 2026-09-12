@@ -29,6 +29,24 @@ struct ContentView: View {
     @AppStorage(BackgroundRefreshCoordinator.lastErrorKey)
     private var backgroundLastError = ""
 
+    @AppStorage(BackgroundRefreshCoordinator.hasPendingRequestKey)
+    private var backgroundHasPendingRequest = false
+
+    @AppStorage(BackgroundRefreshCoordinator.nextEligibleKey)
+    private var backgroundNextEligible: Double = 0
+
+    @AppStorage(BackgroundRefreshCoordinator.lastManualStartedKey)
+    private var backgroundLastManualStarted: Double = 0
+
+    @AppStorage(BackgroundRefreshCoordinator.lastManualCompletedKey)
+    private var backgroundLastManualCompleted: Double = 0
+
+    @AppStorage(BackgroundRefreshCoordinator.lastManualResultKey)
+    private var backgroundLastManualResult = "never"
+
+    @State private var isManualRefreshRunning = false
+    @State private var backgroundActionMessage: String?
+
     @AppStorage(IslandConfiguration.leadingKey)
     private var leadingMetricRaw = DeviceMetric.Kind.battery.rawValue
 
@@ -111,6 +129,7 @@ struct ContentView: View {
             .task {
                 liveActivity.syncState()
                 telemetry.prepareLocationWeather()
+                await BackgroundRefreshCoordinator.shared.refreshPendingStatus()
             }
             .task(id: scenePhase) {
                 await refreshAutomaticallyWhileActive()
@@ -227,34 +246,96 @@ struct ContentView: View {
                     .textSelection(.enabled)
             }
 
+            diagnosticRow(
+                language.text("Pending request", "Solicitud pendiente"),
+                value: backgroundHasPendingRequest
+                    ? language.text("Confirmed", "Confirmada")
+                    : language.text("None", "Ninguna")
+            )
+
+            diagnosticRow(
+                language.text("Earliest eligible", "Elegible desde"),
+                value: backgroundDateText(backgroundNextEligible)
+            )
+
+            diagnosticRow(
+                language.text("Last manual refresh", "Última actualización manual"),
+                value: backgroundDateText(backgroundLastManualCompleted)
+            )
+
+            diagnosticRow(
+                language.text("Manual result", "Resultado manual"),
+                value: backgroundManualResultText
+            )
+
             HStack(spacing: 10) {
                 Button {
-                    BackgroundRefreshCoordinator.shared.schedule()
+                    let scheduled = BackgroundRefreshCoordinator.shared.schedule()
+
+                    backgroundActionMessage = scheduled
+                        ? language.text(
+                            "Request submitted. iOS decides when it runs.",
+                            "Solicitud enviada. iOS decide cuándo ejecutarla."
+                        )
+                        : language.text(
+                            "The request could not be scheduled.",
+                            "No se pudo programar la solicitud."
+                        )
+
+                    Task {
+                        await BackgroundRefreshCoordinator.shared.refreshPendingStatus()
+                    }
                 } label: {
                     Label(
-                        language.text("Reschedule", "Reprogramar"),
+                        language.text("Schedule", "Programar"),
                         systemImage: "calendar.badge.clock"
                     )
                 }
                 .buttonStyle(.bordered)
 
                 Button {
+                    isManualRefreshRunning = true
+                    backgroundActionMessage = nil
+
                     Task {
-                        await telemetry.refreshAllForBackground()
+                        await BackgroundRefreshCoordinator.shared.runManualRefresh(
+                            using: telemetry
+                        )
+
+                        isManualRefreshRunning = false
+                        backgroundActionMessage = language.text(
+                            "Full snapshot sent to the existing Live Activity.",
+                            "Snapshot completo enviado a la Live Activity existente."
+                        )
                     }
                 } label: {
-                    Label(
-                        language.text("Test refresh path", "Probar actualización"),
-                        systemImage: "checkmark.arrow.trianglehead.counterclockwise"
-                    )
+                    if isManualRefreshRunning {
+                        HStack(spacing: 6) {
+                            ProgressView()
+                                .controlSize(.small)
+                            Text(language.text("Updating…", "Actualizando…"))
+                        }
+                    } else {
+                        Label(
+                            language.text("Update now", "Actualizar ahora"),
+                            systemImage: "arrow.clockwise"
+                        )
+                    }
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(.borderedProminent)
+                .disabled(isManualRefreshRunning)
+            }
+
+            if let backgroundActionMessage {
+                Text(backgroundActionMessage)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.secondary)
             }
 
             Text(
                 language.text(
-                    "BGAppRefreshTask is not an immediate timer. A scheduled task can take hours before iOS launches it naturally. Use the diagnostics above to distinguish “never launched” from an ActivityKit update failure.",
-                    "BGAppRefreshTask no es un temporizador inmediato. Una tarea programada puede tardar horas antes de que iOS la ejecute de forma natural. Usa el diagnóstico anterior para distinguir “nunca ejecutada” de un fallo al actualizar ActivityKit."
+                    "Schedule only confirms that iOS has a pending BGAppRefreshTask request; it does not run it immediately. Update now performs a complete foreground test of the same telemetry-to-Live-Activity path.",
+                    "Programar solo confirma que iOS tiene una solicitud BGAppRefreshTask pendiente; no la ejecuta inmediatamente. Actualizar ahora realiza una prueba completa en primer plano de la misma ruta telemetría → Live Activity."
                 )
             )
             .font(.caption)
@@ -275,6 +356,19 @@ struct ContentView: View {
             return language.text("Restricted", "Restringido")
         @unknown default:
             return language.text("Unknown", "Desconocido")
+        }
+    }
+
+    private var backgroundManualResultText: String {
+        switch backgroundLastManualResult {
+        case "running":
+            return language.text("Running", "Ejecutándose")
+        case "success":
+            return language.text("Success", "Correcto")
+        case "cancelled":
+            return language.text("Cancelled", "Cancelado")
+        default:
+            return language.text("Never", "Nunca")
         }
     }
 
