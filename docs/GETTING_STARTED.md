@@ -180,8 +180,17 @@ The default build uses **Core Location + Open-Meteo** and does not require a Wea
 5. To allow location-driven refreshes while Islemetry is backgrounded, enable **Background location**.
 6. iOS may later request **Always** location access; prompt timing is controlled by iOS.
 
-The main target declares the required location privacy strings and `UIBackgroundModes = location`. In Xcode, the main target should show **Background Modes → Location updates**.
+The main target declares the required location privacy strings and `UIBackgroundModes = location`. In Xcode, the main target should show **Background Modes → Location updates** and **Background fetch**.
 
 Background Location is optional and tied only to location/weather. It is not used to keep CPU/RAM sampling alive continuously. When iOS delivers a background location event, Islemetry can refresh weather and update an existing Live Activity.
 
 Current weather is provided by **Open-Meteo**. Internet access is required for a fresh fetch and Islemetry shows a visible provider link.
+
+
+### General telemetry background refresh
+
+Islemetry 0.3.1 registers `com.tiburonns.islemetry.refresh` with `BGTaskScheduler` during app launch and schedules a short `BGAppRefreshTask` request. The required identifier is included in `BGTaskSchedulerPermittedIdentifiers` and the main target enables **Background fetch**.
+
+When iOS launches the task, Islemetry refreshes the complete metric snapshot and updates any existing Live Activity. The request uses 15 minutes only as its **earliest possible** begin time; iOS decides the actual execution time and may run it substantially later.
+
+The repository now also contains a shared `Islemetry` app scheme, so the normal Run target should appear directly in Xcode instead of only `IslemetryWidgets`.
