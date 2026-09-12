@@ -57,6 +57,7 @@ struct IslandConfiguration: Equatable {
 final class LiveActivityManager: ObservableObject {
     @Published private(set) var activeActivityID: String?
     @Published private(set) var lastError: String?
+    private var lastPublishedState: DeviceActivityAttributes.ContentState?
 
     func start(
         with metrics: [DeviceMetric],
@@ -90,6 +91,7 @@ final class LiveActivityManager: ObservableObject {
                 pushType: nil
             )
             activeActivityID = activity.id
+            lastPublishedState = state
             lastError = nil
         } catch {
             lastError = error.localizedDescription
@@ -98,10 +100,20 @@ final class LiveActivityManager: ObservableObject {
 
     func update(
         with metrics: [DeviceMetric],
-        configuration: IslandConfiguration = .current
+        configuration: IslandConfiguration = .current,
+        onlyIfChanged: Bool = false
     ) async {
+        let state = makeContentState(from: metrics, configuration: configuration)
+
+        if onlyIfChanged,
+           let lastPublishedState,
+           hasSameVisiblePayload(lastPublishedState, state) {
+            activeActivityID = Activity<DeviceActivityAttributes>.activities.first?.id
+            return
+        }
+
         let content = ActivityContent(
-            state: makeContentState(from: metrics, configuration: configuration),
+            state: state,
             staleDate: Date().addingTimeInterval(5 * 60)
         )
 
@@ -110,6 +122,7 @@ final class LiveActivityManager: ObservableObject {
         }
 
         activeActivityID = Activity<DeviceActivityAttributes>.activities.first?.id
+        lastPublishedState = activeActivityID == nil ? nil : state
         lastError = nil
     }
 
@@ -118,10 +131,25 @@ final class LiveActivityManager: ObservableObject {
             await activity.end(nil, dismissalPolicy: .immediate)
         }
         activeActivityID = nil
+        lastPublishedState = nil
     }
 
     func syncState() {
         activeActivityID = Activity<DeviceActivityAttributes>.activities.first?.id
+        if activeActivityID == nil {
+            lastPublishedState = nil
+        }
+    }
+
+    private func hasSameVisiblePayload(
+        _ lhs: DeviceActivityAttributes.ContentState,
+        _ rhs: DeviceActivityAttributes.ContentState
+    ) -> Bool {
+        var normalizedLeft = lhs
+        var normalizedRight = rhs
+        normalizedLeft.updatedAt = .distantPast
+        normalizedRight.updatedAt = .distantPast
+        return normalizedLeft == normalizedRight
     }
 
     private func makeContentState(

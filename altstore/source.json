@@ -21,6 +21,15 @@
       "category": "utilities",
       "versions": [
         {
+          "version": "0.2.1",
+          "buildVersion": "3",
+          "date": "2026-09-12T03:50:07Z",
+          "localizedDescription": "Actualización de estabilidad: refresco automático eficiente cada tres segundos y actualizaciones inmediatas cuando cambian las métricas visibles.",
+          "downloadURL": "https://github.com/tiburonns/Islemetry/releases/download/v0.2.1/Islemetry-0.2.1.ipa",
+          "size": 1612402,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "0.2.0",
           "buildVersion": "2",
           "date": "2026-09-08T22:00:00-07:00",

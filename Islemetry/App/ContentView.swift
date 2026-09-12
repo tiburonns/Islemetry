@@ -478,7 +478,7 @@ struct ContentView: View {
         guard scenePhase == .active else { return }
 
         while !Task.isCancelled, scenePhase == .active {
-            await refreshSnapshot(startIfNeeded: false)
+            await refreshSnapshot(startIfNeeded: false, onlyIfChanged: true)
 
             do {
                 try await Task.sleep(for: Self.automaticRefreshInterval)
@@ -489,7 +489,7 @@ struct ContentView: View {
     }
 
     @MainActor
-    private func refreshSnapshot(startIfNeeded: Bool) async {
+    private func refreshSnapshot(startIfNeeded: Bool, onlyIfChanged: Bool = false) async {
         telemetry.refresh()
         let configuration = IslandConfiguration.current
 
@@ -503,7 +503,8 @@ struct ContentView: View {
         } else {
             await liveActivity.update(
                 with: telemetry.metrics,
-                configuration: configuration
+                configuration: configuration,
+                onlyIfChanged: onlyIfChanged
             )
         }
     }
