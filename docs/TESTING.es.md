@@ -261,3 +261,24 @@ La validación de hardware de V0.2 se considera exitosa cuando:
 - Un evento entregado en segundo plano puede actualizar el clima y la Live Activity existente.
 - Desactivar el interruptor detiene las actualizaciones estándar de ubicación en segundo plano.
 - No se presupone un intervalo fijo; iOS controla la planificación.
+
+
+## Prueba de actualización completa en segundo plano
+
+1. Instala Islemetry 0.3.1 en un iPhone físico.
+2. Inicia una Live Activity con métricas fáciles de observar, por ejemplo Batería, Energía, Térmico, Red, Almacenamiento libre y Temperatura local.
+3. Confirma que en primer plano continúe la actualización aproximadamente cada 3 segundos.
+4. Envía Islemetry a segundo plano; no la cierres a la fuerza.
+5. Confirma que **Actualización en segundo plano** esté permitida en los ajustes de iOS.
+6. Deja la Live Activity activa y permite que iOS ejecute la tarea programada.
+7. Vuelve a abrir Islemetry y confirma que no se haya creado una Live Activity duplicada.
+8. Si Ubicación en segundo plano está activada, un evento entregado de ubicación también debe actualizar el snapshot completo de telemetría.
+
+### Resultado esperado
+
+- El registro de `BGTaskScheduler` no provoca un crash al iniciar.
+- El target principal contiene `fetch` y `location` en `UIBackgroundModes`.
+- `com.tiburonns.islemetry.refresh` aparece en `BGTaskSchedulerPermittedIdentifiers`.
+- Una tarea en segundo plano actualiza el arreglo completo de métricas y la Live Activity existente.
+- Los eventos de ubicación también actualizan todas las métricas antes/junto con el clima.
+- No se promete una cadencia fija de 3 segundos ni 15 minutos en segundo plano; iOS decide el momento real.
