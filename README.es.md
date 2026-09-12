@@ -20,7 +20,8 @@ Puedes elegir:
 - Un **color personalizado para la telemetría de la Isla Dinámica**
 - Comportamiento de idioma **Sistema / English / Español**
 - Apariencia **Sistema / Clara / Oscura**
-- **Ubicación en segundo plano** opcional para actualizar el clima local
+- **Actualización de todas las métricas en segundo plano** mediante `BGAppRefreshTask` de iOS
+- **Ubicación en segundo plano** opcional como oportunidad adicional de actualización
 - Temperatura local, sensación térmica, condición meteorológica y últimas coordenadas
 
 La misma Live Activity también aparece en la pantalla bloqueada y la app incluye una vista previa en Inicio que refleja la configuración guardada de la Isla Dinámica y el color de telemetría elegido.
@@ -197,3 +198,10 @@ https://github.com/tiburonns/Islemetry
 ```
 
 Islemetry está en desarrollo activo y prioriza APIs públicas, comportamiento transparente de telemetría y tecnologías nativas de iOS por encima de APIs privadas de monitorización.
+
+
+## Comportamiento de actualización
+
+En primer plano, la telemetría se actualiza cada 3 segundos mientras Islemetry está activa. Cuando la app queda suspendida, iOS no permite mantener un temporizador de 3 segundos. En su lugar, Islemetry programa un `BGAppRefreshTask`. Cada vez que iOS concede esa ventana de ejecución en segundo plano, Islemetry actualiza el **snapshot completo de telemetría** y la Live Activity existente.
+
+Si Ubicación en segundo plano está activada e iOS entrega un evento real de ubicación, ese evento también se aprovecha para actualizar **todas las métricas** y después el clima local. Ambos mecanismos son complementarios; ninguno garantiza un intervalo fijo porque iOS controla la planificación y la entrega.
