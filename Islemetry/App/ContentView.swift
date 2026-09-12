@@ -1,3 +1,4 @@
+import AppIntents
 import SwiftUI
 import UIKit
 
@@ -43,6 +44,18 @@ struct ContentView: View {
 
     @AppStorage(BackgroundRefreshCoordinator.lastManualResultKey)
     private var backgroundLastManualResult = "never"
+
+    @AppStorage(RefreshIslemetryIntent.lastStartedKey)
+    private var shortcutLastStarted: Double = 0
+
+    @AppStorage(RefreshIslemetryIntent.lastCompletedKey)
+    private var shortcutLastCompleted: Double = 0
+
+    @AppStorage(RefreshIslemetryIntent.lastResultKey)
+    private var shortcutLastResult = "never"
+
+    @AppStorage(RefreshIslemetryIntent.lastErrorKey)
+    private var shortcutLastError = ""
 
     @State private var isManualRefreshRunning = false
     @State private var backgroundActionMessage: String?
@@ -116,6 +129,7 @@ struct ContentView: View {
                     statusCard
                     controls
                     backgroundRefreshCard
+                    shortcutsAutomationCard
                     islandConfigurationCard
                     islandPreviewCard
                     locationWeatherCard
@@ -407,6 +421,85 @@ struct ContentView: View {
             Text(value)
                 .font(.caption.weight(.semibold))
                 .multilineTextAlignment(.trailing)
+        }
+    }
+
+    private var shortcutsAutomationCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Label(
+                    language.text("Shortcuts Automations", "Automatizaciones de Atajos"),
+                    systemImage: "bolt.horizontal.circle.fill"
+                )
+                .font(.headline)
+
+                Spacer()
+
+                Text(language.text("EVENT-DRIVEN", "POR EVENTOS"))
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(.green)
+            }
+
+            Text(
+                language.text(
+                    "Use the Refresh Islemetry action from Shortcuts automations. Charger, Wi-Fi, Bluetooth, Low Power Mode, battery level, Focus, Airplane Mode and other supported triggers can refresh the complete telemetry snapshot without opening Islemetry.",
+                    "Usa la acción Actualizar Islemetry desde automatizaciones de Atajos. Cargador, Wi-Fi, Bluetooth, Modo de bajo consumo, nivel de batería, Concentración, Modo avión y otros activadores compatibles pueden refrescar el snapshot completo sin abrir Islemetry."
+                )
+            )
+            .font(.caption)
+            .foregroundStyle(.secondary)
+
+            diagnosticRow(
+                language.text("Last automation start", "Último inicio por automatización"),
+                value: backgroundDateText(shortcutLastStarted)
+            )
+
+            diagnosticRow(
+                language.text("Last automation refresh", "Última actualización por automatización"),
+                value: backgroundDateText(shortcutLastCompleted)
+            )
+
+            diagnosticRow(
+                language.text("Automation result", "Resultado de automatización"),
+                value: shortcutResultText
+            )
+
+            if !shortcutLastError.isEmpty {
+                Text(shortcutLastError)
+                    .font(.caption2)
+                    .foregroundStyle(.red)
+                    .textSelection(.enabled)
+            }
+
+            ShortcutsLink()
+                .shortcutsLinkStyle(.automaticOutline)
+
+            Text(
+                language.text(
+                    "In Shortcuts: Automation → choose a trigger → Run Immediately → add Refresh Islemetry. Every trigger refreshes all available modules and updates the existing Live Activity.",
+                    "En Atajos: Automatización → elige un activador → Ejecutar inmediatamente → agrega Actualizar Islemetry. Cada activador refresca todos los módulos disponibles y actualiza la Live Activity existente."
+                )
+            )
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private var shortcutResultText: String {
+        switch shortcutLastResult {
+        case "running":
+            return language.text("Running", "Ejecutándose")
+        case "success":
+            return language.text("Success", "Correcto")
+        case "cancelled":
+            return language.text("Cancelled", "Cancelado")
+        case "failed":
+            return language.text("Failed", "Falló")
+        default:
+            return language.text("Never", "Nunca")
         }
     }
 
