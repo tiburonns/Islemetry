@@ -11,6 +11,13 @@ final class BackgroundRefreshCoordinator {
     static let lastResultKey = "background.lastResult"
     static let lastErrorKey = "background.lastError"
 
+    static let hasPendingRequestKey = "background.hasPendingRequest"
+    static let nextEligibleKey = "background.nextEligible"
+
+    static let lastManualStartedKey = "background.lastManualStarted"
+    static let lastManualCompletedKey = "background.lastManualCompleted"
+    static let lastManualResultKey = "background.lastManualResult"
+
     private static let earliestRefreshInterval: TimeInterval = 15 * 60
     private var isRegistered = false
 
@@ -45,11 +52,13 @@ final class BackgroundRefreshCoordinator {
         return registered
     }
 
-    func schedule() {
+    @discardableResult
+    func schedule() -> Bool {
         let request = BGAppRefreshTaskRequest(identifier: Self.taskIdentifier)
-        request.earliestBeginDate = Date(
+        let nextEligible = Date(
             timeIntervalSinceNow: Self.earliestRefreshInterval
         )
+        request.earliestBeginDate = nextEligible
 
         BGTaskScheduler.shared.cancel(
             taskRequestWithIdentifier: Self.taskIdentifier
@@ -57,32 +66,111 @@ final class BackgroundRefreshCoordinator {
 
         do {
             try BGTaskScheduler.shared.submit(request)
-            UserDefaults.standard.set(
+
+            let defaults = UserDefaults.standard
+            defaults.set(
                 Date().timeIntervalSince1970,
                 forKey: Self.lastScheduledKey
             )
-            UserDefaults.standard.removeObject(forKey: Self.lastErrorKey)
+            defaults.set(
+                nextEligible.timeIntervalSince1970,
+                forKey: Self.nextEligibleKey
+            )
+            defaults.removeObject(forKey: Self.lastErrorKey)
+
+            Task {
+                await refreshPendingStatus()
+            }
+
+            return true
         } catch {
-            UserDefaults.standard.set(
+            let defaults = UserDefaults.standard
+            defaults.set(
                 error.localizedDescription,
                 forKey: Self.lastErrorKey
             )
+            defaults.set(false, forKey: Self.hasPendingRequestKey)
 
 #if DEBUG
             print("Islemetry background refresh scheduling failed: \(error)")
 #endif
+            return false
         }
     }
 
+    func refreshPendingStatus() async {
+        let requests = await BGTaskScheduler.shared.pendingTaskRequests()
+        let matchingRequest = requests.first {
+            $0.identifier == Self.taskIdentifier
+        }
+
+        let defaults = UserDefaults.standard
+        defaults.set(
+            matchingRequest != nil,
+            forKey: Self.hasPendingRequestKey
+        )
+
+        if let date = matchingRequest?.earliestBeginDate {
+            defaults.set(
+                date.timeIntervalSince1970,
+                forKey: Self.nextEligibleKey
+            )
+        } else if matchingRequest == nil {
+            defaults.removeObject(forKey: Self.nextEligibleKey)
+        }
+    }
+
+    @MainActor
+    func runManualRefresh(using telemetry: DeviceTelemetryStore) async {
+        let defaults = UserDefaults.standard
+        defaults.set(
+            Date().timeIntervalSince1970,
+            forKey: Self.lastManualStartedKey
+        )
+        defaults.set(
+            "running",
+            forKey: Self.lastManualResultKey
+        )
+
+        guard !Task.isCancelled else {
+            defaults.set(
+                "cancelled",
+                forKey: Self.lastManualResultKey
+            )
+            return
+        }
+
+        await telemetry.refreshAllForBackground()
+
+        guard !Task.isCancelled else {
+            defaults.set(
+                "cancelled",
+                forKey: Self.lastManualResultKey
+            )
+            return
+        }
+
+        defaults.set(
+            Date().timeIntervalSince1970,
+            forKey: Self.lastManualCompletedKey
+        )
+        defaults.set(
+            "success",
+            forKey: Self.lastManualResultKey
+        )
+    }
+
     private func handle(_ task: BGAppRefreshTask) {
-        UserDefaults.standard.set(
+        let defaults = UserDefaults.standard
+        defaults.set(
             Date().timeIntervalSince1970,
             forKey: Self.lastLaunchedKey
         )
-        UserDefaults.standard.set(
+        defaults.set(
             "running",
             forKey: Self.lastResultKey
         )
+        defaults.set(false, forKey: Self.hasPendingRequestKey)
 
         schedule()
 
@@ -92,7 +180,7 @@ final class BackgroundRefreshCoordinator {
         }
 
         task.expirationHandler = {
-            UserDefaults.standard.set(
+            defaults.set(
                 "expired",
                 forKey: Self.lastResultKey
             )
@@ -103,11 +191,11 @@ final class BackgroundRefreshCoordinator {
             await work.value
 
             let success = !work.isCancelled
-            UserDefaults.standard.set(
+            defaults.set(
                 Date().timeIntervalSince1970,
                 forKey: Self.lastCompletedKey
             )
-            UserDefaults.standard.set(
+            defaults.set(
                 success ? "success" : "cancelled",
                 forKey: Self.lastResultKey
             )
