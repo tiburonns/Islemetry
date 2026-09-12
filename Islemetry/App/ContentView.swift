@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
@@ -12,6 +13,21 @@ struct ContentView: View {
 
     @AppStorage(AppAppearance.storageKey)
     private var appAppearanceRaw = AppAppearance.system.rawValue
+
+    @AppStorage(BackgroundRefreshCoordinator.lastScheduledKey)
+    private var backgroundLastScheduled: Double = 0
+
+    @AppStorage(BackgroundRefreshCoordinator.lastLaunchedKey)
+    private var backgroundLastLaunched: Double = 0
+
+    @AppStorage(BackgroundRefreshCoordinator.lastCompletedKey)
+    private var backgroundLastCompleted: Double = 0
+
+    @AppStorage(BackgroundRefreshCoordinator.lastResultKey)
+    private var backgroundLastResult = "never"
+
+    @AppStorage(BackgroundRefreshCoordinator.lastErrorKey)
+    private var backgroundLastError = ""
 
     @AppStorage(IslandConfiguration.leadingKey)
     private var leadingMetricRaw = DeviceMetric.Kind.battery.rawValue
@@ -99,11 +115,6 @@ struct ContentView: View {
             .task(id: scenePhase) {
                 await refreshAutomaticallyWhileActive()
             }
-            .onChange(of: scenePhase) { _, phase in
-                if phase == .background {
-                    BackgroundRefreshCoordinator.shared.schedule()
-                }
-            }
             .onChange(of: appLanguageRaw) { _, _ in
                 telemetry.refresh()
                 if liveActivity.activeActivityID != nil {
@@ -182,10 +193,68 @@ struct ContentView: View {
                     .font(.caption.weight(.semibold))
             }
 
+            Divider()
+
+            diagnosticRow(
+                language.text("System permission", "Permiso del sistema"),
+                value: backgroundRefreshStatusText
+            )
+
+            diagnosticRow(
+                language.text("Last scheduled", "Última programación"),
+                value: backgroundDateText(backgroundLastScheduled)
+            )
+
+            diagnosticRow(
+                language.text("Last launched", "Última ejecución"),
+                value: backgroundDateText(backgroundLastLaunched)
+            )
+
+            diagnosticRow(
+                language.text("Last completed", "Última finalización"),
+                value: backgroundDateText(backgroundLastCompleted)
+            )
+
+            diagnosticRow(
+                language.text("Last result", "Último resultado"),
+                value: backgroundResultText
+            )
+
+            if !backgroundLastError.isEmpty {
+                Text(backgroundLastError)
+                    .font(.caption2)
+                    .foregroundStyle(.red)
+                    .textSelection(.enabled)
+            }
+
+            HStack(spacing: 10) {
+                Button {
+                    BackgroundRefreshCoordinator.shared.schedule()
+                } label: {
+                    Label(
+                        language.text("Reschedule", "Reprogramar"),
+                        systemImage: "calendar.badge.clock"
+                    )
+                }
+                .buttonStyle(.bordered)
+
+                Button {
+                    Task {
+                        await telemetry.refreshAllForBackground()
+                    }
+                } label: {
+                    Label(
+                        language.text("Test refresh path", "Probar actualización"),
+                        systemImage: "checkmark.arrow.trianglehead.counterclockwise"
+                    )
+                }
+                .buttonStyle(.bordered)
+            }
+
             Text(
                 language.text(
-                    "When iOS grants background execution time, Islemetry refreshes the full telemetry snapshot and updates the existing Live Activity. Location events can provide additional refresh opportunities when background location is enabled.",
-                    "Cuando iOS concede tiempo de ejecución en segundo plano, Islemetry actualiza el snapshot completo de telemetría y la Live Activity existente. Los eventos de ubicación pueden ofrecer oportunidades adicionales de actualización cuando la ubicación en segundo plano está activada."
+                    "BGAppRefreshTask is not an immediate timer. A scheduled task can take hours before iOS launches it naturally. Use the diagnostics above to distinguish “never launched” from an ActivityKit update failure.",
+                    "BGAppRefreshTask no es un temporizador inmediato. Una tarea programada puede tardar horas antes de que iOS la ejecute de forma natural. Usa el diagnóstico anterior para distinguir “nunca ejecutada” de un fallo al actualizar ActivityKit."
                 )
             )
             .font(.caption)
@@ -194,6 +263,57 @@ struct ContentView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private var backgroundRefreshStatusText: String {
+        switch UIApplication.shared.backgroundRefreshStatus {
+        case .available:
+            return language.text("Available", "Disponible")
+        case .denied:
+            return language.text("Disabled", "Desactivado")
+        case .restricted:
+            return language.text("Restricted", "Restringido")
+        @unknown default:
+            return language.text("Unknown", "Desconocido")
+        }
+    }
+
+    private var backgroundResultText: String {
+        switch backgroundLastResult {
+        case "running":
+            return language.text("Running", "Ejecutándose")
+        case "success":
+            return language.text("Success", "Correcto")
+        case "cancelled":
+            return language.text("Cancelled", "Cancelado")
+        case "expired":
+            return language.text("Expired", "Expiró")
+        default:
+            return language.text("Never", "Nunca")
+        }
+    }
+
+    private func backgroundDateText(_ timestamp: Double) -> String {
+        guard timestamp > 0 else {
+            return language.text("Never", "Nunca")
+        }
+
+        return Date(timeIntervalSince1970: timestamp)
+            .formatted(date: .abbreviated, time: .standard)
+    }
+
+    private func diagnosticRow(_ title: String, value: String) -> some View {
+        HStack {
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            Spacer()
+
+            Text(value)
+                .font(.caption.weight(.semibold))
+                .multilineTextAlignment(.trailing)
+        }
     }
 
     private var controls: some View {
