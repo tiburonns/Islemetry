@@ -282,3 +282,5 @@ La validación de hardware de V0.2 se considera exitosa cuando:
 - Una tarea en segundo plano actualiza el arreglo completo de métricas y la Live Activity existente.
 - Los eventos de ubicación también actualizan todas las métricas antes/junto con el clima.
 - No se promete una cadencia fija de 3 segundos ni 15 minutos en segundo plano; iOS decide el momento real.
+
+> Para pruebas de segundo plano, envía Islemetry al Home pero **no la cierres a la fuerza** desde el selector de apps. Después de un cierre forzado, iOS puede no volver a lanzar la app en segundo plano hasta que el usuario la abra manualmente otra vez.
