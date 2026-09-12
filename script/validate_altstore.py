@@ -33,6 +33,18 @@ def main() -> None:
     require(info["CFBundleVersion"] == version["buildVersion"], "build")
     require(info["MinimumOSVersion"] == version["minOSVersion"], "iOS mínimo")
     require(info["CFBundleSupportedPlatforms"] == ["iPhoneOS"], "plataforma física")
+    background_modes = set(info.get("UIBackgroundModes", []))
+    require({"fetch", "location"}.issubset(background_modes), "modos de segundo plano fetch + location")
+    task_ids = info.get("BGTaskSchedulerPermittedIdentifiers", [])
+    require(
+        "com.tiburonns.islemetry.refresh" in task_ids,
+        "identificador BGTaskScheduler de telemetría",
+    )
+    require("NSLocationWhenInUseUsageDescription" in info, "permiso de ubicación al usar")
+    require(
+        "NSLocationAlwaysAndWhenInUseUsageDescription" in info,
+        "permiso de ubicación siempre",
+    )
     require(widget["CFBundleIdentifier"] == "com.tiburonns.islemetry.widgets", "bundle ID del widget")
     require(widget["CFBundleVersion"] == info["CFBundleVersion"], "build del widget")
     require("Payload/Islemetry.app/PrivacyInfo.xcprivacy" in names, "privacy manifest")
@@ -47,7 +59,7 @@ def main() -> None:
         "URL de descarga",
     )
     require(app["appPermissions"] == {"entitlements": [], "privacy": {}}, "permisos declarados")
-    print("PASS: IPA, widget, versión, privacidad, icono y fuente AltStore")
+    print("PASS: IPA, widget, versión, background refresh, privacidad, icono y fuente AltStore")
 
 
 if __name__ == "__main__":
