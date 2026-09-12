@@ -1,0 +1,46 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Islemetry refresh was cancelled." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La actualización de Islemetry fue cancelada."
+          }
+        }
+      }
+    },
+    "Islemetry telemetry refreshed." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La telemetría de Islemetry se actualizó."
+          }
+        }
+      }
+    },
+    "Refresh all Islemetry device telemetry and update the existing Live Activity." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualiza toda la telemetría del dispositivo en Islemetry y la Live Activity existente."
+          }
+        }
+      }
+    },
+    "Refresh Islemetry" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizar Islemetry"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

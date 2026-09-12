@@ -1,3 +1,4 @@
+import AppIntents
 import SwiftUI
 import UIKit
 
@@ -10,6 +11,7 @@ final class IslemetryAppDelegate: NSObject, UIApplicationDelegate {
     ) -> Bool {
         BackgroundRefreshCoordinator.shared.register()
         BackgroundRefreshCoordinator.shared.schedule()
+        IslemetryShortcuts.updateAppShortcutParameters()
         return true
     }
 

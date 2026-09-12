@@ -292,3 +292,25 @@ La validación de hardware de V0.2 se considera exitosa cuando:
 - **Actualizar ahora** ejecuta inmediatamente el snapshot completo y actualiza la Live Activity existente.
 - La tarjeta muestra solicitud pendiente, primera fecha elegible, última actualización manual y resultado manual.
 - Programar una tarea no obliga a iOS a ejecutarla en ese momento; el sistema decide cuándo lanzar la tarea.
+
+
+## Prueba física de automatizaciones de Atajos
+
+Esta prueba debe realizarse en un iPhone físico con Islemetry 0.4.0 instalada.
+
+1. Abre Islemetry al menos una vez y activa una Live Activity.
+2. En la tarjeta **Automatizaciones de Atajos**, toca el botón de Atajos.
+3. Confirma que aparece **Actualizar Islemetry**.
+4. En Atajos, crea **Automatización → Cargador → Está conectado**.
+5. Elige **Ejecutar inmediatamente**.
+6. Agrega la acción **Actualizar Islemetry** y guarda.
+7. Sal de Islemetry y conecta el cargador.
+8. Comprueba que la Live Activity refleje el nuevo estado sin tener que abrir Islemetry.
+9. Abre Islemetry después de la prueba y revisa:
+   - **Último inicio por automatización** debe mostrar la hora del evento.
+   - **Última actualización por automatización** debe mostrar una hora reciente.
+   - **Resultado de automatización** debe mostrar **Correcto**.
+
+Repite la misma prueba con **Cargador → Está desconectado** y después con Wi-Fi, Bluetooth, Modo de bajo consumo y umbrales de batería.
+
+Si la automatización se ejecuta pero la Live Activity no cambia, registra cuál métrica estaba visible y revisa el resultado mostrado en la tarjeta de automatizaciones.
