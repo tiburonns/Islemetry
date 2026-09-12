@@ -284,3 +284,11 @@ V0.2 hardware validation is successful when:
 - No fixed 3-second or 15-minute background cadence is claimed; iOS decides actual execution timing.
 
 > For background tests, send Islemetry to the Home Screen but **do not force-quit it** from the app switcher. After a force quit, iOS may avoid relaunching the app in the background until the user opens it manually again.
+
+
+## 0.3.3 diagnostic controls
+
+- **Schedule** submits the `BGAppRefreshTask` request and then queries `BGTaskScheduler` to confirm a pending request exists.
+- **Update now** immediately runs the complete snapshot path and updates the existing Live Activity.
+- The card shows pending-request confirmation, earliest eligible time, last manual refresh, and manual result.
+- Scheduling a task does not force iOS to run it immediately; the system still decides the actual launch time.
