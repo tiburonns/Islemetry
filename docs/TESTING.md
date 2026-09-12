@@ -261,3 +261,24 @@ V0.2 hardware validation is successful when:
 - A delivered background location event can refresh weather and update the existing Live Activity.
 - Disabling the switch stops standard background location updates.
 - No fixed background interval is assumed; iOS controls scheduling.
+
+
+## All-metric background refresh test
+
+1. Install Islemetry 0.3.1 on a physical iPhone.
+2. Start a Live Activity with metrics that are easy to observe changing, such as Battery, Power, Thermal, Network, Storage Free, and Local Temperature.
+3. Confirm foreground refresh continues approximately every 3 seconds.
+4. Send Islemetry to the background; do not force-quit it.
+5. Confirm **Background App Refresh** is enabled for the device/app in iOS settings.
+6. Leave the Live Activity running and allow iOS to execute the scheduled refresh task.
+7. Reopen Islemetry and confirm the Live Activity was not duplicated.
+8. If Background Location is enabled, a delivered location event should also update the complete telemetry snapshot.
+
+### Expected result
+
+- `BGTaskScheduler` registration does not crash at launch.
+- The main target contains both `fetch` and `location` in `UIBackgroundModes`.
+- `com.tiburonns.islemetry.refresh` is present in `BGTaskSchedulerPermittedIdentifiers`.
+- A background task refreshes the full metric array and updates the existing Live Activity.
+- Location events also refresh the full metric array before/with weather.
+- No fixed 3-second or 15-minute background cadence is claimed; iOS decides actual execution timing.
