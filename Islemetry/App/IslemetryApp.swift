@@ -4,6 +4,11 @@ import SwiftUI
 struct IslemetryApp: App {
     @StateObject private var telemetry = DeviceTelemetryStore()
 
+    init() {
+        BackgroundRefreshCoordinator.shared.register()
+        BackgroundRefreshCoordinator.shared.schedule()
+    }
+
     @AppStorage(AppAppearance.storageKey)
     private var appAppearanceRaw = AppAppearance.system.rawValue
 
