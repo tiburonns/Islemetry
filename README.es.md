@@ -6,7 +6,7 @@
 
 Islemetry es una aplicación nativa para iOS desarrollada con SwiftUI que convierte la Isla Dinámica en un monitor configurable y visible de un vistazo. Elige la información que te importa, mantén dos métricas visibles en la Isla compacta y mantenla presionada para abrir un snapshot de telemetría más completo.
 
-> **Release actual:** V0.2.1. Mantiene el refresco en primer plano cada tres segundos y evita publicar actualizaciones redundantes de Live Activity cuando los valores visibles no cambian. Continúan disponibles la instalación directa con Xcode y el paquete unsigned para AltStore Classic.
+> **Release actual:** V0.3.2 (build 5). En primer plano, la telemetría se refresca aproximadamente cada tres segundos y se evitan publicaciones redundantes de Live Activity. En segundo plano, Islemetry actualiza todas las métricas cuando iOS concede una ventana `BGAppRefreshTask` o entrega un evento de ubicación habilitado; iOS no garantiza una cadencia de tres segundos con la app suspendida.
 
 ## Qué hace Islemetry
 
@@ -20,6 +20,9 @@ Puedes elegir:
 - Un **color personalizado para la telemetría de la Isla Dinámica**
 - Comportamiento de idioma **Sistema / English / Español**
 - Apariencia **Sistema / Clara / Oscura**
+- **Actualización de todas las métricas en segundo plano** mediante `BGAppRefreshTask` de iOS
+- **Ubicación en segundo plano** opcional como oportunidad adicional de actualización
+- Temperatura local, sensación térmica, condición meteorológica y últimas coordenadas
 
 La misma Live Activity también aparece en la pantalla bloqueada y la app incluye una vista previa en Inicio que refleja la configuración guardada de la Isla Dinámica y el color de telemetría elegido.
 
@@ -37,7 +40,7 @@ La misma Live Activity también aparece en la pantalla bloqueada y la app incluy
 - Selector persistente de apariencia **Sistema / Clara / Oscura**
 - Nombres de métricas, estados, configuración y textos auxiliares de Live Activity según el idioma efectivo
 - Cambios de idioma/distribución/color pueden actualizar una Live Activity ya activa
-- 27 métricas actuales del dispositivo/sistema
+- 31 métricas actuales del dispositivo/sistema/ubicación/clima
 - Sin dependencias externas en tiempo de ejecución
 
 ### Categorías de métricas
@@ -48,6 +51,7 @@ La misma Live Activity también aparece en la pantalla bloqueada y la app incluy
 - **Pantalla:** frecuencia máxima, indicador ProMotion, resolución nativa, escala nativa
 - **Red:** interfaz actual, Low Data Mode, conexión considerada costosa, IPv4, IPv6, DNS
 - **Dispositivo / sistema:** identificador de hardware, modelo, versión de iOS, configuración regional, zona horaria
+- **Ubicación / clima:** últimas coordenadas, temperatura local, sensación térmica y condición actual
 
 ## Inicio rápido
 
@@ -142,6 +146,7 @@ script/
 - Network
 - UIKit
 - Foundation
+- CoreLocation
 
 ## Modelo de actualización en segundo plano
 
@@ -179,7 +184,7 @@ Cuando cambien funcionalidad, arquitectura, instalación, privacidad o distribuc
 2. **V0.2** — Isla configurable + telemetría ampliada + preview + controles de idioma y apariencia ✅ publicada
 3. **V0.3** — Perfiles + Shortcuts / App Intents
 4. **V0.4** — Diagnóstico de red y telemetría más completa
-5. **V0.5** — Módulos opcionales WeatherKit / HealthKit
+5. **V0.5** — HealthKit y módulos ambientales más completos
 6. **V1.0** — Release pulido y preparado para App Store
 
 ## Logo
@@ -193,3 +198,10 @@ https://github.com/tiburonns/Islemetry
 ```
 
 Islemetry está en desarrollo activo y prioriza APIs públicas, comportamiento transparente de telemetría y tecnologías nativas de iOS por encima de APIs privadas de monitorización.
+
+
+## Comportamiento de actualización
+
+En primer plano, la telemetría se actualiza cada 3 segundos mientras Islemetry está activa. Cuando la app queda suspendida, iOS no permite mantener un temporizador de 3 segundos. En su lugar, Islemetry programa un `BGAppRefreshTask`. Cada vez que iOS concede esa ventana de ejecución en segundo plano, Islemetry actualiza el **snapshot completo de telemetría** y la Live Activity existente.
+
+Si Ubicación en segundo plano está activada e iOS entrega un evento real de ubicación, ese evento también se aprovecha para actualizar **todas las métricas** y después el clima local. Ambos mecanismos son complementarios; ninguno garantiza un intervalo fijo porque iOS controla la planificación y la entrega.

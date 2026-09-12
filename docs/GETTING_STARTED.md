@@ -165,3 +165,32 @@ Keep Islemetry in the foreground for at least three seconds. The app refreshes a
 ## IPA distribution
 
 Running directly from Xcode does not require an `.ipa` file. If you want a distributable package, see [IPA.md](IPA.md).
+
+
+## Location and local weather
+
+Islemetry can show local weather using the iPhone's current location.
+
+The default build uses **Core Location + Open-Meteo** and does not require a WeatherKit entitlement, which keeps Personal Team and AltStore signing simpler.
+
+1. Open Islemetry on a physical iPhone.
+2. Find **Location & Weather**.
+3. Tap **Allow Location** and grant access.
+4. Tap **Refresh Weather** for a fresh local snapshot.
+5. To allow location-driven refreshes while Islemetry is backgrounded, enable **Background location**.
+6. iOS may later request **Always** location access; prompt timing is controlled by iOS.
+
+The main target declares the required location privacy strings and `UIBackgroundModes = location`. In Xcode, the main target should show **Background Modes → Location updates** and **Background fetch**.
+
+Background Location is optional and tied only to location/weather. It is not used to keep CPU/RAM sampling alive continuously. When iOS delivers a background location event, Islemetry can refresh weather and update an existing Live Activity.
+
+Current weather is provided by **Open-Meteo**. Internet access is required for a fresh fetch and Islemetry shows a visible provider link.
+
+
+### General telemetry background refresh
+
+Islemetry 0.3.1 registers `com.tiburonns.islemetry.refresh` with `BGTaskScheduler` during app launch and schedules a short `BGAppRefreshTask` request. The required identifier is included in `BGTaskSchedulerPermittedIdentifiers` and the main target enables **Background fetch**.
+
+When iOS launches the task, Islemetry refreshes the complete metric snapshot and updates any existing Live Activity. The request uses 15 minutes only as its **earliest possible** begin time; iOS decides the actual execution time and may run it substantially later.
+
+The repository now also contains a shared `Islemetry` app scheme, so the normal Run target should appear directly in Xcode instead of only `IslemetryWidgets`.

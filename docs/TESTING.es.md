@@ -40,7 +40,7 @@ Registra:
 
 1. Abre Islemetry.
 2. Revisa todas las tarjetas de métricas.
-3. Confirma que las 27 métricas actuales se muestren sin SF Symbols faltantes, valores vacíos ni recortes graves.
+3. Confirma que las 31 métricas actuales se muestren sin SF Symbols faltantes, valores vacíos ni recortes graves.
 4. Compara valores fáciles de verificar: batería, carga, modo de bajo consumo, almacenamiento, frecuencia de pantalla, brillo, red, versión de iOS, configuración regional y zona horaria.
 
 ## Prueba de vista previa de la Isla Dinámica
@@ -221,3 +221,66 @@ La validación de hardware de V0.2 se considera exitosa cuando:
 - Una Live Activity activa se actualiza al cambiar distribución, color o idioma.
 - Las presentaciones compacta, expandida, mínima y de pantalla bloqueada se renderizan correctamente cuando estén disponibles.
 - La Live Activity puede actualizarse y detenerse sin duplicados ni sesiones residuales.
+
+
+## Prueba de ubicación y clima local
+
+1. Instala la compilación más reciente en un iPhone físico.
+2. Abre **Ubicación y clima**.
+3. Pulsa **Permitir ubicación** y concede acceso.
+4. Pulsa **Actualizar clima**.
+5. Confirma que **Temperatura local**, **Sensación térmica**, **Clima** y **Ubicación** muestren valores y no el estado de espera.
+6. Asigna **Temperatura local** a Izquierda o Derecha.
+7. Aplica la configuración a una Live Activity activa.
+8. Confirma que la temperatura aparezca en la Isla Dinámica.
+9. Abre el enlace de atribución de Open-Meteo.
+
+### Resultado esperado
+
+- El estado de permiso se actualiza correctamente.
+- La temperatura local se muestra en °C.
+- La sensación térmica y condición meteorológica se muestran correctamente.
+- La métrica meteorológica seleccionada aparece en la Live Activity.
+- La atribución es visible y se puede tocar.
+
+## Prueba de ubicación en segundo plano
+
+1. Activa **Ubicación en segundo plano**.
+2. Sigue cualquier aviso adicional de permisos de iOS.
+3. Confirma que Islemetry muestre **Siempre** si iOS lo concede.
+4. Mantén una Live Activity activa con Temperatura local seleccionada.
+5. Envía Islemetry a segundo plano.
+6. Desplázate lo suficiente para generar un evento de Core Location o usa la simulación de ubicación de Xcode.
+7. Revisa la Live Activity existente después de que iOS entregue la actualización.
+8. Desactiva **Ubicación en segundo plano**.
+
+### Resultado esperado
+
+- No se crea una Live Activity duplicada.
+- La ubicación en segundo plano solo está activa cuando se habilita explícitamente.
+- Un evento entregado en segundo plano puede actualizar el clima y la Live Activity existente.
+- Desactivar el interruptor detiene las actualizaciones estándar de ubicación en segundo plano.
+- No se presupone un intervalo fijo; iOS controla la planificación.
+
+
+## Prueba de actualización completa en segundo plano
+
+1. Instala Islemetry 0.3.1 en un iPhone físico.
+2. Inicia una Live Activity con métricas fáciles de observar, por ejemplo Batería, Energía, Térmico, Red, Almacenamiento libre y Temperatura local.
+3. Confirma que en primer plano continúe la actualización aproximadamente cada 3 segundos.
+4. Envía Islemetry a segundo plano; no la cierres a la fuerza.
+5. Confirma que **Actualización en segundo plano** esté permitida en los ajustes de iOS.
+6. Deja la Live Activity activa y permite que iOS ejecute la tarea programada.
+7. Vuelve a abrir Islemetry y confirma que no se haya creado una Live Activity duplicada.
+8. Si Ubicación en segundo plano está activada, un evento entregado de ubicación también debe actualizar el snapshot completo de telemetría.
+
+### Resultado esperado
+
+- El registro de `BGTaskScheduler` no provoca un crash al iniciar.
+- El target principal contiene `fetch` y `location` en `UIBackgroundModes`.
+- `com.tiburonns.islemetry.refresh` aparece en `BGTaskSchedulerPermittedIdentifiers`.
+- Una tarea en segundo plano actualiza el arreglo completo de métricas y la Live Activity existente.
+- Los eventos de ubicación también actualizan todas las métricas antes/junto con el clima.
+- No se promete una cadencia fija de 3 segundos ni 15 minutos en segundo plano; iOS decide el momento real.
+
+> Para pruebas de segundo plano, envía Islemetry al Home pero **no la cierres a la fuerza** desde el selector de apps. Después de un cierre forzado, iOS puede no volver a lanzar la app en segundo plano hasta que el usuario la abra manualmente otra vez.

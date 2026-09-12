@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
@@ -12,6 +13,21 @@ struct ContentView: View {
 
     @AppStorage(AppAppearance.storageKey)
     private var appAppearanceRaw = AppAppearance.system.rawValue
+
+    @AppStorage(BackgroundRefreshCoordinator.lastScheduledKey)
+    private var backgroundLastScheduled: Double = 0
+
+    @AppStorage(BackgroundRefreshCoordinator.lastLaunchedKey)
+    private var backgroundLastLaunched: Double = 0
+
+    @AppStorage(BackgroundRefreshCoordinator.lastCompletedKey)
+    private var backgroundLastCompleted: Double = 0
+
+    @AppStorage(BackgroundRefreshCoordinator.lastResultKey)
+    private var backgroundLastResult = "never"
+
+    @AppStorage(BackgroundRefreshCoordinator.lastErrorKey)
+    private var backgroundLastError = ""
 
     @AppStorage(IslandConfiguration.leadingKey)
     private var leadingMetricRaw = DeviceMetric.Kind.battery.rawValue
@@ -81,8 +97,10 @@ struct ContentView: View {
                 VStack(spacing: 20) {
                     statusCard
                     controls
+                    backgroundRefreshCard
                     islandConfigurationCard
                     islandPreviewCard
+                    locationWeatherCard
                     appearanceCard
                     languageCard
                     metricsGrid
@@ -92,6 +110,7 @@ struct ContentView: View {
             .navigationTitle("Islemetry")
             .task {
                 liveActivity.syncState()
+                telemetry.prepareLocationWeather()
             }
             .task(id: scenePhase) {
                 await refreshAutomaticallyWhileActive()
@@ -134,6 +153,167 @@ struct ContentView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private var backgroundRefreshCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Label(
+                    language.text("Background Refresh", "Actualización en segundo plano"),
+                    systemImage: "arrow.triangle.2.circlepath"
+                )
+                .font(.headline)
+
+                Spacer()
+
+                Text(language.text("ALL METRICS", "TODAS"))
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(.green)
+            }
+
+            HStack {
+                Text(language.text("Foreground", "Primer plano"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Spacer()
+
+                Text(language.text("Every 3 seconds", "Cada 3 segundos"))
+                    .font(.caption.weight(.semibold))
+            }
+
+            HStack {
+                Text(language.text("Background", "Segundo plano"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Spacer()
+
+                Text(language.text("Scheduled by iOS", "Programado por iOS"))
+                    .font(.caption.weight(.semibold))
+            }
+
+            Divider()
+
+            diagnosticRow(
+                language.text("System permission", "Permiso del sistema"),
+                value: backgroundRefreshStatusText
+            )
+
+            diagnosticRow(
+                language.text("Last scheduled", "Última programación"),
+                value: backgroundDateText(backgroundLastScheduled)
+            )
+
+            diagnosticRow(
+                language.text("Last launched", "Última ejecución"),
+                value: backgroundDateText(backgroundLastLaunched)
+            )
+
+            diagnosticRow(
+                language.text("Last completed", "Última finalización"),
+                value: backgroundDateText(backgroundLastCompleted)
+            )
+
+            diagnosticRow(
+                language.text("Last result", "Último resultado"),
+                value: backgroundResultText
+            )
+
+            if !backgroundLastError.isEmpty {
+                Text(backgroundLastError)
+                    .font(.caption2)
+                    .foregroundStyle(.red)
+                    .textSelection(.enabled)
+            }
+
+            HStack(spacing: 10) {
+                Button {
+                    BackgroundRefreshCoordinator.shared.schedule()
+                } label: {
+                    Label(
+                        language.text("Reschedule", "Reprogramar"),
+                        systemImage: "calendar.badge.clock"
+                    )
+                }
+                .buttonStyle(.bordered)
+
+                Button {
+                    Task {
+                        await telemetry.refreshAllForBackground()
+                    }
+                } label: {
+                    Label(
+                        language.text("Test refresh path", "Probar actualización"),
+                        systemImage: "checkmark.arrow.trianglehead.counterclockwise"
+                    )
+                }
+                .buttonStyle(.bordered)
+            }
+
+            Text(
+                language.text(
+                    "BGAppRefreshTask is not an immediate timer. A scheduled task can take hours before iOS launches it naturally. Use the diagnostics above to distinguish “never launched” from an ActivityKit update failure.",
+                    "BGAppRefreshTask no es un temporizador inmediato. Una tarea programada puede tardar horas antes de que iOS la ejecute de forma natural. Usa el diagnóstico anterior para distinguir “nunca ejecutada” de un fallo al actualizar ActivityKit."
+                )
+            )
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private var backgroundRefreshStatusText: String {
+        switch UIApplication.shared.backgroundRefreshStatus {
+        case .available:
+            return language.text("Available", "Disponible")
+        case .denied:
+            return language.text("Disabled", "Desactivado")
+        case .restricted:
+            return language.text("Restricted", "Restringido")
+        @unknown default:
+            return language.text("Unknown", "Desconocido")
+        }
+    }
+
+    private var backgroundResultText: String {
+        switch backgroundLastResult {
+        case "running":
+            return language.text("Running", "Ejecutándose")
+        case "success":
+            return language.text("Success", "Correcto")
+        case "cancelled":
+            return language.text("Cancelled", "Cancelado")
+        case "expired":
+            return language.text("Expired", "Expiró")
+        default:
+            return language.text("Never", "Nunca")
+        }
+    }
+
+    private func backgroundDateText(_ timestamp: Double) -> String {
+        guard timestamp > 0 else {
+            return language.text("Never", "Nunca")
+        }
+
+        return Date(timeIntervalSince1970: timestamp)
+            .formatted(date: .abbreviated, time: .standard)
+    }
+
+    private func diagnosticRow(_ title: String, value: String) -> some View {
+        HStack {
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            Spacer()
+
+            Text(value)
+                .font(.caption.weight(.semibold))
+                .multilineTextAlignment(.trailing)
+        }
     }
 
     private var controls: some View {
@@ -270,13 +450,7 @@ struct ContentView: View {
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
 
-                VStack(spacing: 12) {
-                    HStack(spacing: 16) {
-                        expandedPreviewMetric(leadingKind)
-                        Spacer(minLength: 12)
-                        expandedPreviewMetric(trailingKind)
-                    }
-
+                VStack(spacing: 10) {
                     if expandedKinds.isEmpty {
                         Text(
                             language.text(
@@ -288,9 +462,24 @@ struct ContentView: View {
                         .foregroundStyle(islandTextColor.opacity(0.68))
                         .frame(maxWidth: .infinity, alignment: .leading)
                     } else {
-                        LazyVGrid(columns: columns, spacing: 10) {
-                            ForEach(expandedKinds) { kind in
-                                expandedPreviewMetric(kind)
+                        if let first = expandedKinds.first {
+                            HStack(spacing: 16) {
+                                expandedPreviewMetric(first)
+
+                                if expandedKinds.count > 1 {
+                                    expandedPreviewMetric(expandedKinds[1])
+                                } else {
+                                    Spacer(minLength: 0)
+                                }
+                            }
+                        }
+
+                        let remaining = Array(expandedKinds.dropFirst(2))
+                        if !remaining.isEmpty {
+                            LazyVGrid(columns: columns, spacing: 8) {
+                                ForEach(remaining) { kind in
+                                    expandedPreviewMetric(kind)
+                                }
                             }
                         }
                     }
@@ -308,6 +497,126 @@ struct ContentView: View {
             )
             .font(.caption)
             .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private var locationWeatherCard: some View {
+        let temperature = metric(for: .localTemperature)
+        let condition = metric(for: .weatherCondition)
+
+        return VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                Label(
+                    language.text("Location & Weather", "Ubicación y clima"),
+                    systemImage: condition.symbol
+                )
+                .font(.headline)
+
+                Spacer()
+
+                Text(temperature.value)
+                    .font(.headline.monospacedDigit())
+                    .lineLimit(1)
+            }
+
+            HStack {
+                Text(language.text("Location permission", "Permiso de ubicación"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Spacer()
+
+                Text(telemetry.locationAuthorizationDescription(language: language))
+                    .font(.caption.weight(.semibold))
+            }
+
+            Toggle(
+                language.text(
+                    "Background location",
+                    "Ubicación en segundo plano"
+                ),
+                isOn: Binding(
+                    get: { telemetry.backgroundLocationEnabled },
+                    set: { telemetry.setBackgroundLocationEnabled($0) }
+                )
+            )
+
+            Text(
+                language.text(
+                    "When enabled, Core Location can wake Islemetry for genuine location changes. Each delivered event refreshes the full telemetry snapshot and local weather.",
+                    "Al activarlo, Core Location puede despertar Islemetry por cambios reales de ubicación. Cada evento entregado actualiza el snapshot completo de telemetría y el clima local."
+                )
+            )
+            .font(.caption)
+            .foregroundStyle(.secondary)
+
+            HStack(spacing: 10) {
+                Button {
+                    telemetry.requestLocationAccess()
+                } label: {
+                    Label(
+                        language.text("Allow Location", "Permitir ubicación"),
+                        systemImage: "location.fill"
+                    )
+                }
+                .buttonStyle(.bordered)
+
+                Button {
+                    telemetry.refreshLocationWeather(force: true)
+                } label: {
+                    Label(
+                        language.text("Refresh Weather", "Actualizar clima"),
+                        systemImage: "arrow.clockwise"
+                    )
+                }
+                .buttonStyle(.bordered)
+            }
+
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(language.text("Current", "Actual"))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+
+                    Text(temperature.value)
+                        .font(.title3.weight(.semibold))
+                        .lineLimit(1)
+                }
+
+                Spacer()
+
+                VStack(alignment: .trailing, spacing: 3) {
+                    Text(language.text("Conditions", "Condiciones"))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+
+                    Label(condition.value, systemImage: condition.symbol)
+                        .font(.caption.weight(.semibold))
+                        .lineLimit(1)
+                }
+            }
+
+            if let message = telemetry.weatherStatusMessage {
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            if let attributionURL = telemetry.weatherAttributionURL {
+                Link(destination: attributionURL) {
+                    Label(
+                        language.text(
+                            "Weather data: \(telemetry.weatherServiceName)",
+                            "Datos meteorológicos: \(telemetry.weatherServiceName)"
+                        ),
+                        systemImage: "cloud.sun.fill"
+                    )
+                    .font(.caption)
+                }
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()

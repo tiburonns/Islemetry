@@ -165,3 +165,32 @@ Mantén Islemetry en primer plano durante al menos tres segundos. La app se actu
 ## Distribución mediante IPA
 
 Ejecutar directamente desde Xcode no requiere un archivo `.ipa`. Si quieres un paquete distribuible, consulta [IPA.es.md](IPA.es.md).
+
+
+## Ubicación y clima local
+
+Islemetry puede mostrar el clima local utilizando la ubicación actual del iPhone.
+
+La compilación predeterminada usa **Core Location + Open-Meteo** y no requiere entitlement de WeatherKit, lo que simplifica la firma con Personal Team y AltStore.
+
+1. Abre Islemetry en un iPhone físico.
+2. Busca **Ubicación y clima**.
+3. Pulsa **Permitir ubicación** y concede acceso.
+4. Pulsa **Actualizar clima** para obtener un snapshot local reciente.
+5. Para permitir actualizaciones basadas en ubicación mientras Islemetry está en segundo plano, activa **Ubicación en segundo plano**.
+6. iOS puede solicitar más tarde permiso de ubicación **Siempre**; el momento exacto lo controla iOS.
+
+El target principal declara los textos de privacidad necesarios y `UIBackgroundModes = location`. En Xcode, el target principal debe mostrar **Background Modes → Location updates** y **Background fetch**.
+
+La ubicación en segundo plano es opcional y está ligada únicamente a ubicación/clima. No se utiliza para mantener activo continuamente el muestreo de CPU/RAM. Cuando iOS entrega un evento de ubicación en segundo plano, Islemetry puede actualizar el clima y una Live Activity existente.
+
+El clima actual es proporcionado por **Open-Meteo**. Se necesita Internet para obtener un dato nuevo y Islemetry muestra un enlace visible al proveedor.
+
+
+### Actualización general de telemetría en segundo plano
+
+Islemetry 0.3.1 registra `com.tiburonns.islemetry.refresh` con `BGTaskScheduler` durante el arranque y programa una solicitud corta `BGAppRefreshTask`. El identificador requerido está incluido en `BGTaskSchedulerPermittedIdentifiers` y el target principal activa **Background fetch**.
+
+Cuando iOS ejecuta la tarea, Islemetry actualiza el snapshot completo de métricas y cualquier Live Activity existente. Los 15 minutos configurados son únicamente el **momento más temprano posible**; iOS decide el momento real y puede ejecutarla bastante después.
+
+El repositorio ahora también incluye un scheme compartido `Islemetry`, por lo que el target normal de Run debe aparecer directamente en Xcode en lugar de mostrar únicamente `IslemetryWidgets`.

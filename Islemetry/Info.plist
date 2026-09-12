@@ -22,6 +22,19 @@
     <true/>
     <key>NSSupportsLiveActivities</key>
     <true/>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Islemetry uses your location to show local weather in the Dynamic Island. / Islemetry usa tu ubicación para mostrar el clima local en la Isla Dinámica.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Islemetry uses background location only when you enable it, so local weather can refresh as your area changes. / Islemetry usa la ubicación en segundo plano solo cuando la activas, para actualizar el clima local al cambiar de zona.</string>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+        <string>fetch</string>
+    </array>
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>com.tiburonns.islemetry.refresh</string>
+    </array>
     <key>UIApplicationSceneManifest</key>
     <dict>
         <key>UIApplicationSupportsMultipleScenes</key>

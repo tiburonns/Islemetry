@@ -142,6 +142,10 @@ struct DeviceMetric: Identifiable, Hashable, Codable {
         case system
         case locale
         case timeZone
+        case localTemperature
+        case feelsLike
+        case weatherCondition
+        case location
 
         var id: String { rawValue }
 
@@ -178,6 +182,10 @@ struct DeviceMetric: Identifiable, Hashable, Codable {
             case .system: return language.text("System", "Sistema")
             case .locale: return language.text("Locale", "Configuración regional")
             case .timeZone: return language.text("Time Zone", "Zona horaria")
+            case .localTemperature: return language.text("Local Temperature", "Temperatura local")
+            case .feelsLike: return language.text("Feels Like", "Sensación térmica")
+            case .weatherCondition: return language.text("Weather", "Clima")
+            case .location: return language.text("Location", "Ubicación")
             }
         }
     }
