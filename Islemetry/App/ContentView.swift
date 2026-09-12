@@ -1009,6 +1009,9 @@ struct ContentView: View {
 private struct IslandConfigurationView: View {
     let onApply: () -> Void
 
+    @State private var showsAppliedConfirmation = false
+    @State private var applyAnimationTrigger = 0
+
     @AppStorage(AppLanguage.storageKey)
     private var appLanguageRaw = AppLanguage.system.rawValue
 
@@ -1127,14 +1130,46 @@ private struct IslandConfigurationView: View {
             Section {
                 Button {
                     onApply()
+                    applyAnimationTrigger += 1
+
+                    withAnimation(.spring(response: 0.28, dampingFraction: 0.66)) {
+                        showsAppliedConfirmation = true
+                    }
+
+                    Task {
+                        try? await Task.sleep(for: .milliseconds(900))
+
+                        await MainActor.run {
+                            withAnimation(.easeOut(duration: 0.22)) {
+                                showsAppliedConfirmation = false
+                            }
+                        }
+                    }
                 } label: {
-                    Label(
-                        language.text("Apply to Live Activity", "Aplicar a Live Activity"),
-                        systemImage: "checkmark.circle.fill"
-                    )
+                    HStack(spacing: 8) {
+                        Image(
+                            systemName: showsAppliedConfirmation
+                                ? "checkmark.seal.fill"
+                                : "checkmark.circle.fill"
+                        )
+                        .symbolEffect(.bounce, value: applyAnimationTrigger)
+
+                        Text(
+                            showsAppliedConfirmation
+                                ? language.text("Applied", "Aplicado")
+                                : language.text("Apply to Live Activity", "Aplicar a Live Activity")
+                        )
+                        .contentTransition(.opacity)
+                    }
                     .frame(maxWidth: .infinity)
+                    .scaleEffect(showsAppliedConfirmation ? 1.025 : 1)
+                    .animation(
+                        .spring(response: 0.28, dampingFraction: 0.66),
+                        value: showsAppliedConfirmation
+                    )
                 }
                 .buttonStyle(.borderedProminent)
+                .sensoryFeedback(.success, trigger: applyAnimationTrigger)
             } footer: {
                 Text(
                     language.text(

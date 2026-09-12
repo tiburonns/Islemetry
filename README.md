@@ -6,7 +6,7 @@
 
 Islemetry is a native SwiftUI iOS application that turns the Dynamic Island into a configurable, glanceable device-status monitor. Choose the information that matters to you, keep two metrics visible in the compact Island, and press and hold to reveal a richer expanded telemetry snapshot.
 
-> **Current release:** V0.4.0 (build 7). Adds **Refresh Islemetry** to Apple Shortcuts so personal automations such as Charger, Wi-Fi, Bluetooth, Low Power Mode, and Battery Level can refresh all metrics and the Live Activity without opening the app.
+> **Current release:** V0.4.1 (build 8). Adds subtle animated and haptic confirmation to **Apply to Live Activity**, while keeping the Shortcuts automation support introduced in V0.4.0.
 
 ## What Islemetry does
 
