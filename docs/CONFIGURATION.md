@@ -150,3 +150,40 @@ The **Refresh** button remains available for an immediate snapshot. Layout and c
 Islemetry intentionally uses public Apple frameworks. Disk-space information is a Required Reason API use case; Apple's approved reason `85F4.1` permits displaying disk-space information to the user. UserDefaults is used only to save Islemetry's own configuration, including metric selection, language, and text color, corresponding to approved reason `CA92.1`.
 
 System uptime is intentionally not exposed as a metric in this App Store-oriented build because Apple's approved reasons for the system-boot-time API do not include simply displaying device uptime as a system-monitor statistic.
+
+
+## Location and local weather metrics
+
+Four location-aware metrics are available in the normal Dynamic Island picker:
+
+- **Local Temperature** — current outdoor temperature for the latest iPhone location.
+- **Feels Like** — apparent temperature.
+- **Weather** — current weather condition.
+- **Location** — rounded coordinates from the latest location snapshot.
+
+They can be assigned to Compact Leading, Compact Trailing, or any expanded slot.
+
+### Background location
+
+The Home-screen **Location & Weather** card includes **Background location**. When disabled, Islemetry uses one-shot location requests while the app is active. When enabled, Islemetry requests the permission needed for background location and starts Core Location updates with kilometer-level accuracy and a 2 km distance filter to reduce battery use.
+
+Location events can trigger a weather refresh and an ActivityKit update. This does **not** make Islemetry an always-running process; iOS controls background delivery.
+
+### Refresh policy
+
+Automatic weather requests are throttled. Islemetry skips another weather request when the previous successful result is less than 15 minutes old and the device has moved less than 5 km. **Refresh Weather** forces a new request.
+
+### Weather provider
+
+Current weather is provided by **Open-Meteo** and Islemetry shows a visible attribution link next to the weather card.
+
+
+## All-metric background refresh
+
+General background telemetry is always scheduled by Islemetry; it is separate from the optional Background Location switch.
+
+- Foreground: full snapshot approximately every 3 seconds while the app is active.
+- Background app refresh: full snapshot whenever iOS executes `com.tiburonns.islemetry.refresh`.
+- Background location: every delivered location event is also treated as a full-snapshot refresh opportunity before local weather is refreshed.
+
+The Live Activity receives the same currently selected metrics after each successful background opportunity. iOS does not guarantee a 15-minute cadence: `earliestBeginDate` only prevents execution before that time.
