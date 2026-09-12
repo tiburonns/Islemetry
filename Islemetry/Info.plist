@@ -29,6 +29,11 @@
     <key>UIBackgroundModes</key>
     <array>
         <string>location</string>
+        <string>fetch</string>
+    </array>
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>com.tiburonns.islemetry.refresh</string>
     </array>
     <key>UIApplicationSceneManifest</key>
     <dict>
