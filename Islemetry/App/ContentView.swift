@@ -87,9 +87,6 @@ struct ContentView: View {
     @AppStorage("island.expandedMetric6")
     private var expanded6 = DeviceMetric.Kind.lowPower.rawValue
 
-    @State private var showsAppliedConfirmation = false
-    @State private var applyAnimationTrigger = 0
-
     private let columns = [
         GridItem(.flexible(), spacing: 12),
         GridItem(.flexible(), spacing: 12)
@@ -1011,6 +1008,9 @@ struct ContentView: View {
 
 private struct IslandConfigurationView: View {
     let onApply: () -> Void
+
+    @State private var showsAppliedConfirmation = false
+    @State private var applyAnimationTrigger = 0
 
     @AppStorage(AppLanguage.storageKey)
     private var appLanguageRaw = AppLanguage.system.rawValue
