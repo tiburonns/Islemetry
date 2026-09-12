@@ -282,3 +282,5 @@ V0.2 hardware validation is successful when:
 - A background task refreshes the full metric array and updates the existing Live Activity.
 - Location events also refresh the full metric array before/with weather.
 - No fixed 3-second or 15-minute background cadence is claimed; iOS decides actual execution timing.
+
+> For background tests, send Islemetry to the Home Screen but **do not force-quit it** from the app switcher. After a force quit, iOS may avoid relaunching the app in the background until the user opens it manually again.
