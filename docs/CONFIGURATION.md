@@ -176,3 +176,14 @@ Automatic weather requests are throttled. Islemetry skips another weather reques
 ### Weather provider
 
 Current weather is provided by **Open-Meteo** and Islemetry shows a visible attribution link next to the weather card.
+
+
+## All-metric background refresh
+
+General background telemetry is always scheduled by Islemetry; it is separate from the optional Background Location switch.
+
+- Foreground: full snapshot approximately every 3 seconds while the app is active.
+- Background app refresh: full snapshot whenever iOS executes `com.tiburonns.islemetry.refresh`.
+- Background location: every delivered location event is also treated as a full-snapshot refresh opportunity before local weather is refreshed.
+
+The Live Activity receives the same currently selected metrics after each successful background opportunity. iOS does not guarantee a 15-minute cadence: `earliestBeginDate` only prevents execution before that time.
