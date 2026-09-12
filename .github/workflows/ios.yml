@@ -3,7 +3,7 @@ name: iOS
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, feature/background-location-weather]
   workflow_dispatch:
 
 jobs:
