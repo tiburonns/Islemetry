@@ -21,6 +21,7 @@
 		A1000000000000000000000C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = F1000000000000000000000E /* PrivacyInfo.xcprivacy */; };
 		A1000000000000000000000D /* BackgroundRefreshCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1000000000000000000000F /* BackgroundRefreshCoordinator.swift */; };
 		A1000000000000000000000E /* RefreshIslemetryIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000010 /* RefreshIslemetryIntent.swift */; };
+		A1000000000000000000000F /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000011 /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,6 +65,7 @@
 		F1000000000000000000000E /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		F1000000000000000000000F /* BackgroundRefreshCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundRefreshCoordinator.swift; sourceTree = "<group>"; };
 		F10000000000000000000010 /* RefreshIslemetryIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshIslemetryIntent.swift; sourceTree = "<group>"; };
+		F10000000000000000000011 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -144,6 +146,7 @@
 			isa = PBXGroup;
 			children = (
 				F1000000000000000000000D /* Assets.xcassets */,
+				F10000000000000000000011 /* Localizable.xcstrings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -215,7 +218,7 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		R10000000000000000000001 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A1000000000000000000000B /* Assets.xcassets in Resources */, A1000000000000000000000C /* PrivacyInfo.xcprivacy in Resources */, ); runOnlyForDeploymentPostprocessing = 0; };
+		R10000000000000000000001 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A1000000000000000000000B /* Assets.xcassets in Resources */, A1000000000000000000000C /* PrivacyInfo.xcprivacy in Resources */, A1000000000000000000000F /* Localizable.xcstrings in Resources */, ); runOnlyForDeploymentPostprocessing = 0; };
 		R10000000000000000000002 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
