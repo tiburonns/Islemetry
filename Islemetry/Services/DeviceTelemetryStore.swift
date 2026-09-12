@@ -171,6 +171,32 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
         }
     }
 
+    func refreshAllForBackground() async {
+        guard !Task.isCancelled else { return }
+
+        // Refresh immediately, then allow the Network monitor a brief opportunity
+        // to publish its current path before sending the background snapshot.
+        refresh()
+
+        do {
+            try await Task.sleep(for: .milliseconds(350))
+        } catch {
+            return
+        }
+
+        guard !Task.isCancelled else { return }
+
+        refresh()
+        await pushSnapshotToLiveActivity()
+
+        guard !Task.isCancelled else { return }
+
+        if isLocationAuthorized,
+           let location = locationManager.location {
+            await updateWeather(for: location, force: false)
+        }
+    }
+
     func locationAuthorizationDescription(language: AppLanguage) -> String {
         switch locationAuthorizationStatus {
         case .notDetermined:
@@ -334,7 +360,12 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
         let force = pendingForcedWeatherRefresh
         pendingForcedWeatherRefresh = false
 
+        refresh()
+
         Task {
+            await pushSnapshotToLiveActivity()
+
+            guard !Task.isCancelled else { return }
             await updateWeather(for: location, force: force)
         }
 
@@ -358,6 +389,8 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
 
     private func updateWeather(for location: CLLocation, force: Bool) async {
         if weatherRefreshInFlight {
+            refresh()
+            await pushSnapshotToLiveActivity()
             return
         }
 
@@ -367,6 +400,7 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
            Date().timeIntervalSince(lastWeatherFetchAt) < 15 * 60,
            location.distance(from: lastWeatherLocation) < 5_000 {
             refresh()
+            await pushSnapshotToLiveActivity()
             return
         }
 
@@ -389,10 +423,11 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
             weatherStatusMessage = nil
 
             refresh()
-            await pushWeatherSnapshotToLiveActivity()
+            await pushSnapshotToLiveActivity()
         } catch {
             weatherStatusMessage = error.localizedDescription
             refresh()
+            await pushSnapshotToLiveActivity()
         }
     }
 
@@ -455,7 +490,7 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
             .current
     }
 
-    private func pushWeatherSnapshotToLiveActivity() async {
+    private func pushSnapshotToLiveActivity() async {
         let manager = LiveActivityManager()
         await manager.update(
             with: metrics,
