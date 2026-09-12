@@ -5,15 +5,22 @@ final class BackgroundRefreshCoordinator {
     static let shared = BackgroundRefreshCoordinator()
     static let taskIdentifier = "com.tiburonns.islemetry.refresh"
 
+    static let lastScheduledKey = "background.lastScheduled"
+    static let lastLaunchedKey = "background.lastLaunched"
+    static let lastCompletedKey = "background.lastCompleted"
+    static let lastResultKey = "background.lastResult"
+    static let lastErrorKey = "background.lastError"
+
     private static let earliestRefreshInterval: TimeInterval = 15 * 60
     private var isRegistered = false
 
     private init() {}
 
-    func register() {
-        guard !isRegistered else { return }
+    @discardableResult
+    func register() -> Bool {
+        guard !isRegistered else { return true }
 
-        isRegistered = BGTaskScheduler.shared.register(
+        let registered = BGTaskScheduler.shared.register(
             forTaskWithIdentifier: Self.taskIdentifier,
             using: nil
         ) { [weak self] task in
@@ -25,6 +32,17 @@ final class BackgroundRefreshCoordinator {
 
             self.handle(refreshTask)
         }
+
+        isRegistered = registered
+
+        if !registered {
+            UserDefaults.standard.set(
+                "BGTaskScheduler registration returned false",
+                forKey: Self.lastErrorKey
+            )
+        }
+
+        return registered
     }
 
     func schedule() {
@@ -39,7 +57,17 @@ final class BackgroundRefreshCoordinator {
 
         do {
             try BGTaskScheduler.shared.submit(request)
+            UserDefaults.standard.set(
+                Date().timeIntervalSince1970,
+                forKey: Self.lastScheduledKey
+            )
+            UserDefaults.standard.removeObject(forKey: Self.lastErrorKey)
         } catch {
+            UserDefaults.standard.set(
+                error.localizedDescription,
+                forKey: Self.lastErrorKey
+            )
+
 #if DEBUG
             print("Islemetry background refresh scheduling failed: \(error)")
 #endif
@@ -47,6 +75,15 @@ final class BackgroundRefreshCoordinator {
     }
 
     private func handle(_ task: BGAppRefreshTask) {
+        UserDefaults.standard.set(
+            Date().timeIntervalSince1970,
+            forKey: Self.lastLaunchedKey
+        )
+        UserDefaults.standard.set(
+            "running",
+            forKey: Self.lastResultKey
+        )
+
         schedule()
 
         let work = Task { @MainActor in
@@ -55,12 +92,27 @@ final class BackgroundRefreshCoordinator {
         }
 
         task.expirationHandler = {
+            UserDefaults.standard.set(
+                "expired",
+                forKey: Self.lastResultKey
+            )
             work.cancel()
         }
 
         Task {
             await work.value
-            task.setTaskCompleted(success: !work.isCancelled)
+
+            let success = !work.isCancelled
+            UserDefaults.standard.set(
+                Date().timeIntervalSince1970,
+                forKey: Self.lastCompletedKey
+            )
+            UserDefaults.standard.set(
+                success ? "success" : "cancelled",
+                forKey: Self.lastResultKey
+            )
+
+            task.setTaskCompleted(success: success)
         }
     }
 }
