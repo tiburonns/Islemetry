@@ -49,7 +49,8 @@ Como iOS no permite que una aplicación normal se ejecute continuamente en segun
 - Configuración persistente en el dispositivo
 - Modos de idioma Sistema / English / Español
 - 31 métricas del dispositivo/sistema/ubicación/clima
-- Actualización opcional del clima mediante ubicación en segundo plano
+- Actualización de todas las métricas programada por iOS mediante BGAppRefreshTask
+- Oportunidades adicionales de actualización mediante ubicación en segundo plano
 - Clima actual mediante Open-Meteo con atribución visible
 - Sin dependencias externas en tiempo de ejecución
 
