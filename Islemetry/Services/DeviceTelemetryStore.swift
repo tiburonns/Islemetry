@@ -174,18 +174,10 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
     func refreshAllForBackground() async {
         guard !Task.isCancelled else { return }
 
-        // Refresh immediately, then allow the Network monitor a brief opportunity
-        // to publish its current path before sending the background snapshot.
-        refresh()
-
-        do {
-            try await Task.sleep(for: .milliseconds(350))
-        } catch {
-            return
-        }
-
-        guard !Task.isCancelled else { return }
-
+        // NWPathMonitor exposes the latest cached path synchronously. Applying
+        // it here avoids an arbitrary sleep when this store is created solely
+        // for a background refresh or App Intent.
+        applyNetworkPath(pathMonitor.currentPath)
         refresh()
         await pushSnapshotToLiveActivity()
 
@@ -459,11 +451,11 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
         components?.queryItems = [
             URLQueryItem(
                 name: "latitude",
-                value: String(format: "%.5f", location.coordinate.latitude)
+                value: String(format: "%.3f", location.coordinate.latitude)
             ),
             URLQueryItem(
                 name: "longitude",
-                value: String(format: "%.5f", location.coordinate.longitude)
+                value: String(format: "%.3f", location.coordinate.longitude)
             ),
             URLQueryItem(
                 name: "current",
@@ -567,32 +559,33 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
 
     private func startNetworkMonitor() {
         pathMonitor.pathUpdateHandler = { [weak self] path in
-            let interface: NetworkInterface
-
-            if path.status != .satisfied {
-                interface = .offline
-            } else if path.usesInterfaceType(.wifi) {
-                interface = .wifi
-            } else if path.usesInterfaceType(.cellular) {
-                interface = .cellular
-            } else if path.usesInterfaceType(.wiredEthernet) {
-                interface = .ethernet
-            } else {
-                interface = .other
-            }
-
             Task { @MainActor [weak self] in
                 guard let self else { return }
-                self.networkInterface = interface
-                self.networkConstrained = path.isConstrained
-                self.networkExpensive = path.isExpensive
-                self.networkSupportsIPv4 = path.supportsIPv4
-                self.networkSupportsIPv6 = path.supportsIPv6
-                self.networkSupportsDNS = path.supportsDNS
+                self.applyNetworkPath(path)
                 self.refresh()
             }
         }
         pathMonitor.start(queue: monitorQueue)
+    }
+
+    private func applyNetworkPath(_ path: NWPath) {
+        if path.status != .satisfied {
+            networkInterface = .offline
+        } else if path.usesInterfaceType(.wifi) {
+            networkInterface = .wifi
+        } else if path.usesInterfaceType(.cellular) {
+            networkInterface = .cellular
+        } else if path.usesInterfaceType(.wiredEthernet) {
+            networkInterface = .ethernet
+        } else {
+            networkInterface = .other
+        }
+
+        networkConstrained = path.isConstrained
+        networkExpensive = path.isExpensive
+        networkSupportsIPv4 = path.supportsIPv4
+        networkSupportsIPv6 = path.supportsIPv6
+        networkSupportsDNS = path.supportsDNS
     }
 
     private func storageValues(language: AppLanguage) -> (summary: String, free: String, used: String, total: String) {
