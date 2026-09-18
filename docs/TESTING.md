@@ -1,8 +1,8 @@
-# Islemetry V0.4.1 — On-Device Test Plan
+# Islemetry V0.4.2 — On-Device Test Plan
 
 [Español](TESTING.es.md) · **English**
 
-This checklist validates the current Islemetry 0.4.1 build on a physical iPhone with Dynamic Island. It covers the configurable Island experience introduced in earlier releases plus current telemetry, background-refresh diagnostics, local weather, Shortcuts automation refresh, and the animated/haptic Apply to Live Activity confirmation.
+This checklist validates the current Islemetry 0.4.2 build on a physical iPhone with Dynamic Island. It covers the configurable Island experience introduced in earlier releases plus current telemetry, background-refresh diagnostics, local weather, Shortcuts automation refresh, and the animated/haptic Apply to Live Activity confirmation.
 
 ## Goal
 
@@ -207,9 +207,9 @@ Xcode error or console output:
 Screenshot / screen recording:
 ```
 
-## Current acceptance criteria — V0.4.1
+## Current acceptance criteria — V0.4.2
 
-V0.4.1 hardware validation is successful when:
+V0.4.2 hardware validation is successful when:
 
 - The project builds and launches on a physical iPhone.
 - All current metric cards render correctly.
@@ -265,7 +265,7 @@ V0.4.1 hardware validation is successful when:
 
 ## All-metric background refresh test
 
-1. Install the current Islemetry 0.4.1 build on a physical iPhone.
+1. Install the current Islemetry 0.4.2 build on a physical iPhone.
 2. Start a Live Activity with metrics that are easy to observe changing, such as Battery, Power, Thermal, Network, Storage Free, and Local Temperature.
 3. Confirm foreground refresh continues approximately every 3 seconds.
 4. Send Islemetry to the background; do not force-quit it.
