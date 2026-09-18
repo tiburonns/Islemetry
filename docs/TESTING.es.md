@@ -1,12 +1,12 @@
-# Islemetry V0.2 — Plan de pruebas en dispositivo real
+# Islemetry V0.4.2 — Plan de pruebas en dispositivo real
 
 **Español** · [English](TESTING.md)
 
-Esta lista valida la compilación actual de Islemetry en un iPhone físico con Isla Dinámica. V0.1 ya fue compilada e instalada correctamente en hardware real; V0.2 agrega contenido configurable en la Isla Dinámica, telemetría ampliada, vista previa en Inicio, controles de idioma y apariencia, y color personalizado para el texto de la Isla Dinámica.
+Esta lista valida la compilación actual de Islemetry 0.4.2 en un iPhone físico con Isla Dinámica. Incluye la experiencia configurable de versiones anteriores, telemetría actual, diagnósticos de actualización en segundo plano, clima local, automatizaciones mediante Atajos y el flujo actual de Live Activity.
 
 ## Objetivo
 
-Validar que Islemetry compile, abra correctamente, recopile telemetría, muestre una vista previa fiel de la distribución y color guardados para la Isla Dinámica, cambie de idioma y apariencia sin reiniciar y pueda crear, actualizar y detener correctamente la Live Activity tanto en la pantalla bloqueada como en la Isla Dinámica.
+Validar que Islemetry compile, abra correctamente, recopile telemetría, aplique fielmente la configuración guardada de la Isla Dinámica, cambie de idioma y apariencia sin reiniciar, refresque mediante las rutas soportadas de primer plano/segundo plano/automatización y pueda crear, actualizar y detener correctamente la Live Activity tanto en la pantalla bloqueada como en la Isla Dinámica.
 
 ## Entorno de prueba
 
@@ -207,9 +207,9 @@ Error de Xcode o salida de consola:
 Captura / grabación de pantalla:
 ```
 
-## Criterios de aceptación de V0.2
+## Criterios de aceptación actuales — V0.4.2
 
-La validación de hardware de V0.2 se considera exitosa cuando:
+La validación de hardware de V0.4.2 se considera exitosa cuando:
 
 - El proyecto compila y abre en un iPhone físico.
 - Todas las tarjetas de métricas actuales se muestran correctamente.
@@ -265,7 +265,7 @@ La validación de hardware de V0.2 se considera exitosa cuando:
 
 ## Prueba de actualización completa en segundo plano
 
-1. Instala Islemetry 0.3.1 en un iPhone físico.
+1. Instala la compilación actual de Islemetry 0.4.2 en un iPhone físico.
 2. Inicia una Live Activity con métricas fáciles de observar, por ejemplo Batería, Energía, Térmico, Red, Almacenamiento libre y Temperatura local.
 3. Confirma que en primer plano continúe la actualización aproximadamente cada 3 segundos.
 4. Envía Islemetry a segundo plano; no la cierres a la fuerza.
@@ -296,7 +296,7 @@ La validación de hardware de V0.2 se considera exitosa cuando:
 
 ## Prueba física de automatizaciones de Atajos
 
-Esta prueba debe realizarse en un iPhone físico con Islemetry 0.4.0 instalada.
+Esta prueba debe realizarse en un iPhone físico con la compilación actual de Islemetry 0.4.2 instalada.
 
 1. Abre Islemetry al menos una vez y activa una Live Activity.
 2. En la tarjeta **Automatizaciones de Atajos**, toca el botón de Atajos.
