@@ -182,9 +182,9 @@ When functionality, architecture, installation, privacy, or release behavior cha
 
 1. **V0.1** — Core device snapshot + Dynamic Island Live Activity ✅ hardware validated
 2. **V0.2** — Configurable Dynamic Island + expanded telemetry + preview + language and appearance controls ✅ released
-3. **V0.3** — Profiles + Shortcuts / App Intents
-4. **V0.4** — Network diagnostics and richer telemetry
-5. **V0.5** — HealthKit and richer environmental modules
+3. **V0.3** — Foreground auto-refresh, local weather/location, system-managed background refresh, and background diagnostics ✅ released
+4. **V0.4** — Shortcuts/App Intents automation refresh plus Live Activity workflow refinements ✅ released
+5. **V0.5** — Profiles, richer environmental modules, and further automation/polish
 6. **V1.0** — Polished App Store-ready release
 
 ## Logo
