@@ -11,6 +11,12 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Validate release contract
+        run: |
+          plutil -lint Islemetry/Info.plist
+          plutil -lint Islemetry/PrivacyInfo.xcprivacy
+          plutil -lint IslemetryWidgets/Info.plist
+          python3 script/validate_release_contract.py
       - name: Build for Simulator
         run: >-
           xcodebuild
