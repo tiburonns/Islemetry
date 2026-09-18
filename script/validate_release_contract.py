@@ -68,6 +68,31 @@ build_versions = set(re.findall(r"CURRENT_PROJECT_VERSION = ([0-9]+);", project)
 require(len(marketing_versions) == 1, f"app/widget marketing versions diverge: {sorted(marketing_versions)}")
 require(len(build_versions) == 1, f"app/widget build versions diverge: {sorted(build_versions)}")
 
+current_version = next(iter(marketing_versions))
+current_build = next(iter(build_versions))
+
+readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
+readme_es = (ROOT / "README.es.md").read_text(encoding="utf-8")
+testing_en = (ROOT / "docs/TESTING.md").read_text(encoding="utf-8")
+testing_es = (ROOT / "docs/TESTING.es.md").read_text(encoding="utf-8")
+
+require(
+    f"V{current_version} (build {current_build})" in readme_en,
+    "English README development version does not match the Xcode project",
+)
+require(
+    f"V{current_version} (build {current_build})" in readme_es,
+    "Spanish README development version does not match the Xcode project",
+)
+require(
+    testing_en.startswith(f"# Islemetry V{current_version} "),
+    "English physical test plan version does not match the Xcode project",
+)
+require(
+    testing_es.startswith(f"# Islemetry V{current_version} "),
+    "Spanish physical test plan version does not match the Xcode project",
+)
+
 apps = source.get("apps", [])
 require(len(apps) == 1, "AltStore source must contain exactly one Islemetry app")
 app = apps[0]
@@ -82,6 +107,6 @@ for item in versions:
 
 print(
     "PASS: Islemetry release contract — "
-    f"app/widget {next(iter(marketing_versions))} build {next(iter(build_versions))}, "
+    f"app/widget {current_version} build {current_build}, "
     f"{len(versions)} distributed AltStore version(s)"
 )
