@@ -31,22 +31,29 @@ struct RefreshIslemetryIntent: AppIntent {
         }
 
         let telemetry = DeviceTelemetryStore()
-        let didUpdateActivity = await telemetry.refreshAllForBackground()
+        let outcome = await telemetry.refreshAllForBackground()
 
-        guard !Task.isCancelled else {
+        guard !Task.isCancelled, !outcome.cancelled else {
             defaults.set("cancelled", forKey: Self.lastResultKey)
             return .result(dialog: "Islemetry refresh was cancelled.")
         }
 
         defaults.set(Date().timeIntervalSince1970, forKey: Self.lastCompletedKey)
         defaults.set(
-            didUpdateActivity ? "success" : "noActivity",
+            outcome.persistenceToken,
             forKey: Self.lastResultKey
         )
 
-        if didUpdateActivity {
+        switch outcome.persistenceToken {
+        case "success":
             return .result(dialog: "Islemetry telemetry refreshed.")
-        } else {
+        case "partialWeatherFailure":
+            return .result(dialog: "The Live Activity was updated, but weather could not be refreshed.")
+        case "weatherOnly":
+            return .result(dialog: "Weather and telemetry were refreshed, but no active Islemetry Live Activity was available to update.")
+        case "weatherFailed":
+            return .result(dialog: "Telemetry refreshed, but weather failed and no active Islemetry Live Activity was available.")
+        default:
             return .result(dialog: "Telemetry refreshed, but no active Islemetry Live Activity was available to update.")
         }
     }
