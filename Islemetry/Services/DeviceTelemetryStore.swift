@@ -90,7 +90,9 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
         systemObservers = names.map { name in
             center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
                 Task { @MainActor [weak self] in
-                    self?.refresh()
+                    guard let self else { return }
+                    self.refresh()
+                    await self.pushSnapshotToLiveActivity()
                 }
             }
         }
@@ -171,22 +173,24 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
         }
     }
 
-    func refreshAllForBackground() async {
-        guard !Task.isCancelled else { return }
+    @discardableResult
+    func refreshAllForBackground() async -> Bool {
+        guard !Task.isCancelled else { return false }
 
-        // NWPathMonitor exposes the latest cached path synchronously. Applying
-        // it here avoids an arbitrary sleep when this store is created solely
-        // for a background refresh or App Intent.
+        // Apply the currently observed path immediately. The monitor callback
+        // will publish another snapshot if the path changes after this point.
         applyNetworkPath(pathMonitor.currentPath)
         refresh()
-        await pushSnapshotToLiveActivity()
+        let didUpdateActivity = await pushSnapshotToLiveActivity()
 
-        guard !Task.isCancelled else { return }
+        guard !Task.isCancelled else { return false }
 
         if isLocationAuthorized,
            let location = locationManager.location {
             await updateWeather(for: location, force: false)
         }
+
+        return didUpdateActivity
     }
 
     func locationAuthorizationDescription(language: AppLanguage) -> String {
@@ -482,9 +486,10 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
             .current
     }
 
-    private func pushSnapshotToLiveActivity() async {
+    @discardableResult
+    private func pushSnapshotToLiveActivity() async -> Bool {
         let manager = LiveActivityManager()
-        await manager.update(
+        return await manager.update(
             with: metrics,
             configuration: .current
         )
@@ -563,6 +568,7 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
                 guard let self else { return }
                 self.applyNetworkPath(path)
                 self.refresh()
+                await self.pushSnapshotToLiveActivity()
             }
         }
         pathMonitor.start(queue: monitorQueue)
