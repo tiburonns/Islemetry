@@ -312,15 +312,21 @@ struct ContentView: View {
                     backgroundActionMessage = nil
 
                     Task {
-                        await BackgroundRefreshCoordinator.shared.runManualRefresh(
-                            using: telemetry
-                        )
+                        let didUpdateActivity =
+                            await BackgroundRefreshCoordinator.shared.runManualRefresh(
+                                using: telemetry
+                            )
 
                         isManualRefreshRunning = false
-                        backgroundActionMessage = language.text(
-                            "Full snapshot sent to the existing Live Activity.",
-                            "Snapshot completo enviado a la Live Activity existente."
-                        )
+                        backgroundActionMessage = didUpdateActivity
+                            ? language.text(
+                                "Full snapshot sent to the existing Live Activity.",
+                                "Snapshot completo enviado a la Live Activity existente."
+                            )
+                            : language.text(
+                                "Telemetry refreshed, but there is no active Live Activity to update.",
+                                "La telemetría se actualizó, pero no hay una Live Activity activa que actualizar."
+                            )
                     }
                 } label: {
                     if isManualRefreshRunning {
@@ -379,6 +385,8 @@ struct ContentView: View {
             return language.text("Running", "Ejecutándose")
         case "success":
             return language.text("Success", "Correcto")
+        case "noActivity":
+            return language.text("No active Live Activity", "Sin Live Activity activa")
         case "cancelled":
             return language.text("Cancelled", "Cancelado")
         default:
@@ -396,6 +404,8 @@ struct ContentView: View {
             return language.text("Cancelled", "Cancelado")
         case "expired":
             return language.text("Expired", "Expiró")
+        case "noActivity":
+            return language.text("No active Live Activity", "Sin Live Activity activa")
         default:
             return language.text("Never", "Nunca")
         }
@@ -498,6 +508,8 @@ struct ContentView: View {
             return language.text("Cancelled", "Cancelado")
         case "failed":
             return language.text("Failed", "Falló")
+        case "noActivity":
+            return language.text("No active Live Activity", "Sin Live Activity activa")
         default:
             return language.text("Never", "Nunca")
         }
