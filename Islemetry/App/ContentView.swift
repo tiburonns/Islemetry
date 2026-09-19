@@ -387,6 +387,12 @@ struct ContentView: View {
             return language.text("Success", "Correcto")
         case "noActivity":
             return language.text("No active Live Activity", "Sin Live Activity activa")
+        case "weatherOnly":
+            return language.text("Weather refreshed; no active Live Activity", "Clima actualizado; sin Live Activity activa")
+        case "weatherFailed":
+            return language.text("Weather refresh failed; no active Live Activity", "Falló la actualización del clima; sin Live Activity activa")
+        case "partialWeatherFailure":
+            return language.text("Live Activity updated; weather failed", "Live Activity actualizada; falló el clima")
         case "cancelled":
             return language.text("Cancelled", "Cancelado")
         default:
@@ -406,6 +412,12 @@ struct ContentView: View {
             return language.text("Expired", "Expiró")
         case "noActivity":
             return language.text("No active Live Activity", "Sin Live Activity activa")
+        case "weatherOnly":
+            return language.text("Weather refreshed; no active Live Activity", "Clima actualizado; sin Live Activity activa")
+        case "weatherFailed":
+            return language.text("Weather refresh failed; no active Live Activity", "Falló la actualización del clima; sin Live Activity activa")
+        case "partialWeatherFailure":
+            return language.text("Live Activity updated; weather failed", "Live Activity actualizada; falló el clima")
         default:
             return language.text("Never", "Nunca")
         }
