@@ -158,9 +158,9 @@ final class BackgroundRefreshCoordinator {
             return false
         }
 
-        let didUpdateActivity = await telemetry.refreshAllForBackground()
+        let outcome = await telemetry.refreshAllForBackground()
 
-        guard !Task.isCancelled else {
+        guard !Task.isCancelled, !outcome.cancelled else {
             defaults.set(
                 "cancelled",
                 forKey: Self.lastManualResultKey
@@ -173,10 +173,10 @@ final class BackgroundRefreshCoordinator {
             forKey: Self.lastManualCompletedKey
         )
         defaults.set(
-            didUpdateActivity ? "success" : "noActivity",
+            outcome.persistenceToken,
             forKey: Self.lastManualResultKey
         )
-        return didUpdateActivity
+        return outcome.liveActivityUpdated
     }
 
     private func handle(_ task: BGAppRefreshTask) {
@@ -209,9 +209,12 @@ final class BackgroundRefreshCoordinator {
         }
 
         Task {
-            let didUpdateActivity = await work.value
+            let outcome = await work.value
             let expired = executionState.didExpire
-            let completedNormally = !work.isCancelled && !expired
+            let completedNormally =
+                !work.isCancelled
+                && !expired
+                && !outcome.cancelled
 
             if completedNormally {
                 defaults.set(
@@ -219,7 +222,7 @@ final class BackgroundRefreshCoordinator {
                     forKey: Self.lastCompletedKey
                 )
                 defaults.set(
-                    didUpdateActivity ? "success" : "noActivity",
+                    outcome.persistenceToken,
                     forKey: Self.lastResultKey
                 )
             } else if !expired {
