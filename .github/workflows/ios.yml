@@ -17,6 +17,8 @@ jobs:
           plutil -lint Islemetry/PrivacyInfo.xcprivacy
           plutil -lint IslemetryWidgets/Info.plist
           python3 script/validate_release_contract.py
+      - name: Portable core tests
+        run: zsh Tests/run-core-tests.sh
       - name: Build for Simulator
         run: >-
           xcodebuild
