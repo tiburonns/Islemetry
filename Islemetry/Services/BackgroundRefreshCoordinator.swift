@@ -1,6 +1,23 @@
 import BackgroundTasks
 import Foundation
 
+private final class BackgroundExecutionState: @unchecked Sendable {
+    private let lock = NSLock()
+    private var expired = false
+
+    func markExpired() {
+        lock.lock()
+        expired = true
+        lock.unlock()
+    }
+
+    var didExpire: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return expired
+    }
+}
+
 final class BackgroundRefreshCoordinator {
     static let shared = BackgroundRefreshCoordinator()
     static let taskIdentifier = "com.tiburonns.islemetry.refresh"
@@ -121,7 +138,8 @@ final class BackgroundRefreshCoordinator {
     }
 
     @MainActor
-    func runManualRefresh(using telemetry: DeviceTelemetryStore) async {
+    @discardableResult
+    func runManualRefresh(using telemetry: DeviceTelemetryStore) async -> Bool {
         let defaults = UserDefaults.standard
         defaults.set(
             Date().timeIntervalSince1970,
@@ -137,17 +155,17 @@ final class BackgroundRefreshCoordinator {
                 "cancelled",
                 forKey: Self.lastManualResultKey
             )
-            return
+            return false
         }
 
-        await telemetry.refreshAllForBackground()
+        let didUpdateActivity = await telemetry.refreshAllForBackground()
 
         guard !Task.isCancelled else {
             defaults.set(
                 "cancelled",
                 forKey: Self.lastManualResultKey
             )
-            return
+            return false
         }
 
         defaults.set(
@@ -155,9 +173,10 @@ final class BackgroundRefreshCoordinator {
             forKey: Self.lastManualCompletedKey
         )
         defaults.set(
-            "success",
+            didUpdateActivity ? "success" : "noActivity",
             forKey: Self.lastManualResultKey
         )
+        return didUpdateActivity
     }
 
     private func handle(_ task: BGAppRefreshTask) {
@@ -174,12 +193,14 @@ final class BackgroundRefreshCoordinator {
 
         schedule()
 
+        let executionState = BackgroundExecutionState()
         let work = Task { @MainActor in
             let telemetry = DeviceTelemetryStore()
-            await telemetry.refreshAllForBackground()
+            return await telemetry.refreshAllForBackground()
         }
 
         task.expirationHandler = {
+            executionState.markExpired()
             defaults.set(
                 "expired",
                 forKey: Self.lastResultKey
@@ -188,19 +209,27 @@ final class BackgroundRefreshCoordinator {
         }
 
         Task {
-            await work.value
+            let didUpdateActivity = await work.value
+            let expired = executionState.didExpire
+            let completedNormally = !work.isCancelled && !expired
 
-            let success = !work.isCancelled
-            defaults.set(
-                Date().timeIntervalSince1970,
-                forKey: Self.lastCompletedKey
-            )
-            defaults.set(
-                success ? "success" : "cancelled",
-                forKey: Self.lastResultKey
-            )
+            if completedNormally {
+                defaults.set(
+                    Date().timeIntervalSince1970,
+                    forKey: Self.lastCompletedKey
+                )
+                defaults.set(
+                    didUpdateActivity ? "success" : "noActivity",
+                    forKey: Self.lastResultKey
+                )
+            } else if !expired {
+                defaults.set(
+                    "cancelled",
+                    forKey: Self.lastResultKey
+                )
+            }
 
-            task.setTaskCompleted(success: success)
+            task.setTaskCompleted(success: completedNormally)
         }
     }
 }
