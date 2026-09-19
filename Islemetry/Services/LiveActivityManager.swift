@@ -98,18 +98,19 @@ final class LiveActivityManager: ObservableObject {
         }
     }
 
+    @discardableResult
     func update(
         with metrics: [DeviceMetric],
         configuration: IslandConfiguration = .current,
         onlyIfChanged: Bool = false
-    ) async {
+    ) async -> Bool {
         let state = makeContentState(from: metrics, configuration: configuration)
 
         if onlyIfChanged,
            let lastPublishedState,
            hasSameVisiblePayload(lastPublishedState, state) {
             activeActivityID = Activity<DeviceActivityAttributes>.activities.first?.id
-            return
+            return activeActivityID != nil
         }
 
         let content = ActivityContent(
@@ -124,6 +125,7 @@ final class LiveActivityManager: ObservableObject {
         activeActivityID = Activity<DeviceActivityAttributes>.activities.first?.id
         lastPublishedState = activeActivityID == nil ? nil : state
         lastError = nil
+        return activeActivityID != nil
     }
 
     func stop() async {
@@ -132,6 +134,7 @@ final class LiveActivityManager: ObservableObject {
         }
         activeActivityID = nil
         lastPublishedState = nil
+        lastError = nil
     }
 
     func syncState() {
