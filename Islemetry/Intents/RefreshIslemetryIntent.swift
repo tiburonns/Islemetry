@@ -31,7 +31,7 @@ struct RefreshIslemetryIntent: AppIntent {
         }
 
         let telemetry = DeviceTelemetryStore()
-        await telemetry.refreshAllForBackground()
+        let didUpdateActivity = await telemetry.refreshAllForBackground()
 
         guard !Task.isCancelled else {
             defaults.set("cancelled", forKey: Self.lastResultKey)
@@ -39,9 +39,16 @@ struct RefreshIslemetryIntent: AppIntent {
         }
 
         defaults.set(Date().timeIntervalSince1970, forKey: Self.lastCompletedKey)
-        defaults.set("success", forKey: Self.lastResultKey)
+        defaults.set(
+            didUpdateActivity ? "success" : "noActivity",
+            forKey: Self.lastResultKey
+        )
 
-        return .result(dialog: "Islemetry telemetry refreshed.")
+        if didUpdateActivity {
+            return .result(dialog: "Islemetry telemetry refreshed.")
+        } else {
+            return .result(dialog: "Telemetry refreshed, but no active Islemetry Live Activity was available to update.")
+        }
     }
 }
 
