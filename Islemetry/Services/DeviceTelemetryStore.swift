@@ -4,7 +4,7 @@ import Network
 import UIKit
 
 @MainActor
-final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerDelegate {
+final class DeviceTelemetryStore: NSObject, ObservableObject, @preconcurrency CLLocationManagerDelegate {
     static let backgroundLocationKey = "location.backgroundEnabled"
 
     @Published private(set) var metrics: [DeviceMetric] = []
