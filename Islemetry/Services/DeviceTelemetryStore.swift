@@ -174,8 +174,8 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
     }
 
     @discardableResult
-    func refreshAllForBackground() async -> Bool {
-        guard !Task.isCancelled else { return false }
+    func refreshAllForBackground() async -> BackgroundRefreshOutcome {
+        guard !Task.isCancelled else { return .cancelled }
 
         // Apply the currently observed path immediately. The monitor callback
         // will publish another snapshot if the path changes after this point.
@@ -183,14 +183,29 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
         refresh()
         let didUpdateActivity = await pushSnapshotToLiveActivity()
 
-        guard !Task.isCancelled else { return false }
+        guard !Task.isCancelled else { return .cancelled }
 
+        var weatherResult: WeatherRefreshResult = .notAttempted
         if isLocationAuthorized,
            let location = locationManager.location {
-            await updateWeather(for: location, force: false)
+            weatherResult = await updateWeather(
+                for: location,
+                force: false
+            )
         }
 
-        return didUpdateActivity
+        guard !Task.isCancelled else {
+            return BackgroundRefreshOutcome(
+                liveActivityUpdated: didUpdateActivity,
+                weather: weatherResult,
+                cancelled: true
+            )
+        }
+
+        return BackgroundRefreshOutcome(
+            liveActivityUpdated: didUpdateActivity,
+            weather: weatherResult
+        )
     }
 
     func locationAuthorizationDescription(language: AppLanguage) -> String {
@@ -383,11 +398,15 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
         refresh()
     }
 
-    private func updateWeather(for location: CLLocation, force: Bool) async {
+    @discardableResult
+    private func updateWeather(
+        for location: CLLocation,
+        force: Bool
+    ) async -> WeatherRefreshResult {
         if weatherRefreshInFlight {
             refresh()
             await pushSnapshotToLiveActivity()
-            return
+            return .inFlight
         }
 
         if !force,
@@ -397,7 +416,7 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
            location.distance(from: lastWeatherLocation) < 5_000 {
             refresh()
             await pushSnapshotToLiveActivity()
-            return
+            return .cached
         }
 
         weatherRefreshInFlight = true
@@ -420,10 +439,12 @@ final class DeviceTelemetryStore: NSObject, ObservableObject, CLLocationManagerD
 
             refresh()
             await pushSnapshotToLiveActivity()
+            return .refreshed
         } catch {
             weatherStatusMessage = error.localizedDescription
             refresh()
             await pushSnapshotToLiveActivity()
+            return .failed
         }
     }
 
