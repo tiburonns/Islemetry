@@ -23,6 +23,7 @@
 		A1000000000000000000000E /* RefreshIslemetryIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000010 /* RefreshIslemetryIntent.swift */; };
 		A1000000000000000000000F /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000011 /* Localizable.xcstrings */; };
 		A10000000000000000000010 /* BackgroundRefreshOutcome.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000012 /* BackgroundRefreshOutcome.swift */; };
+		A10000000000000000000011 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = V10000000000000000000001 /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,6 +69,8 @@
 		F10000000000000000000010 /* RefreshIslemetryIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshIslemetryIntent.swift; sourceTree = "<group>"; };
 		F10000000000000000000011 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		F10000000000000000000012 /* BackgroundRefreshOutcome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundRefreshOutcome.swift; sourceTree = "<group>"; };
+		F10000000000000000000013 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		F10000000000000000000014 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -149,6 +152,7 @@
 			children = (
 				F1000000000000000000000D /* Assets.xcassets */,
 				F10000000000000000000011 /* Localizable.xcstrings */,
+				V10000000000000000000001 /* InfoPlist.strings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -220,7 +224,7 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		R10000000000000000000001 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A1000000000000000000000B /* Assets.xcassets in Resources */, A1000000000000000000000C /* PrivacyInfo.xcprivacy in Resources */, A1000000000000000000000F /* Localizable.xcstrings in Resources */, ); runOnlyForDeploymentPostprocessing = 0; };
+		R10000000000000000000001 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A1000000000000000000000B /* Assets.xcassets in Resources */, A1000000000000000000000C /* PrivacyInfo.xcprivacy in Resources */, A1000000000000000000000F /* Localizable.xcstrings in Resources */, A10000000000000000000011 /* InfoPlist.strings in Resources */, ); runOnlyForDeploymentPostprocessing = 0; };
 		R10000000000000000000002 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
@@ -260,6 +264,18 @@
 			targetProxy = C10000000000000000000001 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		V10000000000000000000001 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F10000000000000000000013 /* en */,
+				F10000000000000000000014 /* es */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		B10000000000000000000001 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {CLANG_ENABLE_MODULES = YES; DEBUG_INFORMATION_FORMAT = dwarf; ENABLE_TESTABILITY = YES; GCC_C_LANGUAGE_STANDARD = gnu17; IPHONEOS_DEPLOYMENT_TARGET = 17.0; ONLY_ACTIVE_ARCH = YES; SDKROOT = iphoneos; SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)"; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; }; name = Debug; };

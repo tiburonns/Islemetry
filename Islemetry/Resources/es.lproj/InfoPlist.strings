@@ -1,0 +1,2 @@
+"NSLocationWhenInUseUsageDescription" = "Islemetry usa tu ubicación para mostrar el clima local en la Isla Dinámica.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "Islemetry usa la ubicación en segundo plano solo cuando la activas, para actualizar el clima local al cambiar de zona.";

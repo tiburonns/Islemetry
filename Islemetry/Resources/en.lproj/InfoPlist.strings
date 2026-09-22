@@ -1,0 +1,2 @@
+"NSLocationWhenInUseUsageDescription" = "Islemetry uses your location to show local weather in the Dynamic Island.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "Islemetry uses background location only when you enable it, so local weather can refresh as your area changes.";

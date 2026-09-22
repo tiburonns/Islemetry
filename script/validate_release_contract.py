@@ -40,6 +40,28 @@ require(
     "background location disclosure is missing",
 )
 
+for locale in ("en", "es"):
+    info_strings = ROOT / "Islemetry" / "Resources" / f"{locale}.lproj" / "InfoPlist.strings"
+    require(info_strings.exists(), f"{locale} InfoPlist.strings is missing")
+    localized = info_strings.read_text(encoding="utf-8")
+    require(
+        '"NSLocationWhenInUseUsageDescription"' in localized,
+        f"{locale} when-in-use location localization is missing",
+    )
+    require(
+        '"NSLocationAlwaysAndWhenInUseUsageDescription"' in localized,
+        f"{locale} background location localization is missing",
+    )
+
+require(
+    " / " not in info.get("NSLocationWhenInUseUsageDescription", ""),
+    "when-in-use disclosure must not combine multiple languages",
+)
+require(
+    " / " not in info.get("NSLocationAlwaysAndWhenInUseUsageDescription", ""),
+    "background disclosure must not combine multiple languages",
+)
+
 require(privacy.get("NSPrivacyTracking") is False, "privacy manifest must declare no tracking")
 
 required_reasons = {}
