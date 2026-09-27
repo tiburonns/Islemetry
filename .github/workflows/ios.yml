@@ -21,14 +21,26 @@ jobs:
           python3 script/validate_release_contract.py
       - name: Portable core tests
         run: zsh Tests/run-core-tests.sh
-      - name: Build for Simulator
+      - name: Build Release for Simulator
         run: >-
           xcodebuild
           -project Islemetry.xcodeproj
           -scheme Islemetry
-          -configuration Debug
+          -configuration Release
           -destination 'generic/platform=iOS Simulator'
           CODE_SIGNING_ALLOWED=NO
+          SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
+          build
+
+      - name: Build Release for iPhoneOS
+        run: >-
+          xcodebuild
+          -project Islemetry.xcodeproj
+          -scheme Islemetry
+          -configuration Release
+          -destination 'generic/platform=iOS'
+          CODE_SIGNING_ALLOWED=NO
+          SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
           build
       - name: Build unsigned AltStore IPA
         run: ./script/build_altstore_ipa.sh
