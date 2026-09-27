@@ -24,6 +24,12 @@ source = json.loads((ROOT / "altstore/source.json").read_text(encoding="utf-8"))
 project = (ROOT / "Islemetry.xcodeproj/project.pbxproj").read_text(encoding="utf-8")
 
 require(info.get("NSSupportsLiveActivities") is True, "Live Activities support is missing")
+require(
+    info.get("ITSAppUsesNonExemptEncryption") is False,
+    "ITSAppUsesNonExemptEncryption must be false unless encryption behavior changes",
+)
+require((ROOT / "LICENSE").exists(), "public repository requires LICENSE")
+require((ROOT / "docs/TESTFLIGHT.md").exists(), "TestFlight preflight documentation is missing")
 
 background_modes = set(info.get("UIBackgroundModes", []))
 require({"fetch", "location"} <= background_modes, "background modes must include fetch and location")
