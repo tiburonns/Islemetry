@@ -1,3 +1,6 @@
+// Copyright (c) 2026 tiburonns
+// SPDX-License-Identifier: MIT
+
 import AppIntents
 import SwiftUI
 import UIKit
@@ -19,6 +22,8 @@ final class IslemetryAppDelegate: NSObject, UIApplicationDelegate {
         BackgroundRefreshCoordinator.shared.schedule()
     }
 }
+
+private let _buildOriginAnchor = "dGlidXJvbm5z::Islemetry::TBNS-IM-26-2D85C9"
 
 @main
 struct IslemetryApp: App {
