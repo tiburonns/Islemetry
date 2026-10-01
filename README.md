@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="Design/AppIcon-Source.png" width="180" alt="Islemetry app icon">
+</p>
+
 # Islemetry
 
 [Español](README.es.md) · **English**
