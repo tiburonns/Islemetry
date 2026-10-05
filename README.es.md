@@ -207,3 +207,14 @@ Islemetry está en desarrollo activo y prioriza APIs públicas, comportamiento t
 En primer plano, la telemetría se actualiza cada 3 segundos mientras Islemetry está activa. Cuando la app queda suspendida, iOS no permite mantener un temporizador de 3 segundos. En su lugar, Islemetry programa un `BGAppRefreshTask`. Cada vez que iOS concede esa ventana de ejecución en segundo plano, Islemetry actualiza el **snapshot completo de telemetría** y la Live Activity existente.
 
 Si Ubicación en segundo plano está activada e iOS entrega un evento real de ubicación, ese evento también se aprovecha para actualizar **todas las métricas** y después el clima local. Ambos mecanismos son complementarios; ninguno garantiza un intervalo fijo porque iOS controla la planificación y la entrega.
+
+## Contacto, soporte y feedback
+
+¿Tienes una **duda**, **sugerencia**, encontraste un **error** o quieres compartir **feedback** sobre Islemetry? Usa el formulario de GitHub Issues del proyecto:
+
+**[Abrir formulario de contacto y feedback](https://github.com/tiburonns/Islemetry/issues/new?template=feedback.yml)**
+
+Selecciona la categoría que mejor corresponda: **Duda, Sugerencia, Error, Feedback, Compatibilidad u Otro**. Incluye la versión de la app, dispositivo/sistema y pasos para reproducir el problema cuando aplique.
+
+No publiques contraseñas, tokens, claves, direcciones privadas ni otra información personal sensible. Para vulnerabilidades de seguridad, utiliza el proceso indicado en `SECURITY.md` cuando esté disponible.
+
