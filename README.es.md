@@ -166,6 +166,12 @@ Decisiones actuales relacionadas con Required Reason APIs:
 
 Nunca deben almacenarse credenciales de firma ni material privado de cuentas Apple en este repositorio.
 
+## Contacto y feedback
+
+Para dudas, sugerencias, reportes de errores o feedback general, usa la tarjeta **Soporte y feedback** dentro de Islemetry o abre [GitHub Issues](https://github.com/tiburonns/Islemetry/issues). La app prepara el reporte y abre GitHub para que puedas revisarlo antes de publicarlo.
+
+No incluyas contraseñas, ubicación precisa, identificadores privados de red ni otra información sensible. Las vulnerabilidades de seguridad deben enviarse mediante el flujo privado **Security → Report a vulnerability** de GitHub.
+
 ## Documentación
 
 Toda la documentación importante de Islemetry se mantiene en **inglés y español**. Inglés usa el nombre predeterminado y español utiliza `.es.md`.

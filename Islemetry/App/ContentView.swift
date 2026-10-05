@@ -59,6 +59,7 @@ struct ContentView: View {
 
     @State private var isManualRefreshRunning = false
     @State private var backgroundActionMessage: String?
+    @State private var showingFeedback = false
 
     @AppStorage(IslandConfiguration.leadingKey)
     private var leadingMetricRaw = DeviceMetric.Kind.battery.rawValue
@@ -135,6 +136,7 @@ struct ContentView: View {
                     locationWeatherCard
                     appearanceCard
                     languageCard
+                    supportCard
                     metricsGrid
                 }
                 .padding()
@@ -153,6 +155,11 @@ struct ContentView: View {
                 if liveActivity.activeActivityID != nil {
                     refreshLiveActivity(startIfNeeded: false)
                 }
+            }
+        }
+        .sheet(isPresented: $showingFeedback) {
+            NavigationStack {
+                IslemetryFeedbackView(language: language)
             }
         }
     }
@@ -861,6 +868,42 @@ struct ContentView: View {
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 
+    private var supportCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label(
+                language.text("Support & Feedback", "Soporte y feedback"),
+                systemImage: "bubble.left.and.bubble.right"
+            )
+            .font(.headline)
+
+            Text(
+                language.text(
+                    "Questions, suggestions, bug reports, and general feedback can be prepared here and reviewed in GitHub before publishing.",
+                    "Puedes preparar aquí dudas, sugerencias, reportes de errores y feedback general, y revisarlos en GitHub antes de publicarlos."
+                )
+            )
+            .font(.caption)
+            .foregroundStyle(.secondary)
+
+            Button {
+                showingFeedback = true
+            } label: {
+                Label(
+                    language.text("Contact / Send feedback", "Contactar / Enviar feedback"),
+                    systemImage: "paperplane"
+                )
+            }
+
+            Link(
+                language.text("Open GitHub Issues", "Abrir Issues de GitHub"),
+                destination: URL(string: "https://github.com/tiburonns/Islemetry/issues")!
+            )
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
     private var appearanceCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Label(language.text("Appearance", "Apariencia"), systemImage: "circle.lefthalf.filled")
@@ -1232,4 +1275,120 @@ private struct IslandConfigurationView: View {
 #Preview {
     ContentView()
         .environmentObject(DeviceTelemetryStore())
+}
+
+
+private struct IslemetryFeedbackView: View {
+    private enum Category: String, CaseIterable, Identifiable {
+        case question, suggestion, bug, feedback
+        var id: String { rawValue }
+
+        func title(language: AppLanguage) -> String {
+            switch self {
+            case .question: language.text("Question", "Duda")
+            case .suggestion: language.text("Suggestion", "Sugerencia")
+            case .bug: language.text("Bug / Error", "Error")
+            case .feedback: language.text("General feedback", "Feedback general")
+            }
+        }
+
+        var issuePrefix: String {
+            switch self {
+            case .question: "Question"
+            case .suggestion: "Suggestion"
+            case .bug: "Bug"
+            case .feedback: "Feedback"
+            }
+        }
+    }
+
+    let language: AppLanguage
+
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
+    @State private var category = Category.question
+    @State private var message = ""
+
+    var body: some View {
+        Form {
+            Section(language.text("Type", "Tipo")) {
+                Picker(language.text("Category", "Categoría"), selection: $category) {
+                    ForEach(Category.allCases) { option in
+                        Text(option.title(language: language)).tag(option)
+                    }
+                }
+            }
+
+            Section(language.text("Message", "Mensaje")) {
+                TextEditor(text: $message)
+                    .frame(minHeight: 160)
+
+                Text(
+                    language.text(
+                        "Do not include passwords, precise location, network identifiers, or other sensitive information.",
+                        "No incluyas contraseñas, ubicación precisa, identificadores de red ni otra información sensible."
+                    )
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
+
+            Section {
+                Button {
+                    submit()
+                } label: {
+                    Label(
+                        language.text("Open in GitHub", "Abrir en GitHub"),
+                        systemImage: "paperplane.fill"
+                    )
+                }
+                .disabled(message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            } footer: {
+                Text(
+                    language.text(
+                        "GitHub will open so you can review and publish the report yourself.",
+                        "GitHub se abrirá para que revises y publiques el reporte tú mismo."
+                    )
+                )
+            }
+        }
+        .navigationTitle(language.text("Feedback", "Feedback"))
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button(language.text("Close", "Cerrar")) {
+                    dismiss()
+                }
+            }
+        }
+    }
+
+    private var appVersion: String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "—"
+        return "\(version) (\(build))"
+    }
+
+    private func submit() {
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = "github.com"
+        components.path = "/tiburonns/Islemetry/issues/new"
+        components.queryItems = [
+            URLQueryItem(name: "title", value: "[\(category.issuePrefix)] "),
+            URLQueryItem(
+                name: "body",
+                value: """
+                \(message)
+
+                ---
+                App: Islemetry
+                Version: \(appVersion)
+                """
+            )
+        ]
+
+        if let url = components.url {
+            openURL(url)
+        }
+    }
 }

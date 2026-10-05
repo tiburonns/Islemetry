@@ -170,6 +170,12 @@ Current Required Reason API decisions include:
 
 No signing credentials or private Apple account material should ever be committed to this repository.
 
+## Contact and feedback
+
+For questions, suggestions, bug reports, or general feedback, use the **Support & Feedback** card in Islemetry or open [GitHub Issues](https://github.com/tiburonns/Islemetry/issues). The app prepares the report and opens GitHub so you can review it before publishing.
+
+Do not include passwords, precise location, private network identifiers, or other sensitive information. Security vulnerabilities should be submitted through GitHub's private **Security → Report a vulnerability** flow.
+
 ## Documentation
 
 All important Islemetry documentation is maintained in **English and Spanish**. English uses the default filename and Spanish uses `.es.md`.
