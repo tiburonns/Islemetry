@@ -578,6 +578,12 @@ struct ContentView: View {
                 destination: URL(string: "https://github.com/tiburonns/Islemetry/issues/new?template=feedback.yml")!
             )
             .buttonStyle(.bordered)
+
+            Link(
+                language.text("Support development on Patreon", "Apoyar el desarrollo en Patreon"),
+                destination: URL(string: "https://www.patreon.com/tiburonns")!
+            )
+            .buttonStyle(.bordered)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
