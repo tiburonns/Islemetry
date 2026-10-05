@@ -211,3 +211,14 @@ Islemetry is currently an actively developed project and intentionally favors pu
 Foreground telemetry refreshes every 3 seconds while Islemetry is active. When the app is suspended, iOS does not allow Islemetry to keep a 3-second timer running. Instead, Islemetry schedules a `BGAppRefreshTask`. Whenever iOS grants that background execution window, Islemetry refreshes the **entire telemetry snapshot** and updates the existing Live Activity.
 
 If Background Location is enabled and iOS delivers a genuine location event, that event is also used as an opportunity to refresh **all metrics**, followed by local weather. These mechanisms are complementary; neither provides a guaranteed fixed background interval because iOS controls scheduling and delivery.
+
+## Contact, support, and feedback
+
+Have a **question**, **suggestion**, found a **bug**, or want to share **feedback** about Islemetry? Use the project's GitHub Issues form:
+
+**[Open the contact and feedback form](https://github.com/tiburonns/Islemetry/issues/new?template=feedback.yml)**
+
+Choose the category that best fits: **Question, Suggestion, Bug, Feedback, Compatibility, or Other**. Include the app version, device/OS, and reproduction steps when relevant.
+
+Do not post passwords, tokens, keys, private addresses, or other sensitive personal information. For security vulnerabilities, follow the process in `SECURITY.md` when available.
+
