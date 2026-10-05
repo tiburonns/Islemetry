@@ -26,7 +26,7 @@ You can choose:
 - **System / Light / Dark** app appearance
 - **All-metric background refresh** using iOS `BGAppRefreshTask`
 - Optional **background location** for additional location-driven refresh opportunities
-- Local temperature, feels-like temperature, weather condition, and latest coordinates
+- Local weather temperature, feels-like temperature, weather condition, and latest coordinates. Weather values come from Open-Meteo using the latest authorized coordinates.
 
 The same Live Activity also appears on the Lock Screen, and the app includes a Home-screen preview that mirrors the saved Dynamic Island configuration and selected telemetry color.
 
@@ -45,7 +45,7 @@ The same Live Activity also appears on the Lock Screen, and the app includes a H
 - Metric names, states, configuration UI, and Live Activity auxiliary text follow the effective language
 - Language/layout/color changes can update an already-running Live Activity
 - 31 current device/system/location/weather metrics
-- No third-party runtime dependencies
+- No third-party SDK or package runtime dependencies. Weather data is fetched from the external Open-Meteo service when location access is available.
 
 ### Metric categories
 
@@ -55,7 +55,7 @@ The same Live Activity also appears on the Lock Screen, and the app includes a H
 - **Display:** maximum refresh rate, ProMotion indication, native resolution, native scale
 - **Network:** current interface, Low Data Mode, expensive-path state, IPv4, IPv6, DNS
 - **Device / system:** hardware identifier, device model, iOS version, locale, time zone
-- **Location / weather:** latest coordinates, local temperature, feels-like temperature, current condition
+- **Location / weather:** latest coordinates, local weather temperature, feels-like temperature, current condition. These are weather values for the device's location, not the iPhone's internal temperature.
 
 ## Quick start
 
@@ -162,6 +162,8 @@ Many metrics are **snapshots**. While Islemetry is active, it automatically capt
 
 Islemetry is designed to keep device telemetry on-device whenever possible and uses public Apple frameworks.
 
+Device/system telemetry stays local to the app. When weather is requested and location permission is available, Islemetry sends the coordinates needed for that request to **Open-Meteo** to obtain local weather conditions. The weather temperature shown by Islemetry is ambient/local weather data; it is not a measurement of the iPhone's internal hardware temperature.
+
 Current Required Reason API decisions include:
 
 - Disk-space information is displayed to the user under Apple's approved reason `85F4.1`.
@@ -209,3 +211,16 @@ Islemetry is currently an actively developed project and intentionally favors pu
 Foreground telemetry refreshes every 3 seconds while Islemetry is active. When the app is suspended, iOS does not allow Islemetry to keep a 3-second timer running. Instead, Islemetry schedules a `BGAppRefreshTask`. Whenever iOS grants that background execution window, Islemetry refreshes the **entire telemetry snapshot** and updates the existing Live Activity.
 
 If Background Location is enabled and iOS delivers a genuine location event, that event is also used as an opportunity to refresh **all metrics**, followed by local weather. These mechanisms are complementary; neither provides a guaranteed fixed background interval because iOS controls scheduling and delivery.
+
+## Contact, support, and feedback
+
+Have a **question**, **suggestion**, found a **bug**, or want to share **feedback** about Islemetry? Use the project's GitHub Issues form:
+
+**[Open the contact and feedback form](https://github.com/tiburonns/Islemetry/issues/new?template=feedback.yml)**
+
+**[❤️ Support development on Patreon](https://www.patreon.com/tiburonns)**
+
+Choose the category that best fits: **Question, Suggestion, Bug, Feedback, Compatibility, or Other**. Include the app version, device/OS, and reproduction steps when relevant.
+
+Do not post passwords, tokens, keys, private addresses, or other sensitive personal information. For security vulnerabilities, follow the process in `SECURITY.md` when available.
+

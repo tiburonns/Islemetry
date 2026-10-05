@@ -135,6 +135,7 @@ struct ContentView: View {
                     locationWeatherCard
                     appearanceCard
                     languageCard
+                    supportCard
                     metricsGrid
                 }
                 .padding()
@@ -553,6 +554,40 @@ struct ContentView: View {
                 .accessibilityLabel(language.text("Stop", "Detener"))
             }
         }
+    }
+
+    private var supportCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label(
+                language.text("Support & Feedback", "Soporte y feedback"),
+                systemImage: "questionmark.bubble"
+            )
+            .font(.headline)
+
+            Text(
+                language.text(
+                    "Questions, suggestions, bug reports, compatibility notes and general feedback are handled through the Islemetry GitHub issue form.",
+                    "Las dudas, sugerencias, reportes de errores, notas de compatibilidad y feedback general se gestionan mediante el formulario de Issues de Islemetry en GitHub."
+                )
+            )
+            .font(.caption)
+            .foregroundStyle(.secondary)
+
+            Link(
+                language.text("Open feedback form", "Abrir formulario de feedback"),
+                destination: URL(string: "https://github.com/tiburonns/Islemetry/issues/new?template=feedback.yml")!
+            )
+            .buttonStyle(.bordered)
+
+            Link(
+                language.text("Support development on Patreon", "Apoyar el desarrollo en Patreon"),
+                destination: URL(string: "https://www.patreon.com/tiburonns")!
+            )
+            .buttonStyle(.bordered)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 
     private var islandConfigurationCard: some View {
