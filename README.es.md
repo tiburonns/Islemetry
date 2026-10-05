@@ -22,7 +22,7 @@ Puedes elegir:
 - Apariencia **Sistema / Clara / Oscura**
 - **Actualización de todas las métricas en segundo plano** mediante `BGAppRefreshTask` de iOS
 - **Ubicación en segundo plano** opcional como oportunidad adicional de actualización
-- Temperatura local, sensación térmica, condición meteorológica y últimas coordenadas
+- Temperatura meteorológica local, sensación térmica, condición meteorológica y últimas coordenadas. Los datos de clima provienen de Open-Meteo usando las últimas coordenadas autorizadas.
 
 La misma Live Activity también aparece en la pantalla bloqueada y la app incluye una vista previa en Inicio que refleja la configuración guardada de la Isla Dinámica y el color de telemetría elegido.
 
@@ -41,7 +41,7 @@ La misma Live Activity también aparece en la pantalla bloqueada y la app incluy
 - Nombres de métricas, estados, configuración y textos auxiliares de Live Activity según el idioma efectivo
 - Cambios de idioma/distribución/color pueden actualizar una Live Activity ya activa
 - 31 métricas actuales del dispositivo/sistema/ubicación/clima
-- Sin dependencias externas en tiempo de ejecución
+- Sin SDKs ni paquetes externos como dependencias de ejecución. Los datos meteorológicos se consultan al servicio externo Open-Meteo cuando hay acceso a ubicación.
 
 ### Categorías de métricas
 
@@ -51,7 +51,7 @@ La misma Live Activity también aparece en la pantalla bloqueada y la app incluy
 - **Pantalla:** frecuencia máxima, indicador ProMotion, resolución nativa, escala nativa
 - **Red:** interfaz actual, Low Data Mode, conexión considerada costosa, IPv4, IPv6, DNS
 - **Dispositivo / sistema:** identificador de hardware, modelo, versión de iOS, configuración regional, zona horaria
-- **Ubicación / clima:** últimas coordenadas, temperatura local, sensación térmica y condición actual
+- **Ubicación / clima:** últimas coordenadas, temperatura meteorológica local, sensación térmica y condición actual. Son datos del clima de la ubicación del dispositivo, no de la temperatura interna del iPhone.
 
 ## Inicio rápido
 
@@ -158,6 +158,8 @@ Muchas métricas son **snapshots**. Mientras Islemetry está activa, toma autom�
 
 Islemetry está diseñada para mantener la telemetría local siempre que sea posible y utiliza frameworks públicos de Apple.
 
+La telemetría del dispositivo/sistema permanece local en la app. Cuando se solicita el clima y existe permiso de ubicación, Islemetry envía a **Open-Meteo** las coordenadas necesarias para obtener las condiciones meteorológicas locales. La temperatura que muestra Islemetry es temperatura ambiental/meteorológica; no es una medición de la temperatura interna del hardware del iPhone.
+
 Decisiones actuales relacionadas con Required Reason APIs:
 
 - El espacio en disco se muestra al usuario bajo el motivo aprobado `85F4.1`.
@@ -182,9 +184,9 @@ Cuando cambien funcionalidad, arquitectura, instalación, privacidad o distribuc
 
 1. **V0.1** — Snapshot principal + Live Activity en Isla Dinámica ✅ validado en hardware
 2. **V0.2** — Isla configurable + telemetría ampliada + preview + controles de idioma y apariencia ✅ publicada
-3. **V0.3** — Perfiles + Shortcuts / App Intents
-4. **V0.4** — Diagnóstico de red y telemetría más completa
-5. **V0.5** — HealthKit y módulos ambientales más completos
+3. **V0.3** — Actualización automática en primer plano, clima/ubicación local, refresco en segundo plano administrado por el sistema y diagnósticos de background ✅ publicada
+4. **V0.4** — Refresco mediante Atajos/App Intents y mejoras del flujo de Live Activity ✅ publicada
+5. **V0.5** — Perfiles, módulos ambientales más completos y más automatización/pulido
 6. **V1.0** — Release pulido y preparado para App Store
 
 ## Logo
