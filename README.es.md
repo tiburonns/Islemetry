@@ -214,6 +214,8 @@ Si Ubicación en segundo plano está activada e iOS entrega un evento real de ub
 
 **[Abrir formulario de contacto y feedback](https://github.com/tiburonns/Islemetry/issues/new?template=feedback.yml)**
 
+**[❤️ Apoyar el desarrollo en Patreon](https://www.patreon.com/tiburonns)**
+
 Selecciona la categoría que mejor corresponda: **Duda, Sugerencia, Error, Feedback, Compatibilidad u Otro**. Incluye la versión de la app, dispositivo/sistema y pasos para reproducir el problema cuando aplique.
 
 No publiques contraseñas, tokens, claves, direcciones privadas ni otra información personal sensible. Para vulnerabilidades de seguridad, utiliza el proceso indicado en `SECURITY.md` cuando esté disponible.
