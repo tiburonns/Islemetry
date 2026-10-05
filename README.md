@@ -26,7 +26,7 @@ You can choose:
 - **System / Light / Dark** app appearance
 - **All-metric background refresh** using iOS `BGAppRefreshTask`
 - Optional **background location** for additional location-driven refresh opportunities
-- Local temperature, feels-like temperature, weather condition, and latest coordinates
+- Local weather temperature, feels-like temperature, weather condition, and latest coordinates. Weather values come from Open-Meteo using the latest authorized coordinates.
 
 The same Live Activity also appears on the Lock Screen, and the app includes a Home-screen preview that mirrors the saved Dynamic Island configuration and selected telemetry color.
 
@@ -45,7 +45,7 @@ The same Live Activity also appears on the Lock Screen, and the app includes a H
 - Metric names, states, configuration UI, and Live Activity auxiliary text follow the effective language
 - Language/layout/color changes can update an already-running Live Activity
 - 31 current device/system/location/weather metrics
-- No third-party runtime dependencies
+- No third-party SDK or package runtime dependencies. Weather data is fetched from the external Open-Meteo service when location access is available.
 
 ### Metric categories
 
@@ -55,7 +55,7 @@ The same Live Activity also appears on the Lock Screen, and the app includes a H
 - **Display:** maximum refresh rate, ProMotion indication, native resolution, native scale
 - **Network:** current interface, Low Data Mode, expensive-path state, IPv4, IPv6, DNS
 - **Device / system:** hardware identifier, device model, iOS version, locale, time zone
-- **Location / weather:** latest coordinates, local temperature, feels-like temperature, current condition
+- **Location / weather:** latest coordinates, local weather temperature, feels-like temperature, current condition. These are weather values for the device's location, not the iPhone's internal temperature.
 
 ## Quick start
 
@@ -161,6 +161,8 @@ Many metrics are **snapshots**. While Islemetry is active, it automatically capt
 ## Privacy and App Store orientation
 
 Islemetry is designed to keep device telemetry on-device whenever possible and uses public Apple frameworks.
+
+Device/system telemetry stays local to the app. When weather is requested and location permission is available, Islemetry sends the coordinates needed for that request to **Open-Meteo** to obtain local weather conditions. The weather temperature shown by Islemetry is ambient/local weather data; it is not a measurement of the iPhone's internal hardware temperature.
 
 Current Required Reason API decisions include:
 
