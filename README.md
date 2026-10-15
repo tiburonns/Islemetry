@@ -162,6 +162,8 @@ Many metrics are **snapshots**. While Islemetry is active, it automatically capt
 
 Islemetry is designed to keep device telemetry on-device whenever possible and uses public Apple frameworks.
 
+The feedback section prepares an email draft with your message and app version/build. Your email app opens for review; Islemetry sends nothing until you send the message.
+
 Current Required Reason API decisions include:
 
 - Disk-space information is displayed to the user under Apple's approved reason `85F4.1`.

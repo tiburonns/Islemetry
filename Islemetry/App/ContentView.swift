@@ -59,6 +59,9 @@ struct ContentView: View {
 
     @State private var isManualRefreshRunning = false
     @State private var backgroundActionMessage: String?
+    @State private var feedbackCategory = "Suggestion"
+    @State private var feedbackMessage = ""
+    @Environment(\.openURL) private var openURL
 
     @AppStorage(IslandConfiguration.leadingKey)
     private var leadingMetricRaw = DeviceMetric.Kind.battery.rawValue
@@ -135,6 +138,7 @@ struct ContentView: View {
                     locationWeatherCard
                     appearanceCard
                     languageCard
+                    feedbackCard
                     metricsGrid
                 }
                 .padding()
@@ -886,6 +890,42 @@ struct ContentView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private var feedbackCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label(language.text("Bugs, comments & suggestions", "Errores, comentarios y sugerencias"), systemImage: "bubble.left.and.bubble.right")
+                .font(.headline)
+            Picker(language.text("Category", "Categoría"), selection: $feedbackCategory) {
+                Text(language.text("Bug", "Error")).tag("Bug")
+                Text(language.text("Comment", "Comentario")).tag("Comment")
+                Text(language.text("Suggestion", "Sugerencia")).tag("Suggestion")
+                Text(language.text("Other", "Otro")).tag("Other")
+            }
+            TextField(language.text("Message", "Mensaje"), text: $feedbackMessage, axis: .vertical)
+                .lineLimit(4...8)
+            Button(language.text("Continue in email", "Continuar en correo"), action: sendFeedback)
+                .disabled(feedbackMessage.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            Text(language.text("Your email app opens a draft. Review and send it there.", "Tu app de correo abrirá un borrador. Revísalo y envíalo desde allí."))
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private func sendFeedback() {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "unknown"
+        var components = URLComponents()
+        components.scheme = "mailto"
+        components.path = "adrianbarcenasm37@gmail.com"
+        components.queryItems = [
+            URLQueryItem(name: "subject", value: "[Islemetry] [\(feedbackCategory)]"),
+            URLQueryItem(name: "body", value: "\(feedbackMessage)\n\nIslemetry \(version) (\(build))")
+        ]
+        if let url = components.url { openURL(url) }
     }
 
     private func islandSlot(title: String, kind: DeviceMetric.Kind) -> some View {

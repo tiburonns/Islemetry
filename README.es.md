@@ -158,6 +158,8 @@ Muchas métricas son **snapshots**. Mientras Islemetry está activa, toma autom�
 
 Islemetry está diseñada para mantener la telemetría local siempre que sea posible y utiliza frameworks públicos de Apple.
 
+La sección de comentarios prepara un borrador de correo con tu mensaje y versión/compilación de la app. Tu app de correo lo abre para revisión; Islemetry no envía nada hasta que mandes el mensaje.
+
 Decisiones actuales relacionadas con Required Reason APIs:
 
 - El espacio en disco se muestra al usuario bajo el motivo aprobado `85F4.1`.
